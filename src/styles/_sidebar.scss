@@ -1,0 +1,73 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.sidebar {
+	grid-area: sidebar;
+	display: flex;
+	flex-direction: column;
+	padding: space(4) 0;
+	overflow: auto;
+	background: var(--color-panel);
+
+	.steps {
+		flex: 1;
+	}
+
+	.step {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: space(3);
+		width: 100%;
+		padding: space(3) space(6) space(3) space(10);
+		font-size: $size-large;
+		text-align: start;
+		color: var(--color-muted);
+		border: none;
+		@include interactive;
+
+		&.done {
+			color: var(--color-text);
+		}
+
+		&.active {
+			color: var(--color-accent);
+
+			&::before {
+				content: '';
+				position: absolute;
+				top: space(2);
+				bottom: space(2);
+				left: space(6);
+				width: 4px;
+				background: var(--color-accent);
+			}
+		}
+
+		.label {
+			flex: 1;
+		}
+
+		.value {
+			font-size: $size-small;
+			color: var(--color-muted);
+		}
+	}
+
+	.metrics {
+		margin: 0 space(6);
+		padding-top: space(3);
+		border-top: 1px solid var(--color-line);
+	}
+
+	.metric {
+		display: flex;
+		font-size: $size-small;
+		color: var(--color-muted);
+
+		.value {
+			margin-left: auto;
+			color: var(--color-text);
+		}
+	}
+}

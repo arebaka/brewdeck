@@ -1,0 +1,42 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+:root {
+	@include palette(nx);
+	color-scheme: dark;
+	scrollbar-color: var(--color-line) transparent;
+}
+
+* {
+	scrollbar-width: thin;
+}
+
+body {
+	font: #{$size-base}/#{$line-height} $font-sans;
+	color: var(--color-text);
+	background: var(--color-bg);
+	-webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font: inherit;
+	text-align: start;
+}
+
+ul {
+	list-style: none;
+}
+
+::selection {
+	color: var(--color-on-accent);
+	background: var(--color-accent);
+}
+
+@keyframes highlight {
+	0%, 100% {
+		box-shadow: 0 0 0 $focus-width var(--color-focus-1), 0 0 12px var(--color-focus-1);
+	}
+	50% {
+		box-shadow: 0 0 0 $focus-width var(--color-focus-2), 0 0 12px var(--color-focus-2);
+	}
+}

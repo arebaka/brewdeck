@@ -1,0 +1,197 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// Secondary button
+.control {
+	padding: space(1) space(4);
+	font-size: $size-small;
+	color: var(--color-text);
+	background: rgb(255 255 255 / 8%);
+	border: none;
+	border-radius: $radius-button;
+	@include interactive;
+}
+
+.primary {
+	align-self: flex-start;
+	padding: space(2) space(6);
+	color: var(--color-on-accent);
+	background: var(--color-accent);
+	border: none;
+	border-radius: $radius-button;
+	@include interactive;
+
+	&:hover,
+	&:focus-visible,
+	&:active {
+		background: var(--color-accent);
+	}
+}
+
+// Footer hint: button glyph and its action, as at the bottom of every Switch screen
+.hint {
+	display: flex;
+	align-items: center;
+	gap: space(2);
+	padding: space(1) space(2);
+	color: var(--color-text);
+	border: none;
+	border-radius: $radius;
+	@include interactive;
+}
+
+.glyph {
+	display: inline-grid;
+	place-items: center;
+	width: 22px;
+	height: 22px;
+	font: 700 12px/1 $font-sans;
+	color: var(--color-bg);
+	background: var(--color-text);
+	border-radius: 50%;
+}
+
+.badge {
+	padding: 0 space(2);
+	font-size: $size-small;
+	white-space: nowrap;
+	border-radius: $radius;
+	@include tinted(muted);
+
+	&.ok {
+		@include tinted(accent);
+	}
+
+	&.warning {
+		@include tinted(warning);
+	}
+
+	&.danger,
+	&.required {
+		@include tinted(danger);
+	}
+}
+
+.choices {
+	display: flex;
+	flex-wrap: wrap;
+	gap: space(2);
+}
+
+.choice {
+	padding: 1px space(3);
+	font-size: $size-small;
+	color: var(--color-text);
+	background: rgb(255 255 255 / 7%);
+	border-radius: 999px;
+	@include interactive;
+
+	&.active,
+	&.active:hover,
+	&.active:focus-visible {
+		color: var(--color-on-accent);
+		background: var(--color-accent);
+	}
+}
+
+// Notices with a colored bar, like hints of the system settings
+.warnings,
+.advices {
+	display: flex;
+	flex-direction: column;
+	gap: space(1);
+	padding: space(3) space(4);
+	border-left: 4px solid var(--color-warning);
+	background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+
+	.heading {
+		color: var(--color-warning);
+	}
+}
+
+.advices {
+	border-left-color: var(--color-accent);
+	background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.code {
+	max-height: 480px;
+	padding: space(4);
+	overflow: auto;
+	font: #{$size-small}/1.6 $font-mono;
+	white-space: pre;
+	color: var(--color-text);
+	background: var(--color-sunken);
+	border-radius: $radius;
+}
+
+// The track is drawn by hand, native ones follow the OS theme; --fill is the filled share
+.range {
+	--fill: 0%;
+	width: 100%;
+	height: 6px;
+	appearance: none;
+	background: linear-gradient(to right, var(--color-accent) var(--fill), var(--color-line) var(--fill));
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+
+	&::-webkit-slider-thumb {
+		appearance: none;
+		width: 18px;
+		height: 18px;
+		background: var(--color-text);
+		border: 3px solid var(--color-bg);
+		border-radius: 50%;
+	}
+
+	&::-moz-range-thumb {
+		width: 12px;
+		height: 12px;
+		background: var(--color-text);
+		border: 3px solid var(--color-bg);
+		border-radius: 50%;
+	}
+
+	// Firefox draws its own track over the background
+	&::-moz-range-track {
+		background: transparent;
+		border: none;
+	}
+
+	&.hue {
+		background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+	}
+}
+
+.color {
+	width: 44px;
+	height: 26px;
+	padding: 0;
+	border: none;
+	border-radius: $radius;
+	cursor: pointer;
+
+	&::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+
+	// Vendor pseudo-elements in one selector list would drop the whole rule
+	&::-webkit-color-swatch {
+		border: none;
+		border-radius: $radius;
+	}
+
+	&::-moz-color-swatch {
+		border: none;
+		border-radius: $radius;
+	}
+}
+
+.swatch {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: space(1);
+	border-radius: 50%;
+}

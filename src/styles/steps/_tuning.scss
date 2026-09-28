@@ -1,0 +1,38 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.tuning {
+	display: flex;
+	flex-direction: column;
+	gap: space(2);
+
+	> .header {
+		display: flex;
+		align-items: center;
+		gap: space(3);
+
+		.title {
+			flex: 1;
+			@include section-title;
+		}
+
+		.file {
+			font: #{$size-small} $font-mono;
+			color: var(--color-muted);
+		}
+	}
+
+	> .description {
+		font-size: $size-small;
+		color: var(--color-muted);
+	}
+
+	// A group waiting for its component fades as a whole, without fading its rows twice
+	&.disabled {
+		opacity: .45;
+
+		.row.disabled {
+			opacity: 1;
+		}
+	}
+}

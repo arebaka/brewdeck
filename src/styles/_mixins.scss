@@ -1,0 +1,45 @@
+@use 'sass:map';
+@use 'tokens' as *;
+
+@mixin palette($name) {
+	@each $key, $value in map.get($palettes, $name) {
+		--color-#{$key}: #{$value};
+	}
+}
+
+// Pulsing frame of the focused element, as in the Switch system UI
+@mixin highlight {
+	position: relative;
+	z-index: 1;
+	background-color: var(--color-focus-bg);
+	animation: highlight 1.4s ease-in-out infinite;
+}
+
+// Hover and keyboard focus get the highlight, a press flashes like on the console
+@mixin interactive {
+	cursor: pointer;
+
+	&:hover,
+	&:focus-visible {
+		@include highlight;
+	}
+
+	&:active {
+		background-color: color-mix(in srgb, var(--color-focus-1) 20%, var(--color-focus-bg));
+	}
+}
+
+// List header with a gray bar in front
+@mixin section-title {
+	display: flex;
+	align-items: center;
+	gap: space(2);
+	font-size: $size-large;
+	color: var(--color-text);
+	border-bottom: 1px solid var(--color-muted);
+}
+
+@mixin tinted($color) {
+	color: var(--color-#{$color});
+	background: color-mix(in srgb, var(--color-#{$color}) 14%, transparent);
+}

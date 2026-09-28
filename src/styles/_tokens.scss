@@ -1,0 +1,42 @@
+// Colors live in per-console palettes and reach the styles as CSS custom properties,
+// so supporting another console only takes another palette
+
+$palettes: (
+	// Nintendo Switch system UI, Basic Black theme
+	nx: (
+		bg: #2d2d2d,
+		panel: #323232,
+		sunken: #262626,
+		text: #ffffff,
+		muted: #a3a3a3,
+		line: #515151,
+		accent: #00ffcc,
+		on-accent: #342937,
+		focus-1: #198ac6,
+		focus-2: #89f1f2,
+		focus-bg: #1f2227,
+		warning: #ffb400,
+		danger: #ff6b5c,
+		logo-left: #ff3c28,
+		logo-right: #0ab9e6,
+	),
+);
+
+// Latin comes from BIZ UDPGothic, the open edition of the Switch system typeface, Cyrillic from Noto Sans
+$font-sans: 'BIZ UDPGothic', 'Noto Sans', sans-serif;
+$font-mono: 'BIZ UDGothic', monospace;
+
+$size-base: 15px;
+$size-title: 26px;
+$size-large: 17px;
+$size-small: 13px;
+$line-height: 1.65;
+
+$radius: 4px;
+$radius-button: 6px;
+$focus-width: 3px;
+$sidebar-width: 280px;
+
+@function space($steps) {
+	@return $steps * 4px;
+}

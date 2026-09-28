@@ -1,0 +1,23 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.files,
+.usage,
+.generated {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+
+	> .title {
+		@include section-title;
+	}
+}
+
+.summary .value {
+	color: var(--color-text);
+}
+
+.usage .caption {
+	font-size: $size-small;
+	color: var(--color-muted);
+}

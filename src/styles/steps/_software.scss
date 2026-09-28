@@ -1,0 +1,71 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.batch {
+	display: flex;
+	gap: space(2);
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: space(6);
+}
+
+.components {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+
+	> .title {
+		@include section-title;
+	}
+}
+
+.component {
+	gap: space(4);
+
+	// Components left out step back, so the selection reads at a glance
+	&:not(.active):not(:hover):not(:focus-visible) {
+		opacity: .6;
+	}
+
+	.logo-box {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: space(2);
+	}
+
+	.logo {
+		width: 48px;
+	}
+
+	.info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: space(1);
+	}
+
+	.header {
+		display: flex;
+		align-items: baseline;
+		gap: space(3);
+	}
+
+	.name {
+		flex: 1;
+		font-size: $size-large;
+	}
+
+	.version {
+		font: #{$size-small} $font-mono;
+		color: var(--color-muted);
+	}
+
+	.details {
+		font-size: $size-small;
+		color: var(--color-muted);
+	}
+}
