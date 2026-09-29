@@ -1,82 +1,116 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { TuningConfig, TuningGroup, TuningOption, TuningValue } from '../../types';
+import { Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '../../types';
 import { Language, Translation } from '../../i18n';
-import { COMPONENTS, TUNING, isTuningOptionActive } from '../../data';
+import { TUNING, isRequirementMet, isTuningOptionActive } from '../../data';
 import { activate } from '../../utils';
+import { Issues } from '../Issues';
+import { Buttons, isButtons } from '../Buttons';
+
+type SetTuningOption = (group: string, option: string, value: TuningValue) => void;
 
 interface TuningProps {
 	lang: Language;
+	step: 'system' | 'modules';
 	tuning: TuningConfig;
 	selectedComponentIDs: string[];
-	setTuningOption: (group: string, option: string, value: TuningValue) => void;
-	resetTuning: () => void;
+	setTuningOption: SetTuningOption;
+	resetTuning: (step: TuningStep) => void;
+	issues: Issue[];
+	applyFix: (fix: NonNullable<Issue['fix']>) => void;
 	t: Translation;
+}
+
+// Groups of the step whose components are selected
+export function tuningGroups(step: TuningStep, selectedComponentIDs: string[]): TuningGroup[] {
+	return TUNING.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, selectedComponentIDs)));
 }
 
 export function Tuning({
 	lang,
+	step,
 	tuning,
 	selectedComponentIDs,
 	setTuningOption,
 	resetTuning,
+	issues,
+	applyFix,
 	t
 }: TuningProps) {
-	return (<>
-		<header className="header">
-			<h2 className="title">
-				{t.step4.title}
-			</h2>
-			<p className="description">
-				{t.step4.description}
-			</p>
-		</header>
+	const groups = tuningGroups(step, selectedComponentIDs);
 
+	return (<>
 		<section className="batch">
 			<button
 				className="control"
-				onClick={resetTuning}>
-				{t.step4.reset}
+				onClick={() => resetTuning(step)}>
+				{t.pages.system.reset}
 			</button>
 		</section>
 
-		{TUNING.map(group => {
-			const isAvailable = !group.requires || selectedComponentIDs.includes(group.requires);
+		<Issues
+			issues={issues}
+			applyFix={applyFix}
+			t={t} />
 
-			return (
-				<section key={group.id} className={`tuning ${isAvailable ? '' : 'disabled'}`}>
-					<header className="header">
-						<h3 className="title">
-							{t.tuning[group.id].title}
-						</h3>
-						{!isAvailable && (
-							<p className="badge">
-								{t.step4.requires} {COMPONENTS.find(comp => comp.id == group.requires)?.name}
-							</p>
-						)}
-						<p className="file">
-							{group.file}
-						</p>
-					</header>
-					<p className="description">
-						{t.tuning[group.id].description}
-					</p>
-					<ul className="rows">
-						{group.options.map(option => (
-							<Option
-								key={option.id}
-								group={group}
-								option={option}
-								tuning={tuning}
-								isEnabled={isAvailable && isTuningOptionActive(group, option, tuning)}
-								setValue={value => setTuningOption(group.id, option.id, value)}
-								t={t} />
-						))}
-					</ul>
-				</section>
-			);
-		})}
+		{groups.map(group => (
+			<TuningSection
+				key={group.id}
+				group={group}
+				tuning={tuning}
+				setTuningOption={setTuningOption}
+				t={t} />
+		))}
+
+		{groups.length == 0 && (
+			<p className="empty">
+				{t.pages.modules.empty}
+			</p>
+		)}
 	</>);
+}
+
+interface TuningSectionProps {
+	group: TuningGroup;
+	tuning: TuningConfig;
+	setTuningOption: SetTuningOption;
+	t: Translation;
+}
+
+// One configuration file with its options
+export function TuningSection({
+	group,
+	tuning,
+	setTuningOption,
+	t
+}: TuningSectionProps) {
+	return (
+		<section className="tuning">
+			<header className="header">
+				<h3 className="title">
+					{t.tuning[group.id]?.title ?? group.id}
+				</h3>
+				<p className="file">
+					{group.file}
+				</p>
+			</header>
+			<p className="description">
+				{t.tuning[group.id]?.description}
+			</p>
+			<ul className="rows">
+				{group.options.map(option => (
+					<Option
+						key={option.id}
+						group={group}
+						option={option}
+						tuning={tuning}
+						isEnabled={isTuningOptionActive(group, option, tuning)}
+						setValue={value => setTuningOption(group.id, option.id, value)}
+						t={t} />
+				))}
+			</ul>
+		</section>
+	);
 }
 
 interface OptionProps {
@@ -96,7 +130,8 @@ function Option({
 	setValue,
 	t
 }: OptionProps) {
-	const text = t.tuning[group.id].options[option.id];
+	// An option added to the data before its texts shows its key instead of breaking the page
+	const text = t.tuning[group.id]?.options[option.id] ?? { title: option.id, description: '' };
 	const value = tuning[group.id][option.id];
 	const label = (value: string | number) => text.values?.[value] ?? String(value);
 	const set = (value: TuningValue) => isEnabled && setValue(value);
@@ -113,7 +148,7 @@ function Option({
 						{text.title}
 					</h4>
 					<p className={`value ${value ? 'on' : ''}`}>
-						{value ? t.step4.on : t.step4.off}
+						{value ? t.pages.system.on : t.pages.system.off}
 					</p>
 				</header>
 				<p className="description">
@@ -140,12 +175,52 @@ function Option({
 						{String(value)}
 					</p>
 				)}
+				{option.type == 'number' && (
+					<NumberField
+						value={value as number}
+						min={option.min}
+						max={option.max}
+						disabled={!isEnabled}
+						setValue={set} />
+				)}
+				{option.type == 'text' && (
+					<input
+						type={option.secret ? 'password' : 'text'}
+						className="field"
+						maxLength={option.maxLength}
+						value={value as string}
+						disabled={!isEnabled}
+						autoComplete="off"
+						spellCheck={false}
+						onChange={event => set(event.target.value)} />
+				)}
 			</header>
 			<p className="description">
 				{text.description}
 			</p>
 
-			{option.type == 'select' && (
+			{option.type == 'select' && isButtons(option.values) && (
+				<Buttons
+					values={option.values.map(String)}
+					selected={[String(value)]}
+					isEnabled={isEnabled}
+					toggle={set}
+					t={t} />
+			)}
+
+			{option.type == 'multiselect' && isButtons(option.values) && (
+				<Buttons
+					values={option.values}
+					selected={value as string[]}
+					isEnabled={isEnabled}
+					toggle={button => {
+						const selected = value as string[];
+						set(option.values.filter(item => item == button ? !selected.includes(button) : selected.includes(item)));
+					}}
+					t={t} />
+			)}
+
+			{option.type == 'select' && !isButtons(option.values) && (
 				<ul className="choices">
 					{option.values.map(v => (
 						<li
@@ -160,7 +235,7 @@ function Option({
 				</ul>
 			)}
 
-			{option.type == 'multiselect' && (
+			{option.type == 'multiselect' && !isButtons(option.values) && (
 				<ul className="choices">
 					{option.values.map(v => {
 						const selected = value as string[];
@@ -213,5 +288,44 @@ function Option({
 					onChange={event => set(event.target.value)} />
 			)}
 		</li>
+	);
+}
+
+interface NumberFieldProps {
+	value: number;
+	min: number;
+	max: number;
+	disabled: boolean;
+	setValue: (value: number) => void;
+}
+
+// The draft may leave the range while typing, only whole numbers within it reach the state
+function NumberField({
+	value,
+	min,
+	max,
+	disabled,
+	setValue
+}: NumberFieldProps) {
+	const [draft, setDraft] = useState(String(value));
+	useEffect(() => setDraft(String(value)), [value]);
+
+	return (
+		<input
+			type="number"
+			className="field number"
+			min={min}
+			max={max}
+			step={1}
+			value={draft}
+			disabled={disabled}
+			onChange={event => {
+				const number = Number(event.target.value);
+				setDraft(event.target.value);
+				if (event.target.value != '' && Number.isInteger(number) && number >= min && number <= max) {
+					setValue(number);
+				}
+			}}
+			onBlur={() => setDraft(String(value))} />
 	);
 }

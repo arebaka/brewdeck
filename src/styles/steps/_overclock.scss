@@ -1,0 +1,103 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.games {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+
+	> .title {
+		@include section-title;
+	}
+}
+
+// Game picker, title ID field and its button in one line
+.add {
+	display: flex;
+	flex-wrap: wrap;
+	gap: space(2);
+
+	select {
+		flex: 1 1 280px;
+	}
+
+	input {
+		width: 22ch;
+	}
+}
+
+.apply {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: space(2) space(3);
+
+	.caption {
+		font-size: $size-small;
+		color: var(--color-muted);
+	}
+}
+
+.profiles {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+}
+
+.game {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+	padding: space(4) space(4) space(4) space(6);
+	background: var(--color-panel);
+	border-radius: $radius;
+
+	.header {
+		display: flex;
+		align-items: baseline;
+		gap: space(3);
+	}
+
+	.name {
+		flex: 1;
+		font-size: $size-large;
+	}
+
+	.id {
+		font: #{$size-mono} $font-mono;
+		color: var(--color-muted);
+	}
+}
+
+// Modes down, modules across. Stock cells stay muted, set ones take the accent, capped ones warn
+.clocks {
+	width: 100%;
+	border-collapse: collapse;
+
+	th {
+		padding: space(1) space(3) space(1) 0;
+		font-size: $size-small;
+		font-weight: 400;
+		text-align: start;
+		white-space: nowrap;
+		color: var(--color-muted);
+	}
+
+	td {
+		width: 26%;
+		padding: space(1);
+	}
+
+	.field {
+		width: 100%;
+		color: var(--color-muted);
+
+		&.set {
+			color: var(--color-accent);
+		}
+
+		&.capped {
+			color: var(--color-warning);
+		}
+	}
+}

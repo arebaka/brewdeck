@@ -1,58 +1,52 @@
 import React from 'react';
 
-import { HardwareRevision } from '../types';
+import { IssueLevel, StepId } from '../types';
 import { Translation } from '../i18n';
 import { formatSize } from '../utils';
 
+export interface SidebarItem {
+	step: StepId;
+	value: string | number;
+	alert?: IssueLevel;
+}
+
 interface SidebarProps {
-	activeStep: number;
-	setActiveStep: (step: number) => void;
-	hardware: HardwareRevision;
-	hosVersion: string;
-	selectedComponentIDs: string[];
-	tuningChanges: number;
+	items: SidebarItem[];
+	activeStep: StepId;
+	setActiveStep: (step: StepId) => void;
 	totalSize: number;
 	t: Translation;
 }
 
 export function Sidebar({
+	items,
 	activeStep,
 	setActiveStep,
-	hardware,
-	hosVersion,
-	selectedComponentIDs,
-	tuningChanges,
 	totalSize,
 	t
 }: SidebarProps) {
+	const activeIndex = items.findIndex(item => item.step == activeStep);
+
 	return (
 		<aside className="sidebar">
 			<ul className="steps">
-				{[
-					{ step: 1, label: t.steps.hardware, value: t.hardware[hardware].name },
-					{ step: 2, label: t.steps.version, value: hosVersion },
-					{ step: 3, label: t.steps.components, value: selectedComponentIDs.length },
-					{ step: 4, label: t.steps.tuning, value: tuningChanges || '' },
-					{ step: 5, label: t.steps.build, value: '' }
-				].map(item => {
-					const isActive = activeStep == item.step;
-					const isDone = item.step < activeStep;
-
-					return (
-						<li key={item.step}>
-							<button
-								className={`step ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}`}
-								onClick={() => setActiveStep(item.step)}>
-								<span className="label">
-									{item.label}
-								</span>
-								<span className="value">
-									{item.value}
-								</span>
-							</button>
-						</li>
-					);
-				})}
+				{items.map((item, index) => (
+					<li key={item.step}>
+						<button
+							className={`step ${item.step == activeStep ? 'active' : ''} ${index < activeIndex ? 'done' : ''}`}
+							onClick={() => setActiveStep(item.step)}>
+							<span className="label">
+								{t.steps[item.step]}
+							</span>
+							{item.alert && item.alert != 'info' && (
+								<span className={`alert ${item.alert}`}></span>
+							)}
+							<span className="value">
+								{item.value}
+							</span>
+						</button>
+					</li>
+				))}
 			</ul>
 
 			<footer className="metrics">

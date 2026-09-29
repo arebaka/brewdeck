@@ -17,7 +17,7 @@
 		}
 
 		.file {
-			font: #{$size-small} $font-mono;
+			font: #{$size-mono} $font-mono;
 			color: var(--color-muted);
 		}
 	}
@@ -27,12 +27,12 @@
 		color: var(--color-muted);
 	}
 
-	// A group waiting for its component fades as a whole, without fading its rows twice
-	&.disabled {
-		opacity: .45;
+	// Fields take the place of the value
+	.line .field {
+		width: 220px;
 
-		.row.disabled {
-			opacity: 1;
+		&.number {
+			width: 120px;
 		}
 	}
 }

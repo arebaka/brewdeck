@@ -12,6 +12,12 @@
 	@include interactive;
 }
 
+.control:disabled,
+.primary:disabled {
+	opacity: .45;
+	pointer-events: none;
+}
+
 .primary {
 	align-self: flex-start;
 	padding: space(2) space(6);
@@ -94,6 +100,95 @@
 	}
 }
 
+// Controller buttons in their own shapes, as the system UI draws them, grouped by Joy-Con
+.buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: space(3) space(8);
+
+	.side {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: space(2);
+	}
+}
+
+.button {
+	display: inline-grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	font: 700 13px/1 $font-sans;
+	color: var(--color-text);
+	background: rgb(255 255 255 / 10%);
+	@include interactive;
+
+	&.active,
+	&.active:hover,
+	&.active:focus-visible {
+		color: var(--color-on-accent);
+		background: var(--color-accent);
+	}
+
+	// A, B, X, Y and the direction buttons of the left Joy-Con are round
+	&.face,
+	&.direction {
+		border-radius: 50%;
+	}
+
+	// Bumpers are nearly square keys
+	&.bumper {
+		width: 34px;
+		height: 26px;
+		border-radius: 5px;
+	}
+
+	// Triggers bend down from the outer top corner
+	&.trigger {
+		width: 42px;
+		border-radius: 18px 5px 5px 5px;
+
+		&.right {
+			border-radius: 5px 18px 5px 5px;
+		}
+	}
+
+	// Plus and minus are the small buttons between the sticks and the face
+	&.system {
+		width: 22px;
+		height: 22px;
+		font-size: 16px;
+		border-radius: 50%;
+	}
+
+	&.direction::before {
+		content: '';
+		border-style: solid;
+		border-width: 0 5px 8px;
+		border-color: transparent transparent currentColor;
+	}
+
+	&.right::before {
+		transform: rotate(90deg);
+	}
+
+	&.down::before {
+		transform: rotate(180deg);
+	}
+
+	&.left::before {
+		transform: rotate(-90deg);
+	}
+
+	// A stick press is the cap of the stick with its ring
+	&.stick {
+		font-size: 11px;
+		border: 3px solid rgb(255 255 255 / 18%);
+		border-radius: 50%;
+	}
+}
+
 // Notices with a colored bar, like hints of the system settings
 .warnings,
 .advices {
@@ -114,15 +209,136 @@
 	background: color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 
+.warnings:has(.error) {
+	border-left-color: var(--color-danger);
+	background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.notice {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: space(1) space(2);
+
+	.text {
+		flex: 1 1 320px;
+	}
+
+	&.error .text {
+		color: var(--color-danger);
+	}
+}
+
+// Quick fix of a notice
+.fix {
+	padding: 0 space(3);
+	font-size: $size-small;
+	color: var(--color-text);
+	background: rgb(255 255 255 / 8%);
+	border: none;
+	border-radius: 999px;
+	@include interactive;
+}
+
+// Text and number fields, selects of the overclock table
+.field {
+	min-width: 0;
+	padding: space(1) space(2);
+	font: #{$size-small}/1.4 $font-sans;
+	color: var(--color-text);
+	background: var(--color-sunken);
+	border: 1px solid var(--color-line);
+	border-radius: $radius;
+
+	&:focus-visible {
+		outline: none;
+		@include highlight;
+	}
+
+	&:disabled {
+		opacity: .45;
+	}
+
+	&.mono,
+	&.number {
+		font-family: $font-mono;
+		font-size: $size-mono;
+	}
+
+	&::placeholder {
+		color: var(--color-muted);
+	}
+}
+
+select.field {
+	padding-right: space(6);
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a3a3a3' stroke-width='1.5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right space(2) center;
+	background-size: 10px;
+	cursor: pointer;
+
+	option {
+		color: var(--color-text);
+		background: var(--color-panel);
+	}
+}
+
+.empty {
+	padding: space(6) 0;
+	text-align: center;
+	color: var(--color-muted);
+}
+
+.content > .note {
+	font-size: $size-small;
+	color: var(--color-muted);
+}
+
 .code {
 	max-height: 480px;
 	padding: space(4);
 	overflow: auto;
-	font: #{$size-small}/1.6 $font-mono;
+	font: #{$size-mono}/1.6 $font-mono;
 	white-space: pre;
 	color: var(--color-text);
 	background: var(--color-sunken);
 	border-radius: $radius;
+}
+
+// Syntax highlighting of highlight.js in the colors of the palette
+.code {
+	.hljs-comment,
+	.hljs-meta {
+		color: var(--color-muted);
+	}
+
+	.hljs-keyword,
+	.hljs-built_in,
+	.hljs-literal,
+	.hljs-type {
+		color: var(--color-focus-2);
+	}
+
+	.hljs-string {
+		color: var(--color-warning);
+	}
+
+	.hljs-number {
+		color: var(--color-logo-right);
+	}
+
+	.hljs-variable,
+	.hljs-template-variable,
+	.hljs-attr {
+		color: var(--color-accent);
+	}
+
+	.hljs-section,
+	.hljs-title {
+		font-weight: 700;
+	}
 }
 
 // The track is drawn by hand, native ones follow the OS theme; --fill is the filled share
@@ -168,7 +384,6 @@
 	width: 44px;
 	height: 26px;
 	padding: 0;
-	border: none;
 	border-radius: $radius;
 	cursor: pointer;
 

@@ -1,0 +1,34 @@
+[
+	{
+		"id": "erista",
+		"name": "Erista (V1)",
+		"codename": "Icosa",
+		"is_modchip_required": false,
+		"image": "110477-nintendo-switch-gray-gray-front-screen-on-1200x675.avif",
+		"dimensions": [239, 102]
+	},
+	{
+		"id": "mariko",
+		"name": "Mariko (V2)",
+		"codename": "Iowa",
+		"is_modchip_required": true,
+		"image": "110477-nintendo-switch-gray-gray-front-screen-on-1200x675.avif",
+		"dimensions": [239, 102]
+	},
+	{
+		"id": "oled",
+		"name": "OLED",
+		"codename": "Aula",
+		"is_modchip_required": true,
+		"image": "115464-switch-oled-red-blue-console-front-1200x675.avif",
+		"dimensions": [242, 102]
+	},
+	{
+		"id": "lite",
+		"name": "Lite",
+		"codename": "Hoag",
+		"is_modchip_required": true,
+		"image": "110663-nintendo-switch-lite-turquoise-front-screen-on-1200x675.avif",
+		"dimensions": [208, 91.1]
+	}
+]

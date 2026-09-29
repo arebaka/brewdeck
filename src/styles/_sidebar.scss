@@ -52,6 +52,18 @@
 			font-size: $size-small;
 			color: var(--color-muted);
 		}
+
+		// A step with warnings or errors to look at
+		.alert {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--color-warning);
+
+			&.error {
+				background: var(--color-danger);
+			}
+		}
 	}
 
 	.metrics {

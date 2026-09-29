@@ -9,12 +9,14 @@
 	"type": "module",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"test": ":",
+		"test": "vitest run",
+		"test:ui": "node tests/ui.ts",
 		"lint": "tsc --noEmit",
 		"build": "vite build",
 		"prepare": "npm run --silent build",
 		"dev": "vite --host=0.0.0.0 --port=3000",
 		"preview": "vite preview",
+		"sync": "node scripts/sync.mjs",
 		"clean": "rm -rf dist"
 	},
 	"bugs": {
@@ -25,22 +27,24 @@
 		"url": "https://www.patreon.com/arelive"
 	},
 	"keywords": [
-    "nintendo",
-    "switch",
-    "builder",
-    "erista",
-    "mariko",
-    "oled",
-    "lite",
-    "horizon",
-    "atmosphere",
-    "hekate"
-  ],
+		"nintendo",
+		"switch",
+		"builder",
+		"erista",
+		"mariko",
+		"oled",
+		"lite",
+		"horizon",
+		"atmosphere",
+		"hekate"
+	],
 	"dependencies": {
+		"@arelive/reset.css": "^1.2.0",
 		"@fontsource/biz-udgothic": "^5.3.0",
 		"@fontsource/biz-udpgothic": "^5.3.0",
 		"@fontsource/noto-sans": "^5.3.0",
-		"jszip": "^3.10.1",
+		"highlight.js": "^11.12.0",
+		"marked": "^18.0.14",
 		"mustache": "^4.2.0",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7"
@@ -51,9 +55,11 @@
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.3",
+		"jszip": "^3.10.1",
 		"sass-embedded": "^1.105.0",
 		"typescript": "^5.9.3",
 		"vite": "^8.1.3",
-		"vite-tsconfig-paths": "^6.1.1"
+		"vite-tsconfig-paths": "^6.1.1",
+		"vitest": "^5.0.2"
 	}
 }

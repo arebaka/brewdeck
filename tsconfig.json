@@ -16,8 +16,9 @@
 		"paths": {
 			"@/*": ["src/*"],
 			"@components/*": ["src/components/*"],
-			"@data/*": ["src/data/*"]
+			"@data/*": ["data/*"],
+			"@templates/*": ["templates/*"]
 		}
 	},
-	"include": ["src", "vite.config.ts"]
+	"include": ["src", "tests", "vite.config.ts"]
 }

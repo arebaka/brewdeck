@@ -22,14 +22,14 @@ $palettes: (
 	),
 );
 
-// Latin comes from BIZ UDPGothic, the open edition of the Switch system typeface, Cyrillic from Noto Sans
-$font-sans: 'BIZ UDPGothic', 'Noto Sans', sans-serif;
-$font-mono: 'BIZ UDGothic', monospace;
+$font-sans: 'BIZ UDPGothic', sans-serif;
+$font-mono: monospace;
 
 $size-base: 15px;
 $size-title: 26px;
 $size-large: 17px;
 $size-small: 13px;
+$size-mono: 14px;
 $line-height: 1.65;
 
 $radius: 4px;

@@ -1,0 +1,50 @@
+import { Marked } from 'marked';
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+import ini from 'highlight.js/lib/languages/ini';
+import powershell from 'highlight.js/lib/languages/powershell';
+
+hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('ini', ini);
+hljs.registerLanguage('powershell', powershell);
+
+// Languages of the generated files by extension, other files stay plain
+const LANGUAGES: Record<string, string> = {
+	sh: 'bash',
+	ps1: 'powershell',
+	ini: 'ini'
+};
+
+const escape = (text: string) => text
+	.replace(/&/g, '&amp;')
+	.replace(/</g, '&lt;')
+	.replace(/>/g, '&gt;')
+	.replace(/"/g, '&quot;');
+
+const highlightCode = (code: string, language?: string) => language && hljs.getLanguage(language)
+	? hljs.highlight(code, { language }).value
+	: escape(code);
+
+// Highlighted HTML of a generated file
+export function highlight(content: string, path: string): string {
+	return highlightCode(content, LANGUAGES[path.split('.').pop() ?? '']);
+}
+
+// The readme carries versions and names from release metadata, so raw HTML stays text and links only lead to the web
+const markdown = new Marked({
+	gfm: true,
+	renderer: {
+		html: ({ text }) => escape(text),
+		link({ href, title, tokens }) {
+			const text = this.parser.parseInline(tokens);
+			return /^https?:\/\//i.test(href)
+				? `<a href="${escape(href)}"${title ? ` title="${escape(title)}"` : ''} target="_blank" rel="noreferrer">${text}</a>`
+				: text;
+		},
+		code: ({ text, lang }) => `<pre class="code"><code>${highlightCode(text, lang)}</code></pre>`
+	}
+});
+
+export function renderMarkdown(content: string): string {
+	return markdown.parse(content, { async: false });
+}

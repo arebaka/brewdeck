@@ -1,8 +1,11 @@
-.preview-box {
-	display: flex;
-	justify-content: center;
-}
-
+// A console wider than the window scrolls instead of shrinking below its physical size
 .preview {
-	width: min(60%, 720px);
+	overflow: hidden;
+
+	.photo {
+		display: block;
+		max-width: none;
+		height: auto;
+		margin: 0 auto;
+	}
 }

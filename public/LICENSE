@@ -1,0 +1,100 @@
+BrewDeck public assets
+
+The code of BrewDeck is licensed under the MIT license, see LICENSE at the
+root of the repository. The files of this directory belong to their owners
+and are used under the terms listed below.
+
+appearance/
+    Boot logos, backgrounds and boot menu icons for hekate and Nyx,
+    redistributed under the GPL-2.0 license of the projects they come from.
+    Boot logos were converted from the rotated bitmaps hekate expects to the
+    orientation they are seen on screen.
+
+    hekate-*.png             CTCaer, GPL-2.0
+                             https://github.com/CTCaer/hekate
+    atmosphere-*.png         Atmosphère-NX, GPL-2.0
+                             https://github.com/Atmosphere-NX/Atmosphere
+
+images/
+    Product photos of the Nintendo Switch consoles from the Nintendo online
+    store (nintendo.com). Nintendo Switch, its logos and the photos are
+    trademarks and copyrighted works of Nintendo. They only illustrate the
+    console revisions, BrewDeck is not affiliated with Nintendo.
+
+logos/
+    Icons of the homebrew applications, taken from the Homebrew App Store
+    (https://hb-app.store), from the releases or the repositories of the
+    projects. Every icon belongs to the authors of its application.
+
+    aio_updater.jpg          AIO Switch Updater, HamletDuFromage
+                             https://github.com/HamletDuFromage/aio-switch-updater
+    akira.png                Akira (chiaki-ng), xlanor
+                             https://github.com/xlanor/akira
+    amiigo.png               Amiigo, CompSciOrBust
+                             https://github.com/CompSciOrBust/Amiigo
+    appstore.png             Homebrew App Store, 4TU Team
+                             https://github.com/vgmoose/appstorenx
+    atmosphere.png           Atmosphere, SciresM
+                             https://github.com/Atmosphere-NX/Atmosphere
+    breeze.jpg               Breeze, tomvita
+                             https://github.com/tomvita/Breeze-Beta
+    checkpoint.png           Checkpoint, FlagBrew
+                             https://github.com/FlagBrew/Checkpoint
+    daybreak.jpg             Daybreak, Adubbz
+                             https://github.com/Atmosphere-NX/Atmosphere
+    dbi.png                  DBI, duckbill
+                             https://github.com/rashevskyv/dbi
+    edizon_overlay.png       EdiZon Overlay, proferabg / WerWolv
+                             https://github.com/proferabg/EdiZon-Overlay
+    edizon.png               EdiZon SE, tomvita
+                             https://github.com/tomvita/EdiZon-SE
+    emuiibo.png              emuiibo, XorTroll
+                             https://github.com/XorTroll/emuiibo
+    fizeau.png               Fizeau, averne
+                             https://github.com/averne/Fizeau
+    goldleaf.png             Goldleaf, XorTroll
+                             https://github.com/XorTroll/Goldleaf
+    hekate.png               Hekate, CTCaer
+                             https://github.com/CTCaer/hekate
+    jc_color_swapper.png     JC Color Swapper, HamletDuFromage
+                             https://github.com/HamletDuFromage/JC-color-swapper
+    jksv.png                 JKSV, J-D-K
+                             https://github.com/J-D-K/JKSV
+    ldn_mitm.png             ldn_mitm, spacemeowx2
+                             https://github.com/spacemeowx2/ldn_mitm
+    linkalho.png             Linkalho, rdmrocha / impeeza
+                             https://github.com/impeeza/linkalho
+    melonds.png              melonDS, Arisotura / ArcDelta
+                             https://github.com/ArcDelta/melonDS
+    missioncontrol.png       MissionControl, ndeadly
+                             https://github.com/ndeadly/MissionControl
+    moonlight.png            Moonlight, XITRIX
+                             https://github.com/XITRIX/Moonlight-Switch
+    nx_activity_log.jpg      NX Activity Log, tallbl0nde
+                             https://github.com/tallbl0nde/NX-Activity-Log
+    nx_shell.png             NX-Shell, Joel16
+                             https://github.com/Joel16/NX-Shell
+    nxthemes_installer.png   NXThemes Installer, exelix11
+                             https://github.com/exelix11/SwitchThemeInjector
+    ovlmenu.png              Tesla Menu, WerWolv
+                             https://github.com/WerWolv/Tesla-Menu
+    ppsspp.png               PPSSPP, hrydgard / m4xw
+                             https://www.ppsspp.org
+    retroarch.png            RetroArch, libretro
+                             https://github.com/libretro/RetroArch
+    sys_clk.png              sys-clk, RetroNX
+                             https://github.com/retronx-team/sys-clk
+    sys_con.png              sys-con, cathery / o0Zz
+                             https://github.com/o0Zz/sys-con
+    sys_tune.png             sys-tune, HookedBehemoth
+                             https://github.com/HookedBehemoth/sys-tune
+    sysdvr_overlay.png       SysDVR Overlay, Hartie95
+                             https://github.com/Hartie95/sysdvr-overlay
+    sysdvr.png               SysDVR, exelix11
+                             https://github.com/exelix11/SysDVR
+    themezer.png             Themezer, suchmememanyskill
+                             https://github.com/suchmememanyskill/themezer-nx
+    ulaunch.png              uLaunch, XorTroll
+                             https://github.com/XorTroll/uLaunch
+    ultrahand.png            Ultrahand, ppkantorski
+                             https://github.com/ppkantorski/Ultrahand-Overlay

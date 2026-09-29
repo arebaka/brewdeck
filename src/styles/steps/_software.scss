@@ -3,7 +3,14 @@
 
 .batch {
 	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
 	gap: space(2);
+}
+
+// The preset nobody picked, it only marks a selection edited by hand
+.choice.custom {
+	pointer-events: none;
 }
 
 .list {
@@ -37,8 +44,25 @@
 		gap: space(2);
 	}
 
+	// Required and bundled components cannot be switched off
+	&.required,
+	&.bundled {
+		cursor: default;
+	}
+
 	.logo {
 		width: 48px;
+		height: 48px;
+		object-fit: contain;
+		border-radius: $radius;
+	}
+
+	// Initial in place of a missing logo
+	.monogram {
+		display: grid;
+		place-items: center;
+		font-size: 22px;
+		color: var(--color-muted);
 	}
 
 	.info {
@@ -60,12 +84,20 @@
 	}
 
 	.version {
-		font: #{$size-small} $font-mono;
+		font: #{$size-mono} $font-mono;
 		color: var(--color-muted);
 	}
 
+	.source,
 	.details {
 		font-size: $size-small;
 		color: var(--color-muted);
+	}
+
+	.note {
+		padding-left: space(2);
+		font-size: $size-small;
+		color: var(--color-muted);
+		border-left: 2px solid var(--color-line);
 	}
 }

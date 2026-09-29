@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import { ComponentCategory } from '../../types';
-import { Language, Translation } from '../../i18n';
-import { COMPONENTS } from '../../data';
-import { activate } from '../../utils';
+import { Issue } from '../../types';
+import { Language, Translation, format } from '../../i18n';
+import { CATEGORIES, COMPONENTS, PRESETS, matchingPreset } from '../../data';
+import { activate, formatSize } from '../../utils';
+import { Issues } from '../Issues';
 
 interface SoftwareProps {
 	lang: Language;
 	selectedComponentIDs: string[];
 	toggleComponent: (id: string) => void;
-	handleSelectAll: (select: boolean) => void;
-	conflicts: string[];
-	replacesAdvice: string[];
-	totalSize: number;
+	applyPreset: (id: string) => void;
+	issues: Issue[];
+	applyFix: (fix: NonNullable<Issue['fix']>) => void;
 	t: Translation;
 }
 
@@ -20,104 +20,118 @@ export function Software({
 	lang,
 	selectedComponentIDs,
 	toggleComponent,
-	handleSelectAll,
-	conflicts,
-	replacesAdvice,
-	totalSize,
+	applyPreset,
+	issues,
+	applyFix,
 	t
 }: SoftwareProps) {
-	return (<>
-		<header className="header">
-			<h2 className="title">
-				{t.step3.title}
-			</h2>
-			<p className="description">
-				{t.step3.description}
-			</p>
-		</header>
+	// A selection edited by hand matches no preset and shows up as a custom one
+	const preset = useMemo(() => matchingPreset(selectedComponentIDs), [selectedComponentIDs]);
 
+	return (<>
 		<section className="batch">
-			<button
-				className="control"
-				onClick={() => handleSelectAll(true)}>
-				{t.step3.selectAll}
-			</button>
-			<button
-				className="control"
-				onClick={() => handleSelectAll(false)}>
-				{t.step3.deselectAll}
-			</button>
+			<ul className="choices">
+				{PRESETS.map(item => (
+					<li
+						key={item.id}
+						className={`choice ${preset?.id == item.id ? 'active' : ''}`}
+						tabIndex={0}
+						onClick={() => applyPreset(item.id)}
+						onKeyDown={activate}>
+						{t.pages.software.presets[item.id]}
+					</li>
+				))}
+				{!preset && (
+					<li className="choice active custom">
+						{t.pages.software.custom}
+					</li>
+				)}
+			</ul>
 		</section>
 
-		{conflicts.length > 0 && (
-			<section className="warnings">
-				{conflicts.map((conflict, index) => (
-					<p key={index} className="warning">
-						{conflict}
-					</p>
-				))}
-			</section>
-		)}
-		{replacesAdvice.length > 0 && (
-			<section className="advices">
-				{replacesAdvice.map((advice, index) => (
-					<p key={index} className="advice">
-						{advice}
-					</p>
-				))}
-			</section>
-		)}
+		<Issues
+			issues={issues}
+			applyFix={applyFix}
+			t={t} />
 
 		<ul className="list">
-			{(['base', 'payloads', 'sysmodules', 'homebrew', 'overlays'] as ComponentCategory[]).map(category => {
+			{CATEGORIES.map(category => {
 				const components = COMPONENTS.filter(comp => comp.category == category);
 
 				return (
 					<section key={category} className="components">
 						<h3 className="title">
-							{t.step3.categories[category]}
+							{t.pages.software.categories[category]}
 						</h3>
 						<ul className={`grid ${components.length % 2 == 0 ? 'grid2' : 'grid3'}`}>
-							{components.map(component => (
-								<li
-									key={component.id}
-									className={`component
-										${component.is_required ? 'required' : ''}
-										${selectedComponentIDs.includes(component.id) ? 'active' : ''}`}
-									tabIndex={0}
-									onClick={() => toggleComponent(component.id)}
-									onKeyDown={activate}>
-									{(component.logo || component.is_required) && <div className="logo-box">
-										{component.logo && (
-											<img src={"logos/" + component.logo} alt="" className="logo" />
-										)}
-										{component.is_required && (
-											<p className="badge required">
-												{t.step3.requiredBadge}
+							{components.map(component => {
+								const text = t.software[component.id];
+								const parent = COMPONENTS.find(comp => comp.id == component.sources.bundled);
+								// What ships with a required component cannot be switched off either
+								const isRequired = component.is_required || !!parent?.is_required;
+
+								return (
+									<li
+										key={component.id}
+										className={`component
+											${isRequired ? 'required' : ''}
+											${parent ? 'bundled' : ''}
+											${selectedComponentIDs.includes(component.id) ? 'active' : ''}`}
+										tabIndex={0}
+										onClick={() => toggleComponent(component.id)}
+										onKeyDown={activate}>
+										<div className="logo-box">
+											{component.logo ? (
+												<img src={"logos/" + component.logo} alt="" className="logo" loading="lazy" />
+											) : (
+												<span className="logo monogram" aria-hidden="true">
+													{component.name[0]}
+												</span>
+											)}
+											{isRequired && (
+												<p className="badge required">
+													{t.pages.software.requiredBadge}
+												</p>
+											)}
+											{component.deprecated && (
+												<p className="badge warning">
+													{t.pages.software.deprecatedBadge}
+												</p>
+											)}
+										</div>
+										<div className="info">
+											<header className="header">
+												<h4 className="name">
+													{component.name}
+												</h4>
+												<p className="version">
+													{component.version}
+												</p>
+											</header>
+											<p className="source">
+												{component.author} · {parent
+													? format(t.pages.software.bundledBadge, { component: parent.name })
+													: t.pages.software.sources[component.source]}
+												{component.size > 0 && ` · ${formatSize(component.size)}`}
 											</p>
-										)}
-									</div>}
-									<div className="info">
-										<header className="header">
-											<h4 className="name">
-												{component.name}
-											</h4>
-											<p className="version">
-												{component.version}
+											<p className="description">
+												{text?.description}
 											</p>
-										</header>
-										<p className="description">
-											{component.id in t.software && t.software[component.id].description}
-										</p>
-										<p className="details">
-											{component.id in t.software && t.software[component.id].details}
-										</p>
-									</div>
-								</li>
-							))}
+											<p className="details">
+												{text?.details}
+											</p>
+											{text?.note && (
+												<p className="note">
+													{text.note}
+												</p>
+											)}
+										</div>
+									</li>
+								);
+							})}
 						</ul>
 					</section>
-				)
+				);
 			})}
 		</ul>
 	</>);

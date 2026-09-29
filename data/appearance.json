@@ -1,0 +1,20 @@
+[
+	{ "id": "hekate-a", "target": "bootlogo", "file": "appearance/hekate-a.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-a-custom", "target": "bootlogo", "file": "appearance/hekate-a-custom.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-b", "target": "bootlogo", "file": "appearance/hekate-b.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-b-custom", "target": "bootlogo", "file": "appearance/hekate-b-custom.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-c", "target": "bootlogo", "file": "appearance/hekate-c.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-c-ctc", "target": "bootlogo", "file": "appearance/hekate-c-ctc.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-d", "target": "bootlogo", "file": "appearance/hekate-d.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "hekate-d-ctc", "target": "bootlogo", "file": "appearance/hekate-d-ctc.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/res/bootlogo" },
+	{ "id": "atmosphere-logo", "target": "bootlogo", "file": "appearance/atmosphere-logo.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "atmosphere-banner", "target": "bootlogo", "file": "appearance/atmosphere-banner.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "atmosphere-splash", "target": "bootlogo", "file": "appearance/atmosphere-splash.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "atmosphere-splash", "target": "background", "file": "appearance/atmosphere-splash.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "hekate-switch", "target": "icon", "file": "appearance/hekate-icon-switch.png", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
+	{ "id": "hekate-payload", "target": "icon", "file": "appearance/hekate-icon-payload.png", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
+	{ "id": "hekate-lakka", "target": "icon", "file": "appearance/hekate-icon-lakka.png", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
+	{ "id": "hekate-lakka-hue", "target": "icon", "file": "appearance/hekate-icon-lakka-hue.png", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
+	{ "id": "atmosphere-logo", "target": "icon", "file": "appearance/atmosphere-logo.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "atmosphere-logo-light", "target": "icon", "file": "appearance/atmosphere-logo-light.png", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" }
+]
