@@ -1,0 +1,30 @@
+[
+	{
+		"id": "emummc",
+		"name": "CFW (emuMMC)",
+		"caption": "Custom firmware",
+		"keys": {
+			"pkg3": "atmosphere/package3",
+			"emummcforce": 1
+		}
+	},
+	{
+		"id": "sysmmc",
+		"name": "CFW (sysMMC)",
+		"caption": "Custom firmware",
+		"keys": {
+			"pkg3": "atmosphere/package3",
+			"emummc_force_disable": 1
+		}
+	},
+	{
+		"id": "stock",
+		"name": "Stock",
+		"caption": "Stock",
+		"keys": {
+			"pkg3": "atmosphere/package3",
+			"stock": 1,
+			"emummc_force_disable": 1
+		}
+	}
+]

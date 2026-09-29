@@ -5,15 +5,22 @@ root of the repository. The files of this directory belong to their owners
 and are used under the terms listed below.
 
 appearance/
-    Boot logos, backgrounds and boot menu icons for hekate and Nyx,
-    redistributed under the GPL-2.0 license of the projects they come from.
-    Boot logos were converted from the rotated bitmaps hekate expects to the
-    orientation they are seen on screen.
+    Boot logos (bootlogo/), Nyx backgrounds (background/) and boot menu icons
+    (icon/) for hekate and Nyx, redistributed under the GPL-2.0 license of the
+    projects they come from. Boot logos were converted from the rotated bitmaps
+    hekate expects to the orientation they are seen on screen, icons from the
+    bitmaps of Nyx to PNG with their transparency.
 
-    hekate-*.png             CTCaer, GPL-2.0
+    */hekate-*.png           CTCaer, GPL-2.0
                              https://github.com/CTCaer/hekate
-    atmosphere-*.png         Atmosphère-NX, GPL-2.0
+    */atmosphere-*.png       Atmosphère-NX, GPL-2.0
                              https://github.com/Atmosphere-NX/Atmosphere
+    icon/mattera-*.png       Nichole Mattera, GPL-2.0, as stated for every icon
+                             in its folder of the repository: the Atmosphère
+                             one uses the logo by jaames for Atmosphère-NX, the
+                             Switch and payload ones are redrawn after the Nyx
+                             icons of CTCaer
+                             https://github.com/NicholeMattera/Hekate-Icons
 
 images/
     Product photos of the Nintendo Switch consoles from the Nintendo online
@@ -70,8 +77,8 @@ logos/
                              https://github.com/ndeadly/MissionControl
     moonlight.png            Moonlight, XITRIX
                              https://github.com/XITRIX/Moonlight-Switch
-    nx_activity_log.jpg      NX Activity Log, tallbl0nde
-                             https://github.com/tallbl0nde/NX-Activity-Log
+    nx_activity_log.jpg      NX Activity Log, tallbl0nde / zdm65477730
+                             https://github.com/zdm65477730/NX-Activity-Log
     nx_shell.png             NX-Shell, Joel16
                              https://github.com/Joel16/NX-Shell
     nxthemes_installer.png   NXThemes Installer, exelix11

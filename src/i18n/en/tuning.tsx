@@ -1,20 +1,11 @@
-import { TuningGroup } from '..';
+import { TuningGroup } from '../types';
+import { DBI_LANGUAGES } from '../autonyms';
 
 const tuning: {[group in string]: TuningGroup} = {
-	hekate: {
-		title: 'Hekate',
-		description: 'Boot menu entries and startup behavior. The menu always includes CFW (emuMMC), CFW (sysMMC), and Stock.',
+	logo: {
+		title: 'Boot logo',
+		description: 'The logo hekate shows while it waits for VOL- to open the menu.',
 		options: {
-			autoboot: {
-				title: 'Autoboot',
-				description: 'What to boot when turning on. Hold VOL- during the logo to enter the menu anyway.',
-				values: {
-					off: 'Menu',
-					emummc: 'CFW (emuMMC)',
-					sysmmc: 'CFW (sysMMC)',
-					stock: 'Stock',
-				},
-			},
 			bootwait: {
 				title: 'Logo delay',
 				description: 'Boot logo display time (in seconds). A value of 0 completely hides the logo.',
@@ -27,6 +18,16 @@ const tuning: {[group in string]: TuningGroup} = {
 					20: '20 s',
 				},
 			},
+			noticker: {
+				title: 'Hide the logo countdown',
+				description: 'Do not draw the line showing the time left to enter the menu during a custom boot logo.',
+			},
+		},
+	},
+	hekate: {
+		title: 'Hekate',
+		description: 'Startup behavior of the bootloader. Its boot entries and logo are set on the Launch step.',
+		options: {
 			backlight: {
 				title: 'Screen brightness',
 				description: 'Backlight level in Hekate and Nyx.',
@@ -51,10 +52,6 @@ const tuning: {[group in string]: TuningGroup} = {
 			bootprotect: {
 				title: 'Protect bootloader folder',
 				description: 'Hides the bootloader folder from HOS to prevent corruption or modification.',
-			},
-			noticker: {
-				title: 'Hide the logo countdown',
-				description: 'Do not draw the line showing the time left to enter the menu during a custom boot logo.',
 			},
 		},
 	},
@@ -106,7 +103,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Mount eMMC and emuMMC as writable in USB mass storage mode. Careless writes can brick the console.',
 			},
 			jcdisable: {
-				title: 'Disable Joy-Con',
+				title: 'Disable Joy-Cons',
 				description: 'Turn off the Joy-Con driver of Nyx completely.',
 			},
 			jcforceright: {
@@ -294,7 +291,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Allows homebrew to read the calibration partition.',
 			},
 			fsmitm_redirect_saves_to_sd: {
-				title: 'Saves on SD card (experimental)',
+				title: 'Saves on SD card',
 				description: 'Redirects game saves to the SD card. Experimental, saves can be lost.',
 			},
 			applet_heap_size: {
@@ -544,6 +541,17 @@ const tuning: {[group in string]: TuningGroup} = {
 			led: {
 				title: 'LED on connect',
 				description: 'Flash the LED when a client connects.',
+			},
+		},
+	},
+	dbi_patcher: {
+		title: 'DBIPatcher',
+		description: 'Language of the DBI translation.',
+		options: {
+			language: {
+				title: 'Language',
+				description: 'The translation DBI shows instead of Russian.',
+				values: DBI_LANGUAGES,
 			},
 		},
 	},

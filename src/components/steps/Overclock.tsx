@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ClockKey, ClockMode, ClockModule, GameProfile, HardwareRevision, Issue, TuningConfig, TuningStep, TuningValue } from '../../types';
+import { ClockKey, ClockMode, ClockModule, GameProfile, HardwareRevision, Fix, Issue, TuningConfig, TuningStep, TuningValue } from '../../types';
 import { Language, Translation } from '../../i18n';
 import { OVERCLOCK } from '../../data';
 import { gameName, templateClocks } from '../../url';
@@ -18,7 +18,7 @@ interface OverclockProps {
 	setTuningOption: (group: string, option: string, value: TuningValue) => void;
 	resetTuning: (step: TuningStep) => void;
 	issues: Issue[];
-	applyFix: (fix: NonNullable<Issue['fix']>) => void;
+	applyFix: (fix: Fix) => void;
 	t: Translation;
 }
 

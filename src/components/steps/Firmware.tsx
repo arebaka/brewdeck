@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Issue } from '../../types';
+import { Fix, Issue } from '../../types';
 import { Language, Translation } from '../../i18n';
 import { HOS_VERSIONS, isHOSSupported } from '../../data';
 import { activate } from '../../utils';
@@ -11,7 +11,7 @@ interface VersionProps {
 	version: string;
 	setVersion: (version: string) => void;
 	issues: Issue[];
-	applyFix: (fix: NonNullable<Issue['fix']>) => void;
+	applyFix: (fix: Fix) => void;
 	t: Translation;
 }
 

@@ -33,6 +33,7 @@ const GLYPHS: Record<string, { shape: string; label: string }> = {
 	RS: { shape: 'stick', label: 'R' }
 };
 
+// The button a value of an option stands for
 export const buttonName = (value: string) => ALIASES[value] ?? value;
 
 // Options whose every value is a controller button get drawn as buttons

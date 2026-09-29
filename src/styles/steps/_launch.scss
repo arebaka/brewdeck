@@ -1,0 +1,55 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// The name and the description of a boot mode switch it, the highlight fills the row up to the keys
+.row .switch {
+	display: flex;
+	flex-direction: column;
+	gap: space(2);
+	margin: space(-3) space(-3) 0;
+	padding: space(3) space(3) space(1);
+	@include interactive;
+
+	&:last-child {
+		margin-bottom: space(-3);
+		padding-bottom: space(3);
+	}
+}
+
+// Keys every boot mode writes to its section of hekate_ipl.ini
+.row .keys {
+	font: #{$size-mono} $font-mono;
+	white-space: pre-wrap;
+	color: var(--color-muted);
+}
+
+// Exosphere keys of the entry, each with its choices
+.overrides {
+	display: flex;
+	flex-wrap: wrap;
+	gap: space(2) space(6);
+
+	.override {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: space(2);
+	}
+
+	.label {
+		font-size: $size-small;
+		color: var(--color-muted);
+	}
+}
+
+// Folder of one more emuMMC after its fixed prefix
+.add .prefix {
+	align-self: center;
+	font: #{$size-mono} $font-mono;
+	color: var(--color-muted);
+}
+
+.components > .description {
+	font-size: $size-small;
+	color: var(--color-muted);
+}

@@ -12,6 +12,7 @@ const APPSTORE = 'https://switch.cdn.fortheusers.org';
 const SWITCHBREW_VERSIONS = 'https://switchbrew.org/wiki/System_Versions';
 
 const SOFTWARE = new URL('../data/software.json', import.meta.url);
+const TUNING = new URL('../data/tuning.json', import.meta.url);
 const FIRMWARE = new URL('../data/firmware.json', import.meta.url);
 const LOGOS = new URL('../public/logos/', import.meta.url);
 
@@ -104,7 +105,13 @@ async function archiveIcon(buffer) {
 	return null;
 }
 
-async function findLogo(component, release, packages) {
+// Assets named after an option of the component, such as a language, are looked up with its default
+function assetPattern(component, item, tuning) {
+	const options = tuning.find(group => group.id == component.id)?.options ?? [];
+	return new RegExp(item.asset.replace(/\{\{(\w+)\}\}/g, (match, id) => options.find(option => option.id == id)?.default ?? match));
+}
+
+async function findLogo(component, release, packages, tuning) {
 	for (const name of component.sources.appstore ?? []) {
 		try {
 			return { data: await download(`${APPSTORE}/packages/${name}/icon.png`), extension: 'png' };
@@ -112,7 +119,7 @@ async function findLogo(component, release, packages) {
 	}
 
 	const assets = (component.sources.github ?? [])
-		.map(item => release?.assets.find(asset => new RegExp(item.asset).test(asset.name)))
+		.map(item => release?.assets.find(asset => assetPattern(component, item, tuning).test(asset.name)))
 		.filter(asset => asset && asset.size < MAX_ICON_SOURCE && /\.(nro|ovl|zip)$/i.test(asset.name));
 	const archives = packages
 		.filter(pkg => pkg.filesize * 1024 < MAX_ICON_SOURCE)
@@ -158,6 +165,7 @@ function format(value, depth = 0, inline = false) {
 
 async function syncSoftware() {
 	const software = JSON.parse(await readFile(SOFTWARE, 'utf8'));
+	const tuning = JSON.parse(await readFile(TUNING, 'utf8'));
 	const store = Object.fromEntries((await (await request(`${APPSTORE}/repo.json`)).json()).packages.map(pkg => [pkg.name, pkg]));
 	const releases = new Map();
 	const release = async (repo) => {
@@ -190,7 +198,7 @@ async function syncSoftware() {
 			const matched = [];
 			for (const item of items) {
 				const info = await release(item.repo);
-				const asset = info.assets.find(asset => new RegExp(item.asset).test(asset.name));
+				const asset = info.assets.find(asset => assetPattern(component, item, tuning).test(asset.name));
 				if (!asset) problems.push(`${component.id}: no asset ${item.asset} in ${item.repo} ${info.version}`);
 				else matched.push(asset);
 			}
@@ -210,7 +218,7 @@ async function syncSoftware() {
 		}
 
 		if (refreshLogos || !(await existingLogo(component))) {
-			const logo = await findLogo(component, items.length ? await release(items[0].repo) : null, packages);
+			const logo = await findLogo(component, items.length ? await release(items[0].repo) : null, packages, tuning);
 			if (logo) {
 				component.logo = `${component.id}.${logo.extension}`;
 				await writeFile(new URL(component.logo, LOGOS), logo.data);

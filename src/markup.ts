@@ -21,6 +21,7 @@ const escape = (text: string) => text
 	.replace(/>/g, '&gt;')
 	.replace(/"/g, '&quot;');
 
+// Code highlighted as the language, escaped as it is for languages highlight.js does not know
 const highlightCode = (code: string, language?: string) => language && hljs.getLanguage(language)
 	? hljs.highlight(code, { language }).value
 	: escape(code);
@@ -45,6 +46,7 @@ const markdown = new Marked({
 	}
 });
 
+// HTML of the readme
 export function renderMarkdown(content: string): string {
 	return markdown.parse(content, { async: false });
 }

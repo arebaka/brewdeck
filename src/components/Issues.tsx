@@ -1,16 +1,17 @@
 import React from 'react';
 
-import { Issue, StepId } from '../types';
+import { Fix, Issue, StepId } from '../types';
 import { Translation, format } from '../i18n';
 import { COMPONENTS } from '../data';
 
 interface IssuesProps {
 	issues: Issue[];
-	applyFix: (fix: NonNullable<Issue['fix']>) => void;
+	applyFix: (fix: Fix) => void;
 	setStep?: (step: StepId) => void; // offers to open the step of every issue
 	t: Translation;
 }
 
+// Names of the components a fix adds or removes
 const names = (ids: string[]) => ids.map(id => COMPONENTS.find(comp => comp.id == id)?.name ?? id).join(', ');
 
 export function Issues({
@@ -24,20 +25,16 @@ export function Issues({
 			<span className="text">
 				{format(t.issues[issue.code as keyof Translation['issues']], issue.params)}
 			</span>
-			{issue.fix?.add && (
+			{issue.fixes?.map((fix, index) => (
 				<button
+					key={index}
 					className="fix"
-					onClick={() => applyFix(issue.fix!)}>
-					{format(t.issues.add, { component: names(issue.fix.add) })}
+					onClick={() => applyFix(fix)}>
+					{fix.add
+						? format(t.issues.add, { component: names(fix.add) })
+						: format(t.issues.remove, { component: names(fix.remove ?? []) })}
 				</button>
-			)}
-			{issue.fix?.remove && (
-				<button
-					className="fix"
-					onClick={() => applyFix(issue.fix!)}>
-					{format(t.issues.remove, { component: names(issue.fix.remove) })}
-				</button>
-			)}
+			))}
 			{setStep && (
 				<button
 					className="fix"

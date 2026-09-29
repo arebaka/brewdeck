@@ -1,4 +1,4 @@
-import { Software } from '..';
+import { Software } from '../types';
 
 const software: {[component in string]: Software} = {
 	atmosphere: {
@@ -129,6 +129,11 @@ const software: {[component in string]: Software} = {
 		details: 'Connects the console to a PC as an MTP device via USB for installing NSP/NSZ games. Also supports network installs (HTTP, FTP, WebDAV), managing saves, and cleaning up orphaned files.',
 		note: 'Covers everything Goldleaf and Tinfoil do for local installation, but faster and more stable.',
 	},
+	dbi_patcher: {
+		description: 'Unofficial translations of DBI into 20+ languages',
+		details: 'Replaces DBI with the build the translations are made for and puts translation.bin in the language chosen on the Plugins step next to it. Translations lag behind: new DBI versions come out in Russian only.',
+		note: 'The author of DBI warns that patched builds tag the console and start failing over time. Use it at your own risk.',
+	},
 	tinfoil: {
 		description: 'Alternative installer with shop support',
 		details: 'Installs content from third-party online shops, verifies file hashes, and features a tile-based UI with game covers.',
@@ -180,6 +185,7 @@ const software: {[component in string]: Software} = {
 	nx_activity_log: {
 		description: 'Detailed replacement for the system play activity log',
 		details: 'Records play sessions, generates graphs of playtime by days, months, and years, and exports data. Useful for those who like tracking detailed statistics.',
+		note: 'The original has not been updated since 2021; uses the maintained fork by zdm65477730.',
 	},
 	jc_color_swapper: {
 		description: 'Joy-Con color changer',

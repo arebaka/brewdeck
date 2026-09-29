@@ -8,6 +8,7 @@ export function activate(event: KeyboardEvent<HTMLElement>): void {
 	}
 }
 
+// Size in decimal units, as downloads are measured
 export function formatSize(bytes: number, decimals: number = 2): string {
 	const k = 1000;
 	if (bytes < k) {

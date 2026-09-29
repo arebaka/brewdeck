@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { COMPONENTS, GALLERY, HARDWARE, PRESETS, TUNING, matchingPreset, presetSelection, resolveSelection } from '@/data';
 import { translations } from '@/i18n';
 import { buttonName, isButtons } from '@/components/Buttons';
-import { defaultState } from '@/url';
+import { defaultState } from '@/state';
 import { issueCodes } from './fixtures';
 
 const ids = new Set(COMPONENTS.map(comp => comp.id));
@@ -23,6 +23,14 @@ describe('catalog', () => {
 		}
 		for (const preset of PRESETS.filter(preset => Array.isArray(preset.components))) {
 			expect((preset.components as string[]).filter(id => !ids.has(id)), preset.id).toEqual([]);
+		}
+	});
+
+	it('installs payloads where their Launch entries point', () => {
+		for (const comp of COMPONENTS.filter(comp => comp.payload)) {
+			const paths = [...(comp.sources.github ?? []), ...(comp.sources.url ?? [])].map(item => item.path).filter(Boolean);
+			// Archives unpack the payload themselves, single files are saved to the path
+			expect(paths.every(path => path == comp.payload), comp.id).toBe(true);
 		}
 	});
 

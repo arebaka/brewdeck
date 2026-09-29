@@ -31,7 +31,7 @@ export function Topbar({
 						key={option}
 						className={`lang-option ${lang == option ? 'active' : ''}`}
 						onClick={() => setLang(option)}>
-						{option}
+						{translations[option].language}
 					</button>
 				))}
 			</nav>

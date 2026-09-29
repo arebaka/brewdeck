@@ -1,35 +1,19 @@
 import Mustache from 'mustache';
 
-import { AppearanceConfig, ComponentInfo, GameProfile, HardwareRevision, IconEntry, ImageTarget, TuningConfig, TuningValue } from '@/types';
+import { AppearanceConfig, ComponentInfo, GameProfile, HardwareRevision, ImageTarget, LaunchConfig, TuningConfig, TuningValue } from '@/types';
 import { Language, Translation } from '@/i18n';
-import { COMPONENTS, GALLERY, HARDWARE, TUNING, isRequirementMet, isTuningOptionChanged } from '@/data';
-
-import hekateIplIni from '@templates/sd/bootloader/hekate_ipl.ini?raw';
-import nyxIni from '@templates/sd/bootloader/nyx.ini?raw';
-import exosphereIni from '@templates/sd/exosphere.ini?raw';
-import systemSettingsIni from '@templates/sd/atmosphere/config/system_settings.ini?raw';
-import stratosphereIni from '@templates/sd/atmosphere/config/stratosphere.ini?raw';
-import overrideConfigIni from '@templates/sd/atmosphere/config/override_config.ini?raw';
-import nintendoHostsTxt from '@templates/sd/atmosphere/hosts/nintendo.txt?raw';
-import adHostsTxt from '@templates/sd/atmosphere/hosts/advertising.txt?raw';
-import teslaConfigIni from '@templates/sd/config/tesla/config.ini?raw';
-import sysPatchConfigIni from '@templates/sd/config/sys-patch/config.ini?raw';
-import missionControlIni from '@templates/sd/config/MissionControl/missioncontrol.ini?raw';
-import statusMonitorConfigIni from '@templates/sd/config/status-monitor/config.ini?raw';
-import sysFtpdConfigIni from '@templates/sd/config/sys-ftpd/config.ini?raw';
-import sysClkConfigIni from '@templates/sd/config/sys-clk/config.ini?raw';
-import installSh from '@templates/install.sh?raw';
-import installPs1 from '@templates/install.ps1?raw';
-import readmeEn from '@templates/readme/en.md?raw';
-import readmeRu from '@templates/readme/ru.md?raw';
+import { COMPONENTS, GALLERY, HARDWARE, TUNING, isRequirementMet, isTuningOptionChanged, launchEntries } from '@/data';
+import {
+	installSh, installPs1, readmeEn, readmeRu, readmeUk, bootIni,
+	hekateIplIni, nyxIni, exosphereIni, systemSettingsIni, stratosphereIni, overrideConfigIni, nintendoHostsTxt, adHostsTxt,
+	teslaConfigIni, sysPatchConfigIni, missionControlIni, statusMonitorConfigIni, sysFtpdConfigIni, sysClkConfigIni
+} from '@templates';
 
 const READMES: {[lang in Language]: string} = {
 	en: readmeEn,
-	ru: readmeRu
+	ru: readmeRu,
+	uk: readmeUk
 };
-
-// Boot entries in the order of hekate_ipl.ini, autoboot refers to them by 1-based index
-const HEKATE_ENTRIES: IconEntry[] = ['emummc', 'sysmmc', 'stock'];
 
 export interface BuildRequest {
 	hardware: HardwareRevision;
@@ -38,6 +22,7 @@ export interface BuildRequest {
 	tuning: TuningConfig;
 	overclock: GameProfile[];
 	appearance: AppearanceConfig;
+	launch: LaunchConfig;
 	lang: Language;
 	t: Translation;
 	images?: Record<string, string>; // encoded images by SD path, embedded into the installers
@@ -70,6 +55,7 @@ interface ConfigSpec {
 	when?: (request: BuildRequest) => boolean;
 }
 
+// Values as the configs spell them: hekate flags, Atmosphere u8 and u64 settings
 const flag = (value: TuningValue) => value ? 1 : 0;
 const u8 = (value: TuningValue) => value ? '0x1' : '0x0';
 const u64 = (value: number) => `0x${value.toString(16)}`;
@@ -81,6 +67,7 @@ function nyxBackground(color: TuningValue): string {
 	return value.toString(16).padStart(6, '0');
 }
 
+// Whether the hosts file of `emummc` or `sysmmc` blocks Nintendo servers
 function isDNSBlocked({ tuning: { dns } }: BuildRequest, target: string): boolean {
 	return dns.mode == 'block' && (dns.targets as string[]).includes(target);
 }
@@ -95,29 +82,48 @@ function isGroupChanged(request: BuildRequest, id: string): boolean {
 }
 
 // Icons are named after their entry, white layouts get the `_hue` suffix Nyx tints with the theme color
-function iconPath(request: BuildRequest, entry: IconEntry): string | undefined {
+function iconPath(request: BuildRequest, entry: string): string | undefined {
 	const image = request.appearance.icons[entry];
 	if (!image) return undefined;
 	const hue = GALLERY.find(item => item.target == 'icon' && item.id == image)?.hue;
 	return `bootloader/res/brewdeck_${entry}${hue ? '_hue' : ''}.bmp`;
 }
 
+// Boot logo of its own for the entry, the common one otherwise
+function logoPath(request: BuildRequest, entry: string): string | undefined {
+	return request.appearance.logos[entry] ? `bootloader/res/brewdeck_${entry}_logo.bmp` : undefined;
+}
+
 const CONFIGS: ConfigSpec[] = [
+	{
+		path: 'BOOT.INI',
+		template: bootIni,
+		view: () => ({})
+	},
 	{
 		path: 'bootloader/hekate_ipl.ini',
 		template: hekateIplIni,
 		view: (request) => {
-			const { hekate } = request.tuning;
+			const { hekate, logo } = request.tuning;
+			const entries = launchEntries(request.launch, request.selectedComponentIDs);
 			return {
-				autoboot: HEKATE_ENTRIES.indexOf(hekate.autoboot as IconEntry) + 1,
-				bootwait: hekate.bootwait,
-				noticker: flag(hekate.noticker),
+				// Entries are numbered from 1 in the order of the file, 0 stays in the menu
+				autoboot: entries.findIndex(entry => entry.id == request.launch.autoboot) + 1,
+				bootwait: logo.bootwait,
+				noticker: flag(logo.noticker),
 				backlight: hekate.backlight,
 				autohosoff: hekate.autohosoff,
 				autonogc: flag(hekate.autonogc),
 				updater2p: flag(hekate.updater2p),
 				bootprotect: flag(hekate.bootprotect),
-				icons: Object.fromEntries(HEKATE_ENTRIES.map(entry => [entry, iconPath(request, entry)]))
+				// A caption opens every group of entries
+				entries: entries.map((entry, index) => ({
+					name: entry.name,
+					caption: index == 0 || entries[index - 1].caption != entry.caption ? entry.caption : undefined,
+					keys: Object.entries(entry.keys).map(([key, value]) => ({ key, value })),
+					logo: logoPath(request, entry.id),
+					icon: iconPath(request, entry.id)
+				}))
 			};
 		}
 	},
@@ -128,7 +134,6 @@ const CONFIGS: ConfigSpec[] = [
 			themebg: nyxBackground(nyx.themebg),
 			themecolor: nyx.themecolor,
 			entries5col: flag(nyx.entries5col),
-			timeoffset: flag(nyx.timeoffset),
 			timedst: flag(nyx.timedst),
 			homescreen: nyx.homescreen,
 			verification: nyx.verification,
@@ -286,12 +291,17 @@ const CONFIGS: ConfigSpec[] = [
 	}
 ];
 
+// Installers and configs are not HTML, so values go in without escaping
 function render(template: string, view: object): string {
 	return Mustache.render(template, view, {}, { escape: String });
 }
 
+// Assets named after an option of the component, such as `translation_{{language}}.bin`, take its value
+const assetPattern = (asset: string, options: Record<string, TuningValue>) =>
+	asset.replace(/\{\{(\w+)\}\}/g, (match, option) => option in options ? String(options[option]) : match);
+
 // Every flag is set explicitly, so a missing one never resolves from an outer context
-function installSteps(comp: ComponentInfo, modchip: boolean) {
+function installSteps(comp: ComponentInfo, modchip: boolean, options: Record<string, TuningValue> = {}) {
 	const step = { appstore: false, zip: false, file: false, urlZip: false, urlFile: false };
 	switch (comp.source) {
 		case 'appstore':
@@ -300,8 +310,8 @@ function installSteps(comp: ComponentInfo, modchip: boolean) {
 			return comp.sources.github!
 				.filter(item => !item.modchip || modchip)
 				.map(item => item.path
-					? { ...step, file: true, repo: item.repo, asset: item.asset, path: item.path }
-					: { ...step, zip: true, repo: item.repo, asset: item.asset, root: item.root ?? '', into: item.into ?? '' });
+					? { ...step, file: true, repo: item.repo, asset: assetPattern(item.asset, options), path: item.path }
+					: { ...step, zip: true, repo: item.repo, asset: assetPattern(item.asset, options), root: item.root ?? '', into: item.into ?? '' });
 		case 'url':
 			return comp.sources.url!.map(item => item.path
 				? { ...step, urlFile: true, url: item.url, path: item.path }
@@ -311,17 +321,23 @@ function installSteps(comp: ComponentInfo, modchip: boolean) {
 	}
 }
 
+// Images the appearance asks for, logos and icons only of the entries in the menu
 function assets(request: BuildRequest): Asset[] {
-	const { bootlogo, background } = request.appearance;
+	const { bootlogo, background, logos, icons } = request.appearance;
+	const entries = launchEntries(request.launch, request.selectedComponentIDs).map(entry => entry.id);
 	return [
 		...(bootlogo ? [{ path: 'bootloader/bootlogo.bmp', target: 'bootlogo' as ImageTarget, key: 'bootlogo', image: bootlogo }] : []),
 		...(background ? [{ path: 'bootloader/res/background.bmp', target: 'background' as ImageTarget, key: 'background', image: background }] : []),
-		...HEKATE_ENTRIES
-			.filter(entry => request.appearance.icons[entry])
-			.map(entry => ({ path: iconPath(request, entry)!, target: 'icon' as ImageTarget, key: `icon.${entry}`, image: request.appearance.icons[entry]! }))
+		...entries
+			.filter(entry => logos[entry])
+			.map(entry => ({ path: logoPath(request, entry)!, target: 'bootlogo' as ImageTarget, key: `logo.${entry}`, image: logos[entry] })),
+		...entries
+			.filter(entry => icons[entry])
+			.map(entry => ({ path: iconPath(request, entry)!, target: 'icon' as ImageTarget, key: `icon.${entry}`, image: icons[entry] }))
 	];
 }
 
+// The installers, their readme and every config they write, for the chosen build
 export function build(request: BuildRequest): BuildResult {
 	const { t } = request;
 	const hardware = HARDWARE.find(hw => hw.id == request.hardware)!;
@@ -337,7 +353,7 @@ export function build(request: BuildRequest): BuildResult {
 		hardware: hardware.name,
 		hos: request.hosVersion,
 		components: selected
-			.map(comp => ({ name: comp.name, steps: installSteps(comp, hardware.is_modchip_required) }))
+			.map(comp => ({ name: comp.name, steps: installSteps(comp, hardware.is_modchip_required, request.tuning[comp.id]) }))
 			.filter(comp => comp.steps.length),
 		// Heredocs and here-strings add the final line break themselves
 		configs: configs.map(config => ({ path: config.path, content: config.content.trimEnd() })),
@@ -347,7 +363,9 @@ export function build(request: BuildRequest): BuildResult {
 		hasImages: images.length > 0
 	};
 
-	const { hekate, dns } = request.tuning;
+	const { dns } = request.tuning;
+	const entries = launchEntries(request.launch, request.selectedComponentIDs);
+	const autoboot = entries.find(entry => entry.id == request.launch.autoboot);
 	const readmeView = {
 		...installerView,
 		date: new Date().toISOString().slice(0, 10),
@@ -358,7 +376,10 @@ export function build(request: BuildRequest): BuildResult {
 		})),
 		manual: manual.map(comp => comp.name),
 		modchip: hardware.is_modchip_required,
-		autoboot: hekate.autoboot == 'off' ? '' : t.tuning.hekate.options.autoboot.values?.[hekate.autoboot as string],
+		autoboot: autoboot?.name ?? '',
+		// More emuMMCs have to be created in their folders before their entries boot
+		emummcs: request.launch.emummcs.map(folder => ({ folder, name: entries.find(entry => entry.id == `emummc-${folder}`)!.name })),
+		hasEmummcs: request.launch.emummcs.length > 0,
 		dnsBlock: dns.mode == 'block' && (dns.targets as string[]).length > 0,
 		dnsTargets: (dns.targets as string[]).map(target => t.tuning.dns.options.targets.values?.[target]).join(', ')
 	};

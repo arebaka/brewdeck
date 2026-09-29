@@ -1,0 +1,15 @@
+export { default as bootIni }                from './BOOT.INI?raw';
+export { default as hekateIplIni }           from './bootloader/hekate_ipl.ini?raw';
+export { default as nyxIni }                 from './bootloader/nyx.ini?raw';
+export { default as exosphereIni }           from './exosphere.ini?raw';
+export { default as systemSettingsIni }      from './atmosphere/config/system_settings.ini?raw';
+export { default as stratosphereIni }        from './atmosphere/config/stratosphere.ini?raw';
+export { default as overrideConfigIni }      from './atmosphere/config/override_config.ini?raw';
+export { default as nintendoHostsTxt }       from './atmosphere/hosts/nintendo.txt?raw';
+export { default as adHostsTxt }             from './atmosphere/hosts/advertising.txt?raw';
+export { default as teslaConfigIni }         from './config/tesla/config.ini?raw';
+export { default as sysPatchConfigIni }      from './config/sys-patch/config.ini?raw';
+export { default as missionControlIni }      from './config/MissionControl/missioncontrol.ini?raw';
+export { default as statusMonitorConfigIni } from './config/status-monitor/config.ini?raw';
+export { default as sysFtpdConfigIni }       from './config/sys-ftpd/config.ini?raw';
+export { default as sysClkConfigIni }        from './config/sys-clk/config.ini?raw';

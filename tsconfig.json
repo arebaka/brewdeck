@@ -16,8 +16,12 @@
 		"paths": {
 			"@/*": ["src/*"],
 			"@components/*": ["src/components/*"],
+			"@data": ["data"],
 			"@data/*": ["data/*"],
-			"@templates/*": ["templates/*"]
+			"@templates": ["templates"],
+			"@templates/*": ["templates/*"],
+			"@sd": ["templates/sd"],
+			"@sd/*": ["templates/sd/*"]
 		}
 	},
 	"include": ["src", "tests", "vite.config.ts"]

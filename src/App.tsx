@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-import { GameProfile, ImageTarget, Issue, IssueLevel, StepId, TuningStep, TuningValue, Uploads } from './types';
+import { STEP_IDS, Fix, GameProfile, IssueLevel, LaunchConfig, StepId, TuningStep, TuningValue, Uploads } from './types';
 import { format, translations } from './i18n';
-import { COMPONENTS, PRESETS, TUNING, getTuningDefaults, isRequirementMet, isTuningOptionChanged, presetSelection, resolveSelection } from './data';
-import { AppState, STEP_IDS, decodeState, encodeState } from './url';
+import { COMPONENTS, PRESETS, TUNING, getTuningDefaults, isRequirementMet, isTuningOptionChanged, launchEntries, presetSelection, resolveSelection } from './data';
+import { AppState } from './state';
+import { decodeState, encodeState } from './url';
 import { validate } from './validation';
 
-import { Topbar, Sidebar, SidebarItem, Step1Hardware, Step2Version, Step3Software, Step4Tuning, StepOverclock, StepAppearance, Step5Build } from './components';
+import { Topbar, Sidebar, SidebarItem, Hardware, Firmware, Software, Launch, Tuning, Overclock, Appearance, Build } from './components';
 
 // Modules and overclock only appear when a selected component has something to set
 function visibleSteps(selectedComponentIDs: string[]): StepId[] {
@@ -21,6 +22,7 @@ function visibleSteps(selectedComponentIDs: string[]): StepId[] {
 	});
 }
 
+// Options changed on a step, counting only groups whose components are selected
 function countChanges(state: AppState, step: TuningStep): number {
 	return TUNING
 		.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, state.selectedComponentIDs)))
@@ -34,7 +36,7 @@ export default function App() {
 	const [uploads, setUploads] = useState<Uploads>({});
 	const update = (patch: Partial<AppState>) => setState(prev => ({ ...prev, ...patch }));
 
-	const { lang, hardware, hosVersion, selectedComponentIDs, tuning, overclock, appearance } = state;
+	const { lang, hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance } = state;
 	const t = translations[lang];
 
 	const steps = visibleSteps(selectedComponentIDs);
@@ -50,6 +52,11 @@ export default function App() {
 		const query = encodeState({ ...state, step });
 		history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}`);
 	}, [state, step]);
+
+	// Hyphenation, quotes and the choice of fonts follow the language of the page
+	useEffect(() => {
+		document.documentElement.lang = lang;
+	}, [lang]);
 
 	// Every step starts from the top
 	useEffect(() => {
@@ -94,7 +101,8 @@ export default function App() {
 		update({ selectedComponentIDs: presetSelection(PRESETS.find(preset => preset.id == id)!) });
 	};
 
-	const applyFix = (fix: NonNullable<Issue['fix']>) => {
+	// A fix adds or removes components, only an added one brings its dependencies
+	const applyFix = (fix: Fix) => {
 		update({
 			selectedComponentIDs: resolveSelection(
 				[...selectedComponentIDs.filter(id => !fix.remove?.includes(id)), ...(fix.add ?? [])],
@@ -107,14 +115,16 @@ export default function App() {
 		setState(prev => ({ ...prev, tuning: { ...prev.tuning, [group]: { ...prev.tuning[group], [option]: value } } }));
 	};
 
+	// Every option of the step returns to its default
 	const resetTuning = (step: TuningStep) => {
 		const defaults = getTuningDefaults();
 		update({ tuning: { ...tuning, ...Object.fromEntries(TUNING.filter(group => group.step == step).map(group => [group.id, defaults[group.id]])) } });
 	};
 
+	const setLaunch = (launch: LaunchConfig) => update({ launch });
 	const setOverclock = (overclock: GameProfile[]) => update({ overclock });
 
-	// `key` is bootlogo, background or icon.<entry>, `image` is a gallery id, `upload` or nothing for the default
+	// `key` is bootlogo, background, logo.<entry> or icon.<entry>, `image` is a gallery id, `upload` or nothing for the default
 	const setImage = (key: string, image?: string, blob?: Blob) => {
 		if (blob) {
 			setUploads(prev => {
@@ -122,23 +132,29 @@ export default function App() {
 				return { ...prev, [key]: { blob, url: URL.createObjectURL(blob) } };
 			});
 		}
-		const [target, entry] = key.split('.') as [ImageTarget, string?];
-		update({
-			appearance: target == 'icon'
-				? { ...appearance, icons: { ...appearance.icons, [entry!]: image } }
-				: { ...appearance, [target]: image }
-		});
+		const [target, entry] = key.split('.') as ['bootlogo' | 'background' | 'logo' | 'icon', string?];
+		if (target == 'logo' || target == 'icon') {
+			const images = { ...appearance[`${target}s`] };
+			if (image) images[entry!] = image;
+			else delete images[entry!];
+			update({ appearance: { ...appearance, [`${target}s`]: images } });
+		} else {
+			update({ appearance: { ...appearance, [target]: image } });
+		}
 	};
 
 	const stepIssues = (step: StepId) => issues.filter(issue => issue.step == step);
+	// The most serious issue of a step marks it in the sidebar
 	const worst = (step: StepId) => LEVELS.find(level => stepIssues(step).some(issue => issue.level == level));
-	const images = [appearance.bootlogo, appearance.background, ...Object.values(appearance.icons)].filter(Boolean).length;
+	const images = [appearance.bootlogo, appearance.background, ...Object.values(appearance.logos), ...Object.values(appearance.icons)].filter(Boolean).length;
 
 	const values: Record<StepId, string | number> = {
 		hardware: t.hardware[hardware].name,
 		firmware: hosVersion,
 		software: selectedComponentIDs.length,
+		launch: launchEntries(launch, selectedComponentIDs).length,
 		system: countChanges(state, 'system') || '',
+		security: countChanges(state, 'security') || '',
 		modules: countChanges(state, 'modules') || '',
 		overclock: overclock.length || '',
 		appearance: images || '',
@@ -164,7 +180,7 @@ export default function App() {
 		<main ref={contentRef} className="content">
 			<header className="header">
 				<h2 className="title">
-					{format(t.wizard.step, { n: index + 1 })} {page.title}
+					{page.title}
 				</h2>
 				<p className="description">
 					{page.description}
@@ -172,7 +188,7 @@ export default function App() {
 			</header>
 
 			{step == 'hardware' && (
-				<Step1Hardware
+				<Hardware
 					lang={lang}
 					hardware={hardware}
 					setHardware={hardware => update({ hardware })}
@@ -180,7 +196,7 @@ export default function App() {
 			)}
 
 			{step == 'firmware' && (
-				<Step2Version
+				<Firmware
 					lang={lang}
 					version={hosVersion}
 					setVersion={hosVersion => update({ hosVersion })}
@@ -190,7 +206,7 @@ export default function App() {
 			)}
 
 			{step == 'software' && (
-				<Step3Software
+				<Software
 					lang={lang}
 					selectedComponentIDs={selectedComponentIDs}
 					toggleComponent={toggleComponent}
@@ -200,8 +216,22 @@ export default function App() {
 					t={t} />
 			)}
 
-			{(step == 'system' || step == 'modules') && (
-				<Step4Tuning
+			{step == 'launch' && (
+				<Launch
+					lang={lang}
+					launch={launch}
+					setLaunch={setLaunch}
+					selectedComponentIDs={selectedComponentIDs}
+					toggleComponent={toggleComponent}
+					tuning={tuning}
+					setTuningOption={setTuningOption}
+					issues={stepIssues('launch')}
+					applyFix={applyFix}
+					t={t} />
+			)}
+
+			{(step == 'system' || step == 'security' || step == 'modules') && (
+				<Tuning
 					key={step}
 					lang={lang}
 					step={step}
@@ -215,7 +245,7 @@ export default function App() {
 			)}
 
 			{step == 'overclock' && (
-				<StepOverclock
+				<Overclock
 					lang={lang}
 					hardware={hardware}
 					overclock={overclock}
@@ -230,21 +260,22 @@ export default function App() {
 			)}
 
 			{step == 'appearance' && (
-				<StepAppearance
+				<Appearance
 					lang={lang}
 					appearance={appearance}
+					entries={launchEntries(launch, selectedComponentIDs)}
 					uploads={uploads}
 					setImage={setImage}
 					t={t} />
 			)}
 
 			{step == 'build' && (
-				<Step5Build
+				<Build
 					lang={lang}
 					state={state}
 					uploads={uploads}
 					totalSize={totalSize}
-					tuningChanges={countChanges(state, 'system') + countChanges(state, 'modules')}
+					tuningChanges={(['launch', 'system', 'security', 'modules'] as TuningStep[]).reduce((sum, step) => sum + countChanges(state, step), 0)}
 					issues={issues}
 					applyFix={applyFix}
 					setStep={setStep}

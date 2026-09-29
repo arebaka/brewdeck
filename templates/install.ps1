@@ -1,16 +1,11 @@
 # BrewDeck installer: Nintendo Switch {{hardware}}, Horizon OS {{hos}}
 #
 # Usage: put the script into the root of the SD card and run it there:
-#   powershell -ExecutionPolicy Bypass -File install.ps1 [-Yes]
-#   -Yes skips the confirmation.
+#   powershell -ExecutionPolicy Bypass -File install.ps1
 #
 # Downloads the selected components from the Homebrew App Store, GitHub releases and direct links,
 # unpacks them onto the SD card next to the script and writes the configuration and images.
 # Set $env:GITHUB_TOKEN to lift the GitHub API limit of 60 requests per hour.
-
-param(
-	[switch]$Yes
-)
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' # the progress bar slows Invoke-WebRequest down dramatically on PowerShell 5
@@ -18,17 +13,41 @@ $ProgressPreference = 'SilentlyContinue' # the progress bar slows Invoke-WebRequ
 
 $AppStore = 'https://switch.cdn.fortheusers.org'
 $SdRoot = $PSScriptRoot
-
-Write-Host "Installing to $SdRoot"
-if (-not $Yes -and (Read-Host 'Continue? [y/N]') -notmatch '^[yY]') {
-	exit 1
-}
-
-# Downloads land on the SD card next to the script and are removed at the end
 $WorkDir = Join-Path $SdRoot '.brewdeck'
-New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
 $Releases = @{}
 $Failed = @()
+
+function Write-Info([string]$Text) {
+	Write-Host ''
+	Write-Host '==> ' -ForegroundColor Cyan -NoNewline
+	Write-Host $Text -ForegroundColor White
+}
+
+function Write-Step([string]$Text) {
+	Write-Host '    [..] ' -ForegroundColor DarkGray -NoNewline
+	Write-Host "$Text..." -NoNewline
+}
+
+# The result replaces the line of the step, trailing spaces cover its longer tail
+function Write-Ok([string]$Text) {
+	Write-Host "`r    [" -NoNewline
+	Write-Host 'OK' -ForegroundColor Green -NoNewline
+	Write-Host "] $Text   "
+}
+
+function Write-Fail([string]$Text) {
+	Write-Host "`r    [" -NoNewline
+	Write-Host 'ERR' -ForegroundColor Red -NoNewline
+	Write-Host "] $Text  "
+}
+
+function Write-Notice([string]$Text) {
+	Write-Host '    ' -NoNewline
+	Write-Host '!' -ForegroundColor Yellow -NoNewline
+	Write-Host " $Text"
+}
+
+# --- Downloads ---
 
 # Saves the file into the work directory and returns its path
 function Get-Download([string]$Url) {
@@ -114,51 +133,74 @@ function Write-Image([string]$Path, [string]$Data) {
 	}
 }
 
-{{#components}}
-Write-Host '==> {{name}}' -ForegroundColor Cyan
+# --- Installation ---
+
 try {
-{{#steps}}
-{{#appstore}}	Install-AppStore '{{package}}'{{/appstore}}{{#zip}}	Install-Archive (Get-Download (Get-AssetUrl '{{repo}}' '{{asset}}')) '{{root}}' '{{into}}'{{/zip}}{{#file}}	Install-Download (Get-Download (Get-AssetUrl '{{repo}}' '{{asset}}')) '{{path}}'{{/file}}{{#urlZip}}	Install-Archive (Get-Download '{{url}}') '{{root}}' '{{into}}'{{/urlZip}}{{#urlFile}}	Install-Download (Get-Download '{{url}}') '{{path}}'{{/urlFile}}
-{{/steps}}
+	New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
 } catch {
-	Write-Warning $_
-	$Failed += '{{name}}'
+	Write-Host "error: $SdRoot is not writable" -ForegroundColor Red
+	exit 1
 }
 
+# Downloads land on the SD card next to the script and are removed at the end
+try {
+	Write-Info 'Downloading & Unpacking Components'
+{{#components}}
+	Write-Step '{{name}}'
+	try {
+{{#steps}}
+{{#appstore}}		Install-AppStore '{{package}}'{{/appstore}}{{#zip}}		Install-Archive (Get-Download (Get-AssetUrl '{{repo}}' '{{asset}}')) '{{root}}' '{{into}}'{{/zip}}{{#file}}		Install-Download (Get-Download (Get-AssetUrl '{{repo}}' '{{asset}}')) '{{path}}'{{/file}}{{#urlZip}}		Install-Archive (Get-Download '{{url}}') '{{root}}' '{{into}}'{{/urlZip}}{{#urlFile}}		Install-Download (Get-Download '{{url}}') '{{path}}'{{/urlFile}}
+{{/steps}}
+		Write-Ok '{{name}}'
+	} catch {
+		Write-Fail '{{name}}'
+		Write-Host "        $($_.Exception.Message)" -ForegroundColor DarkGray
+		$Failed += '{{name}}'
+	}
+
 {{/components}}
-Write-Host '==> Configuration' -ForegroundColor Cyan
+	Write-Info 'Writing Configuration'
 {{#configs}}
-Write-Config '{{path}}' @'
+	Write-Step '{{path}}'
+	Write-Config '{{path}}' @'
 {{content}}
 '@
+	Write-Ok '{{path}}'
 {{/configs}}
 {{#hasImages}}
 
-Write-Host '==> Appearance' -ForegroundColor Cyan
+	Write-Info 'Deploying Appearance & Assets'
 {{#images}}
-Write-Image '{{path}}' @'
+	Write-Step '{{path}}'
+	Write-Image '{{path}}' @'
 {{data}}
 '@
+	Write-Ok '{{path}}'
 {{/images}}
 {{/hasImages}}
-
-Remove-Item -LiteralPath $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
 {{#hasManual}}
 
-Write-Host ''
-Write-Host 'Download manually:'
+	Write-Info 'Manual Action Required'
 {{#manual}}
-Write-Host '  {{name}}: {{url}}'
+	Write-Notice '{{name}}: {{url}}'
 {{/manual}}
 {{/hasManual}}
+} finally {
+	Remove-Item -LiteralPath $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 Write-Host ''
 if ($Failed.Count -gt 0) {
-	Write-Host "Failed: $($Failed -join ', ')" -ForegroundColor Red
+	Write-Host 'Installation failed for: ' -ForegroundColor Red -NoNewline
+	Write-Host ($Failed -join ' ')
 } else {
-	Write-Host 'Done. Eject the SD card safely and boot the console.' -ForegroundColor Green
+	Write-Host 'Done! ' -ForegroundColor Green -NoNewline
+	Write-Host 'Eject the SD card safely and boot your Nintendo Switch.'
 }
-if (-not $Yes) {
+Write-Host ''
+
+# A window started from Explorer closes as soon as the script ends
+if (-not [Console]::IsInputRedirected) {
 	Read-Host 'Press Enter to exit' | Out-Null
 }
 exit [int]($Failed.Count -gt 0)

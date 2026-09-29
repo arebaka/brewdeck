@@ -17,5 +17,13 @@ export default defineConfig({
 		sourcemap: true,
 		manifest: true,
 		minify: 'oxc',
+		// Libraries change rarely and stay cached across deploys, the app itself is updated often
+		rolldownOptions: {
+			output: {
+				codeSplitting: {
+					groups: [{ name: 'vendor', test: /node_modules/ }],
+				},
+			},
+		},
 	},
 });

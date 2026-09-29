@@ -41,6 +41,16 @@ Keep the system NAND clean and run CFW from an emuMMC:
 1. Create a NAND backup in hekate: **Tools → Backup eMMC**.
 2. Create the emuMMC: **emuMMC → Create emuMMC → SD File**. **SD Partition** is faster, but requires **Tools → Partition SD Card** first.
 3. Boot **Launch → CFW (emuMMC)**.
+{{#hasEmummcs}}
+
+More emuMMCs boot from entries of their own, each from its folder:
+
+{{#emummcs}}
+- **Launch → {{name}}**: `emuMMC/{{folder}}`
+{{/emummcs}}
+
+Create each of them the same way, Hekate names the folders itself: SD00, SD01 and on for files, RAW1 to RAW3 for partitions. **CFW (emuMMC)** boots the one chosen in **emuMMC → Change emuMMC**.
+{{/hasEmummcs}}
 {{#dnsBlock}}
 
 Nintendo servers are blocked on {{dnsTargets}}: updates, eShop and online play don't work there.

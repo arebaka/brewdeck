@@ -1,16 +1,19 @@
-import { Translation } from '..';
+import { Translation } from '../types';
 
 import software from './software';
 import tuning from './tuning';
 
 const ru: Translation = {
+	language: 'ru',
 	title: 'BrewDeck',
 	subtitle: 'Конструктор кастомной прошивки Nintendo Switch',
 	steps: {
 		hardware: 'Ревизия',
 		firmware: 'Версия HOS',
 		software: 'Софт',
+		launch: 'Запуск',
 		system: 'CFW',
+		security: 'Безопасность',
 		modules: 'Плагины',
 		overclock: 'Разгон',
 		appearance: 'Оформление',
@@ -20,7 +23,7 @@ const ru: Translation = {
 		back: 'Назад',
 		next: 'Далее',
 		rebuild: 'Собрать заново',
-		step: 'Шаг {n}.',
+		step: '{n}.',
 	},
 	hardware: {
 		erista: {
@@ -116,6 +119,7 @@ const ru: Translation = {
 			requiredBadge: 'обязательно',
 			bundledBadge: 'в составе {component}',
 			deprecatedBadge: 'заброшен',
+			riskyBadge: 'риск',
 			select: 'включить',
 			deselect: 'отключить',
 			defaultBadge: 'рекомендуется',
@@ -125,6 +129,32 @@ const ru: Translation = {
 			recommendsTitle: 'Рекомендуется добавить:',
 			conflictBadge: 'конфликт',
 		},
+		launch: {
+			title: 'Меню запуска',
+			description: 'Пункты меню Launch в hekate: режимы, в которых загружается консоль, и пэйлоады. Каждый пункт становится секцией bootloader/hekate_ipl.ini с ключами, показанными под ним.',
+			modes: 'Режимы загрузки',
+			entries: {
+				emummc: 'Atmosphere на emuMMC, копии системы на SD-карте. Системная NAND остаётся чистой: основной режим для homebrew и игр.',
+				sysmmc: 'Atmosphere на системной NAND. Всё, что сделано здесь, остаётся в самой консоли.',
+				stock: 'Оригинальная прошивка системной NAND через hekate, без патчей ядра и модулей CFW: ближе всего к нетронутой консоли.',
+			},
+			emummcEntry: 'Atmosphere на emuMMC из папки emuMMC/{folder}.',
+			emummcs: 'Другие emuMMC загружаются своими пунктами по папке в emuMMC/: SD01, RAW2 и так далее. hekate находит только emuMMC, которые создал или перенёс сам.',
+			addEmuMMC: 'Добавить emuMMC',
+			remove: 'Убрать',
+			overrides: {
+				cal0blank: 'Маскировать PRODINFO',
+				usb3force: 'USB 3.0',
+				memmode: 'Режим памяти из boot config',
+			},
+			asConfigured: 'как в настройках',
+			overridesDescription: 'Переключатели под пунктом задают ключи Exosphère только для него: они перекрывают exosphere.ini с шага "Безопасность" и system_settings.ini с шага "CFW". Вариант "как в настройках" ключ не пишет.',
+			payloads: 'Пэйлоады',
+			payloadsDescription: 'Инструменты, которые запускаются вместо системы. Каждый выбранный пэйлоад получает свой пункт в меню.',
+			autoboot: 'Автозагрузка',
+			autobootDescription: 'Пункт, который hekate загружает после логотипа. Зажатая во время логотипа VOL- прервёт автозагрузку и откроет меню.',
+			menu: 'Меню',
+		},
 		system: {
 			title: 'Настройки CFW',
 			description: 'Загрузчик hekate, меню Nyx и системные настройки Atmosphere. Каждая опция соответствует реальному ключу конфигурации, значения по умолчанию совпадают с заданными разработчиками.',
@@ -132,9 +162,13 @@ const ru: Translation = {
 			on: 'вкл',
 			off: 'выкл',
 		},
+		security: {
+			title: 'Безопасность',
+			description: 'Что консоль сообщает Nintendo: блокировка их серверов и данные консоли, которые видит система. Здесь же отладочные настройки монитора безопасности Exosphère.',
+		},
 		modules: {
 			title: 'Системные модули и оверлеи',
-			description: 'Настройки выбранных системных модулей и оверлеев. Здесь только модули с проверенным форматом конфигурации.',
+			description: 'Настройки выбранных системных модулей, оверлеев и приложений. Здесь только компоненты с проверенным форматом конфигурации.',
 			empty: 'У выбранных модулей нет настроек.',
 		},
 		overclock: {
@@ -175,7 +209,7 @@ const ru: Translation = {
 			targets: {
 				bootlogo: {
 					title: 'Логотип загрузки',
-					description: 'bootloader/bootlogo.bmp: показывается при старте hekate, до 1280×720, хранится повёрнутым под портретный экран.',
+					description: 'bootloader/bootlogo.bmp до 1280×720, хранится повёрнутым под портретный экран. hekate показывает его перед автозагрузкой, пока идёт задержка логотипа, при запуске из меню логотипа нет. Пункт может взять свой логотип: он покажется, когда автозагрузка запускает этот пункт.',
 				},
 				background: {
 					title: 'Фон Nyx',
@@ -186,11 +220,7 @@ const ru: Translation = {
 					description: 'bootloader/res: иконки 192×192 для пунктов меню Launch. Белые контуры окрашиваются в акцентный цвет Nyx.',
 				},
 			},
-			icons: {
-				emummc: 'CFW (emuMMC)',
-				sysmmc: 'CFW (sysMMC)',
-				stock: 'Stock',
-			},
+			common: 'Общий',
 			none: 'Стандартный',
 			upload: 'Загрузить',
 			uploaded: 'Своя картинка',
@@ -230,12 +260,14 @@ const ru: Translation = {
 		replaces: '{component} перекрывает {other}, достаточно одного',
 		hardware: '{component} полезен только на {revisions}',
 		deprecated: '{component} давно не обновлялся и может не работать на свежей прошивке',
+		risky: '{component}: {note}',
 		manual: '{component} придётся скачать вручную',
 		hosUnsupported: 'Atmosphere пока не поддерживает HOS {hos}: дождись его обновления, прежде чем обновлять консоль',
 		hosTracks: '{component} вышел до поддержки HOS {hos}, его патчи могут не сработать до обновления',
+		noEntries: 'Меню запуска пустое: включи режим загрузки или выбери пэйлоад',
 		atmosphereTracks: '{component} не обновлялся после Atmosphere {version}, часть его патчей может не сработать',
 		ftpCredentials: 'У sys-ftpd-light нет логина и пароля: задай их или разреши анонимный доступ',
-		gpuCap: '{game}: sys-clk ограничит GPU до {cap} МГц в режиме «{mode}»',
+		gpuCap: '{game}: sys-clk ограничит GPU до {cap} МГц в режиме "{mode}"',
 		add: 'Добавить {component}',
 		remove: 'Убрать {component}',
 		or: ' или ',

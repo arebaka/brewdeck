@@ -1,16 +1,19 @@
-import { Translation } from '..';
+import { Translation } from '../types';
 
 import software from './software';
 import tuning from './tuning';
 
 const en: Translation = {
+	language: 'en',
 	title: 'BrewDeck',
 	subtitle: 'Nintendo Switch custom firmware builder',
 	steps: {
 		hardware: 'Hardware',
 		firmware: 'HOS Version',
 		software: 'Software',
+		launch: 'Launch',
 		system: 'CFW',
+		security: 'Security',
 		modules: 'Plugins',
 		overclock: 'Overclock',
 		appearance: 'Appearance',
@@ -20,7 +23,7 @@ const en: Translation = {
 		back: 'Back',
 		next: 'Next',
 		rebuild: 'Rebuild',
-		step: 'Step {n}.',
+		step: '{n}.',
 	},
 	hardware: {
 		erista: {
@@ -116,6 +119,7 @@ const en: Translation = {
 			requiredBadge: 'required',
 			bundledBadge: 'in {component}',
 			deprecatedBadge: 'abandoned',
+			riskyBadge: 'risky',
 			select: 'enable',
 			deselect: 'disable',
 			defaultBadge: 'recommended',
@@ -125,6 +129,32 @@ const en: Translation = {
 			recommendsTitle: 'Recommended to add:',
 			conflictBadge: 'conflict',
 		},
+		launch: {
+			title: 'Launch menu',
+			description: 'Entries of the Launch menu of hekate: the modes the console boots in and the payloads. Each entry is a section of bootloader/hekate_ipl.ini with the keys shown under it.',
+			modes: 'Boot modes',
+			entries: {
+				emummc: 'Atmosphere on the emuMMC, a copy of the system on the SD card. The system NAND stays clean: the main mode for homebrew and games.',
+				sysmmc: 'Atmosphere on the system NAND. Everything done here stays in the console itself.',
+				stock: 'The original firmware of the system NAND through hekate, without kernel patches and CFW modules: the closest to a console never modified.',
+			},
+			emummcEntry: 'Atmosphere on the emuMMC in the folder emuMMC/{folder}.',
+			emummcs: 'More emuMMCs boot from entries of their own by their folder in emuMMC/: SD01, RAW2 and so on. hekate only finds emuMMCs it created or migrated itself.',
+			addEmuMMC: 'Add emuMMC',
+			remove: 'Remove',
+			overrides: {
+				cal0blank: 'Blank PRODINFO',
+				usb3force: 'USB 3.0',
+				memmode: 'Boot config memory mode',
+			},
+			asConfigured: 'as configured',
+			overridesDescription: 'The switches under an entry set Exosphère keys for it alone, over exosphere.ini from the Security step and system_settings.ini from the CFW step; "as configured" leaves the key out.',
+			payloads: 'Payloads',
+			payloadsDescription: 'Tools started instead of the system. Every selected payload gets its own entry in the menu.',
+			autoboot: 'Autoboot',
+			autobootDescription: 'The entry hekate boots after the logo. Holding VOL- during the logo opens the menu anyway.',
+			menu: 'Menu',
+		},
 		system: {
 			title: 'CFW settings',
 			description: 'The hekate bootloader, the Nyx menu and the system settings of Atmosphere. Each option corresponds to an actual configuration key, default values match developer recommendations.',
@@ -132,9 +162,13 @@ const en: Translation = {
 			on: 'on',
 			off: 'off',
 		},
+		security: {
+			title: 'Security',
+			description: 'What the console tells Nintendo: blocking of their servers and the identity data of the console the system sees. Exosphere also keeps the debug settings of the secure monitor.',
+		},
 		modules: {
 			title: 'Sysmodules and overlays',
-			description: 'Settings of the selected system modules and overlays. Only modules with a verified configuration format are listed.',
+			description: 'Settings of the selected system modules, overlays and applications. Only components with a verified configuration format are listed.',
 			empty: 'None of the selected modules has settings.',
 		},
 		overclock: {
@@ -175,7 +209,7 @@ const en: Translation = {
 			targets: {
 				bootlogo: {
 					title: 'Boot logo',
-					description: 'bootloader/bootlogo.bmp: shown while hekate starts, up to 1280×720, stored rotated for the portrait screen.',
+					description: 'bootloader/bootlogo.bmp, up to 1280×720, stored rotated for the portrait screen. hekate shows it before an autoboot, during the logo delay; launching from the menu shows no logo. An entry can take a logo of its own, shown when autoboot starts that entry.',
 				},
 				background: {
 					title: 'Nyx background',
@@ -186,11 +220,7 @@ const en: Translation = {
 					description: 'bootloader/res: 192×192 icons of the Launch menu entries. White outlines take the Nyx accent color.',
 				},
 			},
-			icons: {
-				emummc: 'CFW (emuMMC)',
-				sysmmc: 'CFW (sysMMC)',
-				stock: 'Stock',
-			},
+			common: 'Common',
 			none: 'Default',
 			upload: 'Upload',
 			uploaded: 'Your image',
@@ -230,9 +260,11 @@ const en: Translation = {
 		replaces: '{component} covers {other}, one of them is enough',
 		hardware: '{component} is only useful on {revisions}',
 		deprecated: '{component} has not been updated for years and may not work on current firmware',
+		risky: '{component}: {note}',
 		manual: '{component} has to be downloaded by hand',
 		hosUnsupported: 'Atmosphere does not support HOS {hos} yet, wait for its update before updating the console',
 		hosTracks: '{component} came out before HOS {hos} got supported, its patches may not apply until it is updated',
+		noEntries: 'The Launch menu is empty: enable a boot mode or select a payload',
 		atmosphereTracks: '{component} has not been updated since Atmosphere {version}, some of its patches may not apply',
 		ftpCredentials: 'sys-ftpd-light has no login and password: set them or allow anonymous access',
 		gpuCap: '{game}: sys-clk caps the GPU at {cap} MHz in the "{mode}" mode',

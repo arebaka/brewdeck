@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { AppearanceConfig, IconEntry, ImageTarget, Uploads } from '../../types';
+import { AppearanceConfig, ImageTarget, LaunchEntry, Uploads } from '../../types';
 import { Language, Translation, format } from '../../i18n';
 import { GALLERY } from '../../data';
 import { activate } from '../../utils';
@@ -8,12 +8,11 @@ import { activate } from '../../utils';
 interface AppearanceProps {
 	lang: Language;
 	appearance: AppearanceConfig;
+	entries: LaunchEntry[]; // entries of the Launch menu, each can have a boot logo and an icon
 	uploads: Uploads;
 	setImage: (key: string, image?: string, blob?: Blob) => void;
 	t: Translation;
 }
-
-const ICON_ENTRIES: IconEntry[] = ['emummc', 'sysmmc', 'stock'];
 
 // Hekate centers the boot logo without scaling it up and fills the rest of the screen with its top-left pixel
 function previewBootlogo(event: React.SyntheticEvent<HTMLImageElement>) {
@@ -32,12 +31,18 @@ function previewBootlogo(event: React.SyntheticEvent<HTMLImageElement>) {
 export function Appearance({
 	lang,
 	appearance,
+	entries,
 	uploads,
 	setImage,
 	t
 }: AppearanceProps) {
 	// Key of the last upload the browser could not decode
 	const [failed, setFailed] = useState<string>();
+	// Entries the boot logo and the icon are picked for, an entry that left the menu gives the choice back
+	const [logoEntry, setLogoEntry] = useState<string>();
+	const [iconEntry, setIconEntry] = useState<string>();
+	const logoFor = entries.find(entry => entry.id == logoEntry)?.id;
+	const iconFor = entries.find(entry => entry.id == iconEntry)?.id ?? entries[0]?.id;
 
 	const upload = async (key: string, file: File) => {
 		try {
@@ -49,10 +54,12 @@ export function Appearance({
 		}
 	};
 
-	const gallery = (target: ImageTarget, key: string, value?: string) => (
+	const gallery = (target: ImageTarget, key: string, value?: string, none = t.pages.appearance.none) => (
 		<Gallery
+			key={key}
 			target={target}
 			value={value}
+			none={none}
 			uploaded={uploads[key]?.url}
 			isFailed={failed == key}
 			select={image => setImage(key, image)}
@@ -60,22 +67,51 @@ export function Appearance({
 			t={t} />
 	);
 
+	// Entries to pick from, the ones with a picture of their own are marked
+	const chips = (items: { id?: string; name: string }[], active: string | undefined, images: Record<string, string>, select: (id?: string) => void) => (
+		<ul className="choices">
+			{items.map(item => (
+				<li
+					key={item.id ?? 'common'}
+					className={`choice ${item.id == active ? 'active' : ''} ${item.id && images[item.id] ? 'set' : ''}`}
+					tabIndex={0}
+					onClick={() => select(item.id)}
+					onKeyDown={activate}>
+					{item.name}
+				</li>
+			))}
+		</ul>
+	);
+
 	return (<>
-		{(['bootlogo', 'background'] as const).map(target => (
-			<section key={target} className="appearance">
-				<header className="header">
-					<h3 className="title">
-						{t.pages.appearance.targets[target].title}
-					</h3>
-				</header>
-				<p className="description">
-					{t.pages.appearance.targets[target].description}
-				</p>
-				{gallery(target, target, appearance[target])}
-			</section>
-		))}
+		<section className="appearance">
+			<header className="header">
+				<h3 className="title">
+					{t.pages.appearance.targets.bootlogo.title}
+				</h3>
+			</header>
+			<p className="description">
+				{t.pages.appearance.targets.bootlogo.description}
+			</p>
+			{entries.length > 0 && chips([{ name: t.pages.appearance.common }, ...entries], logoFor, appearance.logos, setLogoEntry)}
+			{logoFor
+				? gallery('bootlogo', `logo.${logoFor}`, appearance.logos[logoFor], t.pages.appearance.common)
+				: gallery('bootlogo', 'bootlogo', appearance.bootlogo)}
+		</section>
 
 		<section className="appearance">
+			<header className="header">
+				<h3 className="title">
+					{t.pages.appearance.targets.background.title}
+				</h3>
+			</header>
+			<p className="description">
+				{t.pages.appearance.targets.background.description}
+			</p>
+			{gallery('background', 'background', appearance.background)}
+		</section>
+
+		{iconFor && <section className="appearance">
 			<header className="header">
 				<h3 className="title">
 					{t.pages.appearance.targets.icon.title}
@@ -84,15 +120,9 @@ export function Appearance({
 			<p className="description">
 				{t.pages.appearance.targets.icon.description}
 			</p>
-			{ICON_ENTRIES.map(entry => (
-				<div key={entry} className="entry">
-					<h4 className="name">
-						{t.pages.appearance.icons[entry]}
-					</h4>
-					{gallery('icon', `icon.${entry}`, appearance.icons[entry])}
-				</div>
-			))}
-		</section>
+			{chips(entries, iconFor, appearance.icons, setIconEntry)}
+			{gallery('icon', `icon.${iconFor}`, appearance.icons[iconFor])}
+		</section>}
 
 		<p className="note">
 			{t.pages.appearance.more}
@@ -103,6 +133,7 @@ export function Appearance({
 interface GalleryProps {
 	target: ImageTarget;
 	value?: string;
+	none: string; // caption of the tile without a picture
 	uploaded?: string; // object URL of the upload
 	isFailed: boolean;
 	select: (image?: string) => void;
@@ -110,9 +141,11 @@ interface GalleryProps {
 	t: Translation;
 }
 
+// Pictures for one target: the default, the gallery, the upload and a tile to upload one
 function Gallery({
 	target,
 	value,
+	none,
 	uploaded,
 	isFailed,
 	select,
@@ -143,7 +176,7 @@ function Gallery({
 
 	return (
 		<ul className={`gallery ${target}`}>
-			{picture(undefined, t.pages.appearance.none)}
+			{picture(undefined, none)}
 			{GALLERY
 				.filter(item => item.target == target)
 				.map(item => picture(

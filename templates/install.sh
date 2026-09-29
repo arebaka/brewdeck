@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # BrewDeck installer: Nintendo Switch {{hardware}}, Horizon OS {{hos}}
 #
-# Usage: put the script into the root of the SD card and run it there: bash install.sh [-y]
-#   -y skips the confirmation.
+# Usage: put the script into the root of the SD card and run it there:
+#   bash install.sh
 #
 # Downloads the selected components from the Homebrew App Store, GitHub releases and direct links,
 # unpacks them onto the SD card next to the script and writes the configuration and images.
@@ -10,15 +10,28 @@
 
 set -euo pipefail
 
-ASSUME_YES=0
-if [ "${1:-}" = "-y" ] || [ "${1:-}" = "--yes" ]; then
-	ASSUME_YES=1
-fi
-
 APPSTORE='https://switch.cdn.fortheusers.org'
 SD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK_DIR="$SD_ROOT/.brewdeck"
 FAILED=()
+
+if [ -t 1 ]; then
+	CLR_RESET='\033[0m'
+	CLR_BOLD='\033[1m'
+	CLR_DIM='\033[2m'
+	CLR_GREEN='\033[32m'
+	CLR_RED='\033[31m'
+	CLR_CYAN='\033[36m'
+	CLR_YELLOW='\033[33m'
+else
+	CLR_RESET='' CLR_BOLD='' CLR_DIM='' CLR_GREEN='' CLR_RED='' CLR_CYAN='' CLR_YELLOW=''
+fi
+
+info()    { printf "\n${CLR_CYAN}==>${CLR_RESET} ${CLR_BOLD}%s${CLR_RESET}\n" "$1"; }
+step()    { printf "    ${CLR_DIM}[..]${CLR_RESET} %s..." "$1"; }
+ok()      { printf "\r    [${CLR_GREEN}OK${CLR_RESET}] %s   \n" "$1"; }
+fail()    { printf "\r    [${CLR_RED}ERR${CLR_RESET}] %s  \n" "$1"; }
+warning() { printf "    ${CLR_YELLOW}!${CLR_RESET} %s\n" "$1"; }
 
 if ! command -v curl > /dev/null; then
 	echo "error: curl is required" >&2
@@ -45,20 +58,20 @@ if [ ! -w "$SD_ROOT" ]; then
 	exit 1
 fi
 
-echo "Installing to $SD_ROOT"
-if [ "$ASSUME_YES" = 0 ] && [ -t 0 ]; then
-	read -r -p "Continue? [y/N] " answer
-	case "$answer" in
-		[yY]*) ;;
-		*) exit 1 ;;
-	esac
-fi
+cleanup() {
+	rm -rf "$WORK_DIR"
+	rm -f install.sh
+	rm -f \
+		LICENSE.txt \
+		README.txt \
+		README.md \
+		screen1.png \
+		screen2.png
+}
 
-# Downloads land on the SD card next to the script and are removed at the end
 mkdir -p "$WORK_DIR"
-trap 'rm -rf "$WORK_DIR"' EXIT
+trap cleanup EXIT
 
-# Prints the URL of the first asset of the latest release of repository $1 whose name matches regex $2
 asset_url() {
 	local cache="$WORK_DIR/release-${1//\//_}.json" url name
 	if [ ! -f "$cache" ]; then
@@ -76,7 +89,6 @@ asset_url() {
 	return 1
 }
 
-# download URL: saves the file into the work directory and prints its path
 download() {
 	local file
 	file="$WORK_DIR/$(basename "${1%%\?*}")"
@@ -84,7 +96,6 @@ download() {
 	echo "$file"
 }
 
-# unpack ARCHIVE [ROOT] [INTO]: merges the archive, or its ROOT directory, into the INTO directory of the SD card
 unpack() {
 	local unpacked="$WORK_DIR/unpacked"
 	rm -rf "$unpacked" && mkdir -p "$unpacked" "$SD_ROOT/${3:-.}"
@@ -92,12 +103,10 @@ unpack() {
 	cp -R "$unpacked/${2:-.}/." "$SD_ROOT/${3:-.}/"
 }
 
-# save FILE PATH: copies the file to PATH on the SD card
 save() {
 	mkdir -p "$SD_ROOT/$(dirname "$2")" && cp "$1" "$SD_ROOT/$2"
 }
 
-# install_appstore PACKAGE: unpacks a Homebrew App Store package and registers it, so the store on the console sees it installed
 install_appstore() {
 	local file unpacked="$WORK_DIR/unpacked" registry="$SD_ROOT/switch/appstore/.get/packages/$1"
 	file="$(download "$APPSTORE/zips/$1.zip")" || return 1
@@ -111,68 +120,73 @@ install_appstore() {
 	cp -R "$unpacked/." "$SD_ROOT/"
 }
 
-# install_zip REPOSITORY REGEX [ROOT] [INTO]: unpacks a release archive
 install_zip() {
 	local url file
 	url="$(asset_url "$1" "$2")" && file="$(download "$url")" && unpack "$file" "${3:-}" "${4:-}"
 }
 
-# install_file REPOSITORY REGEX PATH: saves a release asset to PATH
 install_file() {
 	local url file
 	url="$(asset_url "$1" "$2")" && file="$(download "$url")" && save "$file" "$3"
 }
 
-# write_config PATH: writes stdin to PATH on the SD card
 write_config() {
 	mkdir -p "$SD_ROOT/$(dirname "$1")" && cat > "$SD_ROOT/$1"
 }
 
-# write_image PATH: decodes a gzip-compressed base64 image from stdin to PATH on the SD card
 write_image() {
 	mkdir -p "$SD_ROOT/$(dirname "$1")" && base64 --decode | gzip -dc > "$SD_ROOT/$1"
 }
 
+info "Downloading & Unpacking Components"
 {{#components}}
-echo '==> {{name}}'
-{{#steps}}
-{{#appstore}}install_appstore '{{package}}' &&{{/appstore}}{{#zip}}install_zip '{{repo}}' '{{asset}}' '{{root}}' '{{into}}' &&{{/zip}}{{#file}}install_file '{{repo}}' '{{asset}}' '{{path}}' &&{{/file}}{{#urlZip}}{ archive="$(download '{{url}}')" && unpack "$archive" '{{root}}' '{{into}}'; } &&{{/urlZip}}{{#urlFile}}{ file="$(download '{{url}}')" && save "$file" '{{path}}'; } &&{{/urlFile}}
-{{/steps}}
-	true || FAILED+=('{{name}}')
+step '{{name}}'
+if {{#steps}}{{#appstore}}install_appstore '{{package}}' &&{{/appstore}}{{#zip}}install_zip '{{repo}}' '{{asset}}' '{{root}}' '{{into}}' &&{{/zip}}{{#file}}install_file '{{repo}}' '{{asset}}' '{{path}}' &&{{/file}}{{#urlZip}}{ archive="$(download '{{url}}')" && unpack "$archive" '{{root}}' '{{into}}'; } &&{{/urlZip}}{{#urlFile}}{ file="$(download '{{url}}')" && save "$file" '{{path}}'; } &&{{/urlFile}}{{/steps}} true; then
+	ok '{{name}}'
+else
+	fail '{{name}}'
+	FAILED+=('{{name}}')
+fi
 
 {{/components}}
-echo '==> Configuration'
+info "Writing Configuration"
 {{#configs}}
+step '{{path}}'
 write_config '{{path}}' << 'BREWDECK_EOF'
 {{content}}
 BREWDECK_EOF
+ok '{{path}}'
 {{/configs}}
 {{#hasImages}}
 
-echo '==> Appearance'
+info "Deploying Appearance & Assets"
 {{#images}}
+step '{{path}}'
 write_image '{{path}}' << 'BREWDECK_EOF'
 {{data}}
 BREWDECK_EOF
+ok '{{path}}'
 {{/images}}
 {{/hasImages}}
 
 # macOS leaves AppleDouble ._ files on FAT32, Atmosphere tries to load them as contents
 if [ "$(uname)" = Darwin ] && command -v dot_clean > /dev/null; then
+	step "Cleaning macOS dotfiles"
 	dot_clean -m "$SD_ROOT"
+	ok "Cleaning macOS dotfiles"
 fi
 {{#hasManual}}
 
-echo
-echo 'Download manually:'
+info "Manual Action Required"
 {{#manual}}
-echo '  {{name}}: {{url}}'
+warning '{{name}}: {{url}}'
 {{/manual}}
 {{/hasManual}}
 
-echo
+printf "\n"
 if [ ${#FAILED[@]} -gt 0 ]; then
-	echo "Failed: ${FAILED[*]}" >&2
+	printf "${CLR_RED}${CLR_BOLD}Installation failed for:${CLR_RESET} %s\n\n" "${FAILED[*]}" >&2
 	exit 1
 fi
-echo 'Done. Eject the SD card safely and boot the console.'
+
+printf '%b%bDone!%b Eject the SD card safely and boot your Nintendo Switch.\n\n' "$CLR_GREEN" "$CLR_BOLD" "$CLR_RESET"

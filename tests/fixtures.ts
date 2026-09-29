@@ -1,12 +1,13 @@
 import { gzipSync } from 'node:zlib';
 
-import { AppState, defaultState, templateClocks } from '@/url';
+import { AppState, defaultState } from '@/state';
+import { templateClocks } from '@/url';
 import { resolveSelection } from '@/data';
 import { Issue } from '@/types';
 import { validate } from '@/validation';
 import { translations } from '@/i18n';
 
-// A build touching every kind of option, a secret, overclock profiles of every kind and uploads
+// A build touching every kind of option, a secret, overclock profiles of every kind, launch extras and uploads
 export function customState(): AppState {
 	const state = defaultState();
 	state.hardware = 'erista';
@@ -15,7 +16,14 @@ export function customState(): AppState {
 		...state.selectedComponentIDs.filter(id => id != 'dbi' && id != 'ovlmenu'),
 		'sys_ftpd_light', 'missioncontrol', 'ultrahand', 'tinfoil'
 	]);
-	Object.assign(state.tuning.hekate, { autoboot: 'emummc', noticker: true, backlight: 50 });
+	state.launch = {
+		modes: ['emummc', 'stock'],
+		emummcs: ['SD01'],
+		overrides: { emummc: { cal0blank: 0 }, 'emummc-SD01': { usb3force: 1, memmode: 1 } },
+		autoboot: 'stock'
+	};
+	Object.assign(state.tuning.logo, { bootwait: 5, noticker: true });
+	state.tuning.hekate.backlight = 50;
 	Object.assign(state.tuning.nyx, { themecolor: 200, themebg: '#123456' });
 	state.tuning.dns.targets = ['emummc', 'sysmmc'];
 	state.tuning.tesla.key_combo = ['ZL', 'ZR', 'DDOWN'];
@@ -27,7 +35,12 @@ export function customState(): AppState {
 		{ id: '0123456789ABCDEF', name: '0123456789ABCDEF', template: 'custom', clocks: { docked_cpu: 1785, handheld_gpu: 614 } },
 		{ id: '01007EF00011E000', name: 'The Legend of Zelda: Breath of the Wild', template: 'stock', clocks: {} }
 	];
-	state.appearance = { bootlogo: 'hekate-a', background: 'upload', icons: { emummc: 'hekate-switch', stock: 'upload' } };
+	state.appearance = {
+		bootlogo: 'hekate-a',
+		background: 'upload',
+		logos: { 'emummc-SD01': 'upload', stock: 'hekate-b' },
+		icons: { emummc: 'hekate-switch', stock: 'upload', fusee: 'hekate-payload' }
+	};
 	return state;
 }
 

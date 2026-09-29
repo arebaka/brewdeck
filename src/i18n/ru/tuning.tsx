@@ -1,20 +1,11 @@
-import { TuningGroup } from '..';
+import { TuningGroup } from '../types';
+import { DBI_LANGUAGES } from '../autonyms';
 
 const tuning: {[group in string]: TuningGroup} = {
-	hekate: {
-		title: 'Hekate',
-		description: 'Пункты загрузочного меню и поведение при старте. В меню всегда есть CFW (emuMMC), CFW (sysMMC) и Stock.',
+	logo: {
+		title: 'Логотип загрузки',
+		description: 'Логотип, который hekate показывает, пока ждёт VOL- для входа в меню.',
 		options: {
-			autoboot: {
-				title: 'Автозагрузка',
-				description: 'Что загружать при включении. Зажми VOL- во время логотипа, чтобы всё равно попасть в меню.',
-				values: {
-					off: 'Меню',
-					emummc: 'CFW (emuMMC)',
-					sysmmc: 'CFW (sysMMC)',
-					stock: 'Stock',
-				},
-			},
 			bootwait: {
 				title: 'Задержка логотипа',
 				description: 'Время отображения загрузочного логотипа (в секундах). Значение 0 полностью скрывает логотип.',
@@ -27,6 +18,16 @@ const tuning: {[group in string]: TuningGroup} = {
 					20: '20 с',
 				},
 			},
+			noticker: {
+				title: 'Скрыть отсчёт на логотипе',
+				description: 'Не рисовать полоску оставшегося до входа в меню времени во время своего логотипа.',
+			},
+		},
+	},
+	hekate: {
+		title: 'Hekate',
+		description: 'Поведение загрузчика при старте. Пункты загрузки и логотип настраиваются на шаге "Запуск".',
+		options: {
 			backlight: {
 				title: 'Яркость экрана',
 				description: 'Уровень подсветки в Hekate и Nyx.',
@@ -52,10 +53,6 @@ const tuning: {[group in string]: TuningGroup} = {
 				title: 'Защита папки bootloader',
 				description: 'Прячет папку bootloader от HOS, чтобы её не повредили и не изменили.',
 			},
-			noticker: {
-				title: 'Скрыть отсчёт на логотипе',
-				description: 'Не рисовать полоску оставшегося до входа в меню времени во время своего логотипа.',
-			},
 		},
 	},
 	nyx: {
@@ -76,8 +73,8 @@ const tuning: {[group in string]: TuningGroup} = {
 				values: {
 					0: 'Главная',
 					1: 'Все конфиги',
-					2: 'Launch (Запуск)',
-					3: 'More configs (Дополнительные опции)',
+					2: 'Launch',
+					3: 'More configs',
 				},
 			},
 			verification: {
@@ -106,7 +103,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Подключать eMMC и emuMMC с правом записи в режиме USB-накопителя. Неосторожная запись может окирпичить консоль.',
 			},
 			jcdisable: {
-				title: 'Отключить Joy-Con',
+				title: 'Отключить Joy-Con-ы',
 				description: 'Полностью отключить драйвер Joy-Con в Nyx.',
 			},
 			jcforceright: {
@@ -294,7 +291,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Разрешает homebrew читать раздел калибровки.',
 			},
 			fsmitm_redirect_saves_to_sd: {
-				title: 'Сохранения на SD-карте (эксперимент)',
+				title: 'Сохранения на SD-карте',
 				description: 'Перенаправляет сохранения игр на SD-карту. Экспериментально, сохранения можно потерять.',
 			},
 			applet_heap_size: {
@@ -461,7 +458,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Значения в режиме mini.',
 				values: {
 					TEMP: 'Температура',
-					FAN: 'Вентилятор',
+					FAN: 'Кулер',
 					DRAW: 'Потребление',
 					RES: 'Разрешение',
 					READ: 'Скорость чтения',
@@ -472,7 +469,7 @@ const tuning: {[group in string]: TuningGroup} = {
 				description: 'Значения в полоске micro.',
 				values: {
 					BRD: 'Плата',
-					FAN: 'Вентилятор',
+					FAN: 'Кулер',
 				},
 			},
 			average_gpu_load: {
@@ -544,6 +541,17 @@ const tuning: {[group in string]: TuningGroup} = {
 			led: {
 				title: 'Индикатор при подключении',
 				description: 'Мигать индикатором, когда подключается клиент.',
+			},
+		},
+	},
+	dbi_patcher: {
+		title: 'DBIPatcher',
+		description: 'Язык перевода DBI.',
+		options: {
+			language: {
+				title: 'Язык',
+				description: 'Перевод, который DBI показывает вместо русского.',
+				values: DBI_LANGUAGES,
 			},
 		},
 	},

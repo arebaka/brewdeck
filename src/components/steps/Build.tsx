@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Issue, StepId, Uploads } from '../../types';
+import { Fix, Issue, StepId, Uploads } from '../../types';
 import { Language, Translation, format } from '../../i18n';
 import { GALLERY, HARDWARE } from '../../data';
 import { build } from '../../build';
 import { encodeImage } from '../../images';
 import { highlight, renderMarkdown } from '../../markup';
-import { AppState } from '../../url';
+import { AppState } from '../../state';
 import { activate, downloadFile, formatSize } from '../../utils';
 import { Issues } from '../Issues';
 
@@ -17,7 +17,7 @@ interface BuildProps {
 	totalSize: number;
 	tuningChanges: number;
 	issues: Issue[];
-	applyFix: (fix: NonNullable<Issue['fix']>) => void;
+	applyFix: (fix: Fix) => void;
 	setStep: (step: StepId) => void;
 	t: Translation;
 }
@@ -29,7 +29,7 @@ interface Encoded {
 }
 
 // Windows PowerShell reads scripts without a byte order mark in the ANSI code page
-const withBOM = (path: string, content: string) => path.endsWith('.ps1') ? `﻿${content}` : content;
+const withBOM = (path: string, content: string) => path.endsWith('.ps1') ? `\uFEFF${content}` : content;
 
 export function Build({
 	lang,
@@ -42,9 +42,9 @@ export function Build({
 	setStep,
 	t
 }: BuildProps) {
-	const { hardware, hosVersion, selectedComponentIDs, tuning, overclock, appearance } = state;
-	const request = { hardware, hosVersion, selectedComponentIDs, tuning, overclock, appearance, lang, t };
-	const result = useMemo(() => build(request), [hardware, hosVersion, selectedComponentIDs, tuning, overclock, appearance, lang, t]);
+	const { hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance } = state;
+	const request = { hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance, lang, t };
+	const result = useMemo(() => build(request), [hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance, lang, t]);
 
 	// Images are converted in the background and embedded into the installers once ready
 	const sources = result.assets.map(asset => ({

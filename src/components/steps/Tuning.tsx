@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '../../types';
+import { Fix, Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '../../types';
 import { Language, Translation } from '../../i18n';
 import { TUNING, isRequirementMet, isTuningOptionActive } from '../../data';
 import { activate } from '../../utils';
@@ -11,13 +11,13 @@ type SetTuningOption = (group: string, option: string, value: TuningValue) => vo
 
 interface TuningProps {
 	lang: Language;
-	step: 'system' | 'modules';
+	step: 'system' | 'security' | 'modules';
 	tuning: TuningConfig;
 	selectedComponentIDs: string[];
 	setTuningOption: SetTuningOption;
 	resetTuning: (step: TuningStep) => void;
 	issues: Issue[];
-	applyFix: (fix: NonNullable<Issue['fix']>) => void;
+	applyFix: (fix: Fix) => void;
 	t: Translation;
 }
 
@@ -122,6 +122,7 @@ interface OptionProps {
 	t: Translation;
 }
 
+// An option as a row of the settings list: a toggle switches by a click, other types carry their control
 function Option({
 	group,
 	option,

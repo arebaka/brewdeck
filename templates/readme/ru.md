@@ -41,6 +41,16 @@
 1. Сделай бэкап NAND в Hekate: **Tools → Backup eMMC**.
 2. Создай emuMMC: **emuMMC → Create emuMMC → SD File**. **SD Partition** быстрее, но сначала требует **Tools → Partition SD Card**.
 3. Загрузи **Launch → CFW (emuMMC)**.
+{{#hasEmummcs}}
+
+Другие emuMMC загружаются своими пунктами, каждая из своей папки:
+
+{{#emummcs}}
+- **Launch → {{name}}**: `emuMMC/{{folder}}`
+{{/emummcs}}
+
+Создай каждую так же, папки Hekate называет сам: SD00, SD01 и дальше для файлов, RAW1–RAW3 для разделов. **CFW (emuMMC)** загружает ту, что выбрана в **emuMMC → Change emuMMC**.
+{{/hasEmummcs}}
 {{#dnsBlock}}
 
 Серверы Nintendo заблокированы в {{dnsTargets}}: обновления, eShop и онлайн-игра там не работают.

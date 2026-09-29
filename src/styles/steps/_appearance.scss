@@ -27,8 +27,9 @@
 	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 	gap: space(3);
 
+	// Wide enough for the captions of the default and the upload tiles in every language
 	&.icon {
-		grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
 	}
 
 	// Screens keep the 16:9 of the console, the boot logo keeps its size on it
@@ -107,4 +108,20 @@
 		color: var(--color-danger);
 		border-color: var(--color-danger);
 	}
+}
+
+// Entries with a picture of their own carry a dot
+.appearance .choice.set::after {
+	content: '';
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	margin-left: space(2);
+	vertical-align: middle;
+	background: var(--color-accent);
+	border-radius: 50%;
+}
+
+.appearance .choice.set.active::after {
+	background: currentColor;
 }

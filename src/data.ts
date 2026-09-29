@@ -1,12 +1,6 @@
-import { ComponentCategory, ComponentInfo, GalleryImage, HardwareInfo, HOSVersion, OverclockData, Preset, Requirement, TuningConfig, TuningGroup, TuningOption } from '@/types';
+import { BootEntry, BootMode, ComponentCategory, ComponentInfo, EntryOverride, GalleryImage, HardwareInfo, HOSVersion, LaunchConfig, LaunchEntry, OverclockData, Preset, Requirement, TuningConfig, TuningGroup, TuningOption } from '@/types';
 
-import hardware from '@data/hardware.json';
-import firmware from '@data/firmware.json';
-import software from '@data/software.json';
-import tuning from '@data/tuning.json';
-import presets from '@data/presets.json';
-import overclock from '@data/overclock.json';
-import appearance from '@data/appearance.json';
+import { appearance, firmware, hardware, launch, overclock, presets, software, tuning } from '@data';
 
 export const HARDWARE: HardwareInfo[] = hardware as HardwareInfo[];
 export const HOS_VERSIONS: HOSVersion[] = firmware.map(v => ({
@@ -17,14 +11,19 @@ export const HOS_VERSIONS: HOSVersion[] = firmware.map(v => ({
 	supported: v.supported ? new Date(v.supported) : undefined
 })) as HOSVersion[];
 export const COMPONENTS: ComponentInfo[] = software as ComponentInfo[];
-export const CATEGORIES: ComponentCategory[] = ['base', 'payloads', 'sysmodules', 'overlays', 'homebrew', 'themes', 'streaming', 'emulators', 'developer'];
+// Payloads are picked on the Launch step, the other categories on the Software one
+export const CATEGORIES: ComponentCategory[] = ['base', 'sysmodules', 'overlays', 'homebrew', 'themes', 'streaming', 'emulators', 'developer'];
+export const BOOT_ENTRIES: BootEntry[] = launch as unknown as BootEntry[];
 export const TUNING: TuningGroup[] = tuning as TuningGroup[];
 export const PRESETS: Preset[] = presets as Preset[];
 export const OVERCLOCK: OverclockData = overclock as OverclockData;
-export const GALLERY: GalleryImage[] = appearance as GalleryImage[];
+// Pictures lie in the folder of their target under their ID: appearance/icon/hekate-switch.png
+export const GALLERY: GalleryImage[] = (appearance as Omit<GalleryImage, 'file'>[])
+	.map(image => ({ ...image, file: `appearance/${image.target}/${image.id}.png` }));
 
 export const DEFAULT_COMPONENTS = COMPONENTS.filter(comp => comp.is_selected_by_default || comp.is_required).map(comp => comp.id);
 
+// Compares dotted versions part by part: -1, 0 or 1
 export function compareVersions(a: string, b: string): number {
 	const [x, y] = [a, b].map(version => version.split('.').map(Number));
 	for (let i = 0; i < Math.max(x.length, y.length); i++) {
@@ -40,6 +39,7 @@ const NEWEST_SUPPORTED_HOS = HOS_VERSIONS
 
 export const isHOSSupported = (version: string) => compareVersions(version, NEWEST_SUPPORTED_HOS) <= 0;
 
+// Default values of every option, by group
 export function getTuningDefaults(): TuningConfig {
 	return Object.fromEntries(TUNING.map(group => [
 		group.id,
@@ -56,10 +56,7 @@ export function isTuningOptionChanged(group: TuningGroup, option: TuningOption, 
 	return JSON.stringify(tuning[group.id][option.id]) != JSON.stringify(option.default);
 }
 
-export function countTuningChanges(tuning: TuningConfig): number {
-	return TUNING.reduce((count, group) => count + group.options.filter(option => isTuningOptionChanged(group, option, tuning)).length, 0);
-}
-
+// A component is required by its id, alternatives by any of theirs
 export function isRequirementMet(requirement: Requirement, selectedComponentIDs: string[]): boolean {
 	return typeof requirement == 'string'
 		? selectedComponentIDs.includes(requirement)
@@ -97,6 +94,7 @@ function allComponents(): string[] {
 	return ids;
 }
 
+// Components of a preset with their dependencies
 export function presetSelection(preset: Preset): string[] {
 	return resolveSelection(
 		preset.components == 'default' ? DEFAULT_COMPONENTS
@@ -105,7 +103,39 @@ export function presetSelection(preset: Preset): string[] {
 	);
 }
 
+// The preset the selection equals to, if any
 export function matchingPreset(selectedComponentIDs: string[]): Preset | undefined {
 	const current = [...selectedComponentIDs].sort().join();
 	return PRESETS.find(preset => presetSelection(preset).sort().join() == current);
+}
+
+// Keys an entry sets over exosphere.ini and system_settings.ini, 0 or 1. A missing key keeps the configs
+export const ENTRY_OVERRIDES: EntryOverride[] = ['cal0blank', 'usb3force', 'memmode'];
+
+// Folders of emuMMCs as hekate names them (SD00, RAW1) or a user renames them. FAT ignores the case,
+// so folders are kept in upper case and `sd01` never turns into a second entry of `SD01`
+export const isEmuMMCFolder = (folder: string) => /^[A-Z0-9_-]{1,32}$/.test(folder);
+
+// Entries of the Launch menu in their order: the emuMMC ones, sysMMC and stock, then payloads of the selected components.
+// Entries booting the system carry the Exosphere keys set for them
+export function launchEntries(launch: LaunchConfig, selectedComponentIDs: string[]): LaunchEntry[] {
+	const mode = (id: BootMode) => BOOT_ENTRIES.filter(entry => entry.id == id && launch.modes.includes(id));
+	const emummc = BOOT_ENTRIES.find(entry => entry.id == 'emummc')!;
+
+	return [
+		...[
+			...mode('emummc'),
+			...launch.emummcs.map(folder => ({
+				id: `emummc-${folder}`,
+				name: `CFW (emuMMC ${folder})`,
+				caption: emummc.caption,
+				keys: { ...emummc.keys, emupath: `emuMMC/${folder}` }
+			})),
+			...mode('sysmmc'),
+			...mode('stock')
+		].map(entry => ({ ...entry, keys: { ...entry.keys, ...launch.overrides[entry.id] } })),
+		...COMPONENTS
+			.filter(comp => comp.payload && selectedComponentIDs.includes(comp.id))
+			.map(comp => ({ id: comp.id, name: comp.name, caption: 'Payloads', keys: { payload: comp.payload! } }))
+	];
 }

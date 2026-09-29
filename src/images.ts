@@ -7,6 +7,7 @@ const SIZES: Record<ImageTarget, [number, number]> = {
 	icon: [192, 192]
 };
 
+// Decodes the image of a URL or a blob
 async function loadImage(source: Blob | string): Promise<ImageBitmap> {
 	return createImageBitmap(typeof source == 'string' ? await (await fetch(source)).blob() : source);
 }
@@ -69,6 +70,7 @@ export function encodeBitmap(image: ImageData, target: ImageTarget): Uint8Array<
 	return bytes;
 }
 
+// The bitmap hekate or Nyx expects for the target, converted from any image the browser reads
 export async function convertImage(source: Blob | string, target: ImageTarget): Promise<Uint8Array<ArrayBuffer>> {
 	return encodeBitmap(render(await loadImage(source), target), target);
 }

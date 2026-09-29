@@ -10,9 +10,6 @@ import { createServer } from 'vite';
 
 const BROWSERS = ['google-chrome-stable', 'google-chrome', 'chromium', 'chromium-browser'];
 
-// A 242 mm OLED at the 96 pixels per inch browsers assume on Linux
-const OLED_WIDTH = 242 / 25.4 * 96;
-
 // Chrome DevTools Protocol over the WebSocket of a page
 class Page {
 	socket: WebSocket;
@@ -146,7 +143,11 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.evaluate(HELPERS);
 
 	// Hardware
-	await check('the console is as wide as the real one', `Math.abs(document.querySelector('.console .photo').getBoundingClientRect().width - ${OLED_WIDTH}) < 1`);
+	// The photo is titled with the size of the console, drawn at the 96 pixels per inch browsers assume on Linux
+	await check('the console is as wide as the real one', `(() => {
+		const photo = document.querySelector('.preview .photo');
+		return Math.abs(photo.getBoundingClientRect().width - parseFloat(photo.title) / 25.4 * 96) < 1;
+	})()`);
 
 	// Software
 	await page.act(`step('Software')`);
@@ -164,23 +165,70 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('a removed dependency leaves a fix', `$$('.notice .fix').some(button => button.textContent == 'Add SaltyNX')`);
 	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Add SaltyNX').click()`);
 	await check('the fix brings it back', `byText('.component .name', 'SaltyNX').closest('.component').classList.contains('active')`);
+	await page.act(`byText('.component .name', 'Ultrahand').closest('.component').click()`);
+	await check('a conflict offers to remove either side', `['Remove Tesla Menu', 'Remove Ultrahand'].every(text => $$('.notice .fix').some(button => button.textContent == text))`);
+	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Remove Ultrahand').click()`);
+	await check('the chosen side goes away', `(() => {
+		const active = name => byText('.component .name', name).closest('.component').classList.contains('active');
+		return !active('Ultrahand') && active('Tesla Menu');
+	})()`);
+
+	await page.act(`byText('.component .name', 'DBIPatcher').closest('.component').click()`);
+	await check('a risky component is marked and warned about', `byText('.component .name', 'DBIPatcher').closest('.component').querySelector('.badge.warning') != null
+		&& $$('.notice').some(notice => notice.textContent.includes('The author of DBI warns'))`);
+
+	// Launch
+	await check('payloads moved off the Software step', `byText('.component .name', 'Lockpick RCM') == null`);
+	await page.act(`step('Launch')`);
+	await check('payloads are picked on the Launch step', `byText('.component .name', 'Lockpick RCM') != null`);
+	await page.act(`byText('.row .name', 'CFW (sysMMC)').closest('.switch').click()`);
+	await check('a boot mode leaves the menu', `location.search.includes('boot=emummc,stock') && byText('.choices .choice', 'CFW (sysMMC)') == null`);
+	const folder = `document.querySelector('.add input')`;
+	await page.act(`setField(${folder}, 'sd01/..')`);
+	await check('an emuMMC folder keeps safe characters in upper case', `${folder}.value == 'SD01'`);
+	await page.act(`key(${folder}, 'Enter')`);
+	await check('another emuMMC gets an entry', `location.search.includes('emummc=SD01') && byText('.row .name', 'CFW (emuMMC SD01)') != null`);
+	await page.act(`setField(${folder}, 'RAW1')`);
+	await page.act(`key(${folder}, 'Enter')`);
+	// Choice of an Exosphere key under the entry
+	const override = (entry: string, label: string, value: string) => `[...byText('.row .name', '${entry}').closest('.row').querySelectorAll('.override')]
+		.find(item => item.querySelector('.label').textContent == '${label}').querySelectorAll('.choice')[${['as configured', 'on', 'off'].indexOf(value)}]`;
+	await page.act(`${override('CFW (emuMMC SD01)', 'USB 3.0', 'on')}.click()`);
+	await check('an entry overrides an Exosphere key', `location.search.includes('launch.emummc-SD01.usb3force=1')
+		&& byText('.row .name', 'CFW (emuMMC SD01)').closest('.row').querySelector('.keys').textContent.includes('usb3force=1')`);
+	await page.act(`${override('CFW (emuMMC RAW1)', 'Boot config memory mode', 'off')}.click()`);
+	await page.act(`byText('.row .name', 'CFW (emuMMC RAW1)').closest('.row').querySelector('.control').click()`);
+	await check('a removed emuMMC takes its keys along', `!location.search.includes('RAW1') && location.search.includes('emummc=SD01')`);
+	await check('the logo delay is set with the menu', `byText('.row .name', 'Logo delay') != null`);
+	await page.act(`byText('.component .name', 'Lockpick RCM').closest('.component').click()`);
+	await page.act(`byText('.choices .choice', 'Lockpick RCM').click()`);
+	await check('a payload can boot on its own', `location.search.includes('autoboot=lockpick_rcm')`);
 
 	// CFW
 	await page.act(`step('CFW')`);
-	await check('every option is shown at once', `$$('.tuning .row').length >= 60`);
-	await page.act(`setField(byText('.row .name', 'Log baud rate').closest('.row').querySelector('input'), '9600')`);
-	await check('a number field reaches the link', `location.search.includes('exosphere.log_baud_rate=9600')`);
-	await page.act(`setField(byText('.row .name', 'Log baud rate').closest('.row').querySelector('input'), '99999999')`);
-	await check('a number out of range is not taken', `location.search.includes('exosphere.log_baud_rate=9600')`);
+	await check('every option is shown at once', `$$('.row .name').length > 20 && !$$('.batch .control').some(button => /ADVANCED/.test(button.textContent))`);
+	await check('the logo delay left the step', `byText('.row .name', 'Logo delay') == null`);
 	await check('buttons are drawn in their shapes', `$$('.buttons .button.trigger').length > 0 && $$('.buttons .button.face').length > 0`);
 	await page.act(`byText('.row .name', 'Button').closest('.row').querySelector('.button.trigger.left').click()`);
 	await check('a button picks the key', `location.search.includes('hbl.key=ZL')`);
 	await page.act(`byText('.batch .control', 'RESET').click()`);
-	await check('reset clears the step', `!location.search.includes('exosphere.') && !location.search.includes('hbl.')`);
+	await check('reset clears the step', `!location.search.includes('hbl.')`);
+
+	// Security
+	await page.act(`step('Security')`);
+	const baudRate = `byText('.row .name', 'Log baud rate').closest('.row').querySelector('input')`;
+	await page.act(`setField(${baudRate}, '9600')`);
+	await check('a number field reaches the link', `location.search.includes('exosphere.log_baud_rate=9600')`);
+	await page.act(`setField(${baudRate}, '99999999')`);
+	await check('a number out of range is not taken', `location.search.includes('exosphere.log_baud_rate=9600')`);
+	await page.act(`byText('.batch .control', 'RESET').click()`);
+	await check('reset clears only its step', `!location.search.includes('exosphere.') && location.search.includes('launch.emummc-SD01.usb3force=1')`);
 
 	// Plugins
 	await page.act(`step('Plugins')`);
 	await check('the settings of selected plugins are listed', `$$('.tuning > .header .title').length > 0`);
+	await page.act(`byText('.row .choice', 'Українська').click()`);
+	await check('the translation of DBI takes a language', `location.search.includes('dbi_patcher.language=ua')`);
 
 	// Overclock
 	await page.act(`step('Overclock')`);
@@ -207,7 +255,19 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`step('Appearance')`);
 	await page.act(`$$('.gallery.bootlogo .picture')[1].click()`);
 	await check('a gallery image reaches the link', `location.search.includes('img.bootlogo=hekate-a')`);
+	// Chips of the entries in the section of the target
+	const chip = (target: string, name: string) => `[...document.querySelector('.gallery.${target}').closest('.appearance').querySelectorAll('.choice')]
+		.find(chip => chip.textContent == '${name}')`;
+	await page.act(`${chip('bootlogo', 'CFW (emuMMC SD01)')}.click()`);
+	await check('an entry starts from the common logo', `document.querySelector('.gallery.bootlogo .picture.active').textContent == 'Common'`);
+	await page.act(`$$('.gallery.bootlogo .picture')[3].click()`);
+	await check('an entry takes a logo of its own', `location.search.includes('img.logo.emummc-SD01=hekate-b')
+		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && location.search.includes('img.bootlogo=hekate-a')`);
 	await page.act(`$$('.gallery.icon .picture')[1].click()`);
+	await check('the first entry gets the icon', `location.search.includes('img.icon.emummc=hekate-switch')`);
+	await page.act(`${chip('icon', 'Lockpick RCM')}.click()`);
+	await page.act(`$$('.gallery.icon .picture')[2].click()`);
+	await check('a payload gets an icon too', `location.search.includes('img.icon.lockpick_rcm=hekate-payload')`);
 
 	// Keyboard
 	await page.act(`document.activeElement.blur(); key(document.body, 'Escape')`);
@@ -221,21 +281,36 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the readme is rendered', `document.querySelector('.readme h1')?.textContent.startsWith('BrewDeck') && $$('.readme li').length > 5`);
 	await check('generated files are highlighted', `document.querySelector('.generated .code .hljs-keyword') != null`);
 	await check('the installers are ready', `$$('.files .row.interactive').length == 3`);
+	await page.act(`byText('.generated .choice', 'bootloader/hekate_ipl.ini').click()`);
+	await check('the Launch menu reaches hekate_ipl.ini', `(() => {
+		const ini = document.querySelector('.generated .code').textContent;
+		return ini.includes('[Lockpick RCM]') && !ini.includes('[CFW (sysMMC)]') && /autoboot=\\d/.test(ini)
+			&& ini.includes('[CFW (emuMMC SD01)]') && ini.includes('emupath=emuMMC/SD01') && ini.includes('usb3force=1')
+			&& ini.includes('logopath=bootloader/res/brewdeck_emummc-SD01_logo.bmp') && ini.includes('icon=bootloader/res/brewdeck_lockpick_rcm_hue.bmp')
+			&& !ini.includes('RAW1');
+	})()`);
 	await page.act(`byText('.generated .choice', 'config/sys-clk/config.ini').click()`);
 	await check('the sys-clk profile is previewed', `document.querySelector('.generated .code').textContent.includes('[ABCDEF0123456789]')`);
 	await page.act(`byText('.files .row .name', 'install.sh').closest('.row').click()`);
 	await page.act(`byText('.files .row .name', 'install.ps1').closest('.row').click()`);
 	await sleep(1000);
 
-	const images = embeddedImages(readFileSync(join(downloads, 'install.sh'), 'utf8'));
+	const installer = readFileSync(join(downloads, 'install.sh'), 'utf8');
+	expect('the installer fetches the translation in the chosen language', installer.includes("'^translation_ua\\.bin$'"));
+	const images = embeddedImages(installer);
 	expect('the installer embeds the boot logo rotated and opaque', images.some(image =>
 		image.path == 'bootloader/bootlogo.bmp' && image.magic == 'BM' && image.bpp == 32 && image.width == 50 && image.height == 204 && image.isOpaque), images);
 	expect('the installer embeds the icon with its transparency', images.some(image =>
 		image.path == 'bootloader/res/brewdeck_emummc_hue.bmp' && image.width == 192 && image.height == 192 && !image.isOpaque), images);
+	expect('the installer embeds the logo of an entry', images.some(image =>
+		image.path == 'bootloader/res/brewdeck_emummc-SD01_logo.bmp' && image.magic == 'BM' && image.bpp == 32 && image.isOpaque), images);
+	expect('the installer embeds the icon of a payload', images.some(image => image.path == 'bootloader/res/brewdeck_lockpick_rcm_hue.bmp'), images);
 	expect('install.ps1 starts with a byte order mark', readFileSync(join(downloads, 'install.ps1')).subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf])));
 
 	await page.act(`byText('.lang-switch button', 'ru').click()`);
-	await check('the language changes in place', `byText('.sidebar .step.active .label', 'Сборка') != null`);
+	await check('the language changes in place', `byText('.sidebar .step.active .label', 'Сборка') != null && document.documentElement.lang == 'ru'`);
+	await page.act(`byText('.lang-switch button', 'ua').click()`);
+	await check('Ukrainian is there too', `byText('.sidebar .step.active .label', 'Збірка') != null && document.documentElement.lang == 'uk'`);
 
 	expect('the console stays clean', page.console.length == 0, page.console);
 	return failures;

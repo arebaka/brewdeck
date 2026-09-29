@@ -5,7 +5,7 @@ export interface HardwareInfo {
 	name: string;
 	codename: string;
 	is_modchip_required: boolean;
-	image: string; // photo cropped to the console, so its width is the width of the console
+	image: string;
 	dimensions: [number, number]; // width and height in millimeters, Joy-Con attached
 }
 
@@ -15,7 +15,7 @@ export interface HOSVersion {
 	version: string;
 	date: Date;
 	status: HOSVersionStatus;
-	atmosphere?: string;
+	atmosphere?: string; // Atmosphere version
 	supported?: Date;
 }
 
@@ -23,7 +23,7 @@ export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' 
 
 export type ComponentSource = 'appstore' | 'github' | 'url' | 'manual' | 'bundled';
 
-// Asset of the latest GitHub release: an archive merged into the SD card or a single file saved to `path`
+// Asset of the latest GitHub release: an archive merged into the SD card or a single file
 export interface GithubAsset {
 	repo: string;
 	asset: string; // regular expression matched against asset names
@@ -48,7 +48,6 @@ export interface ComponentSources {
 	bundled?: string; // component that already ships this one
 }
 
-// Nested arrays list alternatives, any of them satisfies the requirement
 export type Requirement = string | string[];
 
 export interface ComponentInfo {
@@ -60,15 +59,17 @@ export interface ComponentInfo {
 	size: number; // bytes to download
 	released?: string;
 	logo?: string;
-	source: ComponentSource; // the fresher of the available sources, picked by `npm run sync`
+	source: ComponentSource; // the fresher of the available sources, picked by npm run sync
 	prefer?: 'appstore' | 'github';
 	sources: ComponentSources;
-	requires?: Requirement[];
+	requires?: Requirement[]; // all have to be met, a nested list is met by any of its components
 	conflicts_with?: string[];
 	replaces?: string[];
 	hardware?: HardwareRevision[]; // revisions the component is useful on
 	tracks?: ('hos' | 'atmosphere')[]; // has to be updated for every new HOS or Atmosphere release
 	deprecated?: boolean;
+	risky?: boolean; // its note tells what may go wrong, the build warns about it too
+	payload?: string; // SD path of the payload, it gets an entry in the Launch menu of hekate
 	is_selected_by_default: boolean;
 	is_required: boolean;
 }
@@ -80,7 +81,7 @@ export interface Preset {
 
 export type TuningValue = boolean | number | string | string[];
 
-export type TuningStep = 'system' | 'modules' | 'overclock';
+export type TuningStep = 'launch' | 'system' | 'security' | 'modules' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
@@ -121,7 +122,7 @@ export interface OverclockData {
 	games: { id: string; name: string }[];
 }
 
-// sys-clk profile of a game, `template` turns into `custom` once any clock is edited by hand
+// sys-clk profile of a game, template turns into custom once any clock is edited by hand
 export interface GameProfile {
 	id: string; // title ID
 	name: string;
@@ -134,33 +135,63 @@ export type ImageTarget = 'bootlogo' | 'background' | 'icon';
 export interface GalleryImage {
 	id: string;
 	target: ImageTarget;
-	file: string; // public path of the image, in the orientation it is seen on screen
+	file: string; // public path of the image, in the orientation it is seen on screen, made of the target and the ID
 	hue?: boolean; // white layout Nyx tints with the theme color
 	author: string;
 	license: string;
 	url: string;
 }
 
-export type IconEntry = 'emummc' | 'sysmmc' | 'stock';
+export type BootMode = 'emummc' | 'sysmmc' | 'stock';
+
+// Section of hekate_ipl.ini, an entry of the Launch menu
+export interface LaunchEntry {
+	id: string; // boot mode, `emummc-<folder>` of another emuMMC or a payload component
+	name: string; // name of the section, shown in the Launch menu
+	caption: string; // caption of the group the section belongs to
+	keys: Record<string, string | number>;
+}
+
+// Entry booting the console in one of the modes
+export type BootEntry = LaunchEntry & { id: BootMode };
+
+// Exosphere keys an entry sets for itself, overriding exosphere.ini and system_settings.ini
+export type EntryOverride = 'cal0blank' | 'usb3force' | 'memmode';
+
+// Launch menu of hekate: the boot modes, more emuMMCs, then payloads of the selected components
+export interface LaunchConfig {
+	modes: BootMode[];
+	emummcs: string[]; // folders in emuMMC/ of more emuMMCs, each gets its own entry
+	overrides: Record<string, Partial<Record<EntryOverride, 0 | 1>>>; // by entry, a missing key follows the configs
+	autoboot: string; // an entry booted after the logo, `menu` to stay in the menu
+}
 
 // Gallery image ids or `upload` for an image picked from the disk
 export interface AppearanceConfig {
 	bootlogo?: string;
 	background?: string;
-	icons: Partial<Record<IconEntry, string>>;
+	logos: Record<string, string>; // boot logos of entries, shown when hekate boots them by itself
+	icons: Record<string, string>; // icons of entries in the Launch menu
 }
 
-// Images picked from the disk by `bootlogo`, `background` or `icon.<entry>`, kept only in this tab: links cannot carry them
+// Images picked from the disk by `bootlogo`, `background`, `logo.<entry>` or `icon.<entry>`, kept only in this tab: links cannot carry them
 export type Uploads = Record<string, { blob: Blob; url: string }>;
 
-export type StepId = 'hardware' | 'firmware' | 'software' | 'system' | 'modules' | 'overclock' | 'appearance' | 'build';
+export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'modules' | 'overclock' | 'appearance' | 'build';
+export const STEP_IDS: StepId[] = ['hardware', 'firmware', 'software', 'launch', 'system', 'security', 'modules', 'overclock', 'appearance', 'build'];
 
 export type IssueLevel = 'error' | 'warning' | 'info';
+
+// Components a fix adds or removes
+export interface Fix {
+	add?: string[];
+	remove?: string[];
+}
 
 export interface Issue {
 	level: IssueLevel;
 	code: string;
 	step: StepId;
 	params: Record<string, string>;
-	fix?: { add?: string[]; remove?: string[] };
+	fixes?: Fix[]; // ways to resolve the issue, a button each
 }

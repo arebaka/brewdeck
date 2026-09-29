@@ -1,17 +1,19 @@
-import { ClockKey, ClockMode, GameProfile, HardwareRevision, Issue, TuningConfig } from './types';
+import { ClockKey, ClockMode, GameProfile, HardwareRevision, Issue, LaunchConfig, TuningConfig } from './types';
 import { Translation } from './i18n';
-import { COMPONENTS, HARDWARE, HOS_VERSIONS, OVERCLOCK, isHOSSupported, isRequirementMet } from './data';
+import { COMPONENTS, HARDWARE, HOS_VERSIONS, OVERCLOCK, isHOSSupported, isRequirementMet, launchEntries } from './data';
 
 export interface ValidationState {
 	hardware: HardwareRevision;
 	hosVersion: string;
 	selectedComponentIDs: string[];
+	launch: LaunchConfig;
 	tuning: TuningConfig;
 	overclock: GameProfile[];
 }
 
 const LEVELS = { error: 0, warning: 1, info: 2 };
 
+// Everything to check before building, errors first. Every issue points at the step to fix it on
 export function validate(state: ValidationState, t: Translation): Issue[] {
 	const issues: Issue[] = [];
 	const selected = COMPONENTS.filter(comp => state.selectedComponentIDs.includes(comp.id));
@@ -23,16 +25,24 @@ export function validate(state: ValidationState, t: Translation): Issue[] {
 		issues.push({ level: 'error', code: 'hosUnsupported', step: 'firmware', params: { hos: state.hosVersion } });
 	}
 
+	if (!launchEntries(state.launch, state.selectedComponentIDs).length) {
+		issues.push({ level: 'error', code: 'noEntries', step: 'launch', params: {} });
+	}
+
 	for (const comp of selected) {
+		// Payloads are picked on the Launch step
+		const step = comp.payload ? 'launch' : 'software';
+
 		for (const requirement of comp.requires ?? []) {
 			if (!isRequirementMet(requirement, state.selectedComponentIDs)) {
 				const alternatives = typeof requirement == 'string' ? [requirement] : requirement;
 				issues.push({
 					level: 'warning',
 					code: 'requires',
-					step: 'software',
+					step,
 					params: { component: comp.name, dependency: alternatives.map(name).join(t.issues.or) },
-					fix: { add: [alternatives[0]] }
+					// Every alternative can be added
+					fixes: alternatives.map(id => ({ add: [id] }))
 				});
 			}
 		}
@@ -40,27 +50,31 @@ export function validate(state: ValidationState, t: Translation): Issue[] {
 		// Conflicts are mutual, the pair is reported once
 		for (const other of comp.conflicts_with ?? []) {
 			if (state.selectedComponentIDs.includes(other) && COMPONENTS.indexOf(comp) < COMPONENTS.findIndex(c => c.id == other)) {
-				issues.push({ level: 'warning', code: 'conflict', step: 'software', params: { component: comp.name, other: name(other) }, fix: { remove: [other] } });
+				issues.push({ level: 'warning', code: 'conflict', step, params: { component: comp.name, other: name(other) }, fixes: [{ remove: [comp.id] }, { remove: [other] }] });
 			}
 		}
 
 		for (const other of comp.replaces ?? []) {
 			if (state.selectedComponentIDs.includes(other)) {
-				issues.push({ level: 'info', code: 'replaces', step: 'software', params: { component: comp.name, other: name(other) }, fix: { remove: [other] } });
+				issues.push({ level: 'info', code: 'replaces', step, params: { component: comp.name, other: name(other) }, fixes: [{ remove: [other] }, { remove: [comp.id] }] });
 			}
 		}
 
 		if (comp.hardware && !comp.hardware.includes(state.hardware)) {
 			const revisions = comp.hardware.map(id => HARDWARE.find(hw => hw.id == id)!.name).join(', ');
-			issues.push({ level: 'warning', code: 'hardware', step: 'software', params: { component: comp.name, revisions }, fix: { remove: [comp.id] } });
+			issues.push({ level: 'warning', code: 'hardware', step, params: { component: comp.name, revisions }, fixes: [{ remove: [comp.id] }] });
 		}
 
 		if (comp.deprecated) {
-			issues.push({ level: 'info', code: 'deprecated', step: 'software', params: { component: comp.name } });
+			issues.push({ level: 'info', code: 'deprecated', step, params: { component: comp.name } });
+		}
+
+		if (comp.risky) {
+			issues.push({ level: 'warning', code: 'risky', step, params: { component: comp.name, note: t.software[comp.id]?.note ?? '' } });
 		}
 
 		if (comp.source == 'manual') {
-			issues.push({ level: 'info', code: 'manual', step: 'software', params: { component: comp.name } });
+			issues.push({ level: 'info', code: 'manual', step, params: { component: comp.name } });
 		}
 
 		// Components patching HOS or Atmosphere have to be released after the support of the chosen versions

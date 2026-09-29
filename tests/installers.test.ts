@@ -7,7 +7,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { GeneratedFile, build } from '@/build';
 import { PRESETS, presetSelection } from '@/data';
 import { translations } from '@/i18n';
-import { defaultState } from '@/url';
+import { defaultState } from '@/state';
 import { BITMAPS, encodeBitmaps } from './fixtures';
 
 // The installers are run for real where their tools are installed
@@ -18,7 +18,7 @@ const canRunBash = has('bash') && has('curl') && (has('unzip') || has('bsdtar') 
 const offline = build({
 	...defaultState(),
 	selectedComponentIDs: [],
-	appearance: { bootlogo: 'hekate-a', background: 'atmosphere-splash', icons: { emummc: 'hekate-switch' } },
+	appearance: { bootlogo: 'hekate-a', background: 'atmosphere-splash', logos: {}, icons: { emummc: 'hekate-switch' } },
 	images: encodeBitmaps(BITMAPS),
 	t: translations.en
 });
@@ -56,22 +56,24 @@ function expectInstalled(root: string) {
 describe.skipIf(!canRunBash)('install.sh', () => {
 	it('writes the configuration and the images next to itself', () => {
 		const root = card('install.sh', script(offline.files, 'install.sh'));
-		execFileSync('bash', [join(root, 'install.sh'), '-y'], { stdio: 'pipe' });
+		execFileSync('bash', [join(root, 'install.sh')], { stdio: 'pipe' });
 		expectInstalled(root);
 	});
 });
 
 describe.skipIf(!has('shellcheck'))('install.sh under shellcheck', () => {
+	// Findings come out as the difference, one per line
 	it.each(builds)('has no findings for the %s build', (name, files) => {
-		execFileSync('shellcheck', ['-S', 'style', '-'], { input: script(files, 'install.sh'), stdio: 'pipe' });
+		const { stdout } = spawnSync('shellcheck', ['-S', 'style', '-f', 'gcc', '-'], { input: script(files, 'install.sh'), encoding: 'utf8' });
+		expect(stdout.trim().split('\n').filter(Boolean)).toEqual([]);
 	});
 });
 
 describe.skipIf(!has('pwsh'))('install.ps1', () => {
 	// The page adds the byte order mark for Windows PowerShell
 	it('writes the configuration and the images next to itself', () => {
-		const root = card('install.ps1', `﻿${script(offline.files, 'install.ps1')}`);
-		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1'), '-Yes'], { stdio: 'pipe' });
+		const root = card('install.ps1', `\uFEFF${script(offline.files, 'install.ps1')}`);
+		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1')], { stdio: 'pipe' });
 		expectInstalled(root);
 	}, 60_000);
 

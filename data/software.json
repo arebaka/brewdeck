@@ -71,6 +71,7 @@
 				{ "repo": "Atmosphere-NX/Atmosphere", "asset": "^fusee\\.bin$", "path": "bootloader/payloads/fusee.bin" }
 			]
 		},
+		"payload": "bootloader/payloads/fusee.bin",
 		"is_selected_by_default": true,
 		"is_required": false
 	},
@@ -88,6 +89,7 @@
 				{ "repo": "impeeza/Lockpick_RCMDecScots", "asset": "^Lockpick_RCM-[0-9.]+_Hekate\\.zip$" }
 			]
 		},
+		"payload": "bootloader/payloads/Lockpick_RCM.bin",
 		"is_selected_by_default": true,
 		"is_required": false
 	},
@@ -107,6 +109,7 @@
 				{ "repo": "suchmememanyskill/TegraExplorer", "asset": "^TegraExplorer\\.bin$", "path": "bootloader/payloads/TegraExplorer.bin" }
 			]
 		},
+		"payload": "bootloader/payloads/TegraExplorer.bin",
 		"is_selected_by_default": true,
 		"is_required": false
 	},
@@ -124,6 +127,7 @@
 				{ "repo": "Team-Neptune/CommonProblemResolver", "asset": "^CommonProblemResolver\\.bin$", "path": "bootloader/payloads/CommonProblemResolver.bin" }
 			]
 		},
+		"payload": "bootloader/payloads/CommonProblemResolver.bin",
 		"is_selected_by_default": false,
 		"is_required": false
 	},
@@ -142,6 +146,7 @@
 			]
 		},
 		"hardware": ["mariko", "oled", "lite"],
+		"payload": "bootloader/payloads/hwfly_toolbox.bin",
 		"is_selected_by_default": false,
 		"is_required": false
 	},
@@ -159,6 +164,7 @@
 			]
 		},
 		"hardware": ["mariko", "oled", "lite"],
+		"payload": "bootloader/payloads/picofly_toolbox.bin",
 		"is_selected_by_default": false,
 		"is_required": false
 	},
@@ -541,6 +547,27 @@
 		"is_required": false
 	},
 	{
+		"id": "dbi_patcher",
+		"name": "DBIPatcher",
+		"author": "rashevskyv",
+		"category": "homebrew",
+		"version": "905",
+		"size": 16918333,
+		"released": "2026-08-29",
+		"logo": "dbi.png",
+		"source": "github",
+		"sources": {
+			"github": [
+				{ "repo": "rashevskyv/DBIPatcher", "asset": "^DBI\\.nro$", "path": "switch/DBI/DBI.nro" },
+				{ "repo": "rashevskyv/DBIPatcher", "asset": "^translation_{{language}}\\.bin$", "path": "switch/DBI/translation.bin" }
+			]
+		},
+		"requires": ["dbi"],
+		"risky": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "tinfoil",
 		"name": "Tinfoil",
 		"author": "blawar",
@@ -576,6 +603,24 @@
 		"is_required": false
 	},
 	{
+		"id": "aio_updater",
+		"name": "AIO Switch Updater",
+		"author": "HamletDuFromage",
+		"category": "homebrew",
+		"version": "2.23.3",
+		"size": 3538231,
+		"released": "2025-11-17",
+		"logo": "aio_updater.jpg",
+		"source": "github",
+		"sources": {
+			"github": [
+				{ "repo": "HamletDuFromage/aio-switch-updater", "asset": "^aio-switch-updater\\.zip$" }
+			]
+		},
+		"is_selected_by_default": true,
+		"is_required": false
+	},
+	{
 		"id": "jksv",
 		"name": "JKSV",
 		"author": "J-D-K",
@@ -608,24 +653,6 @@
 			"appstore": ["Checkpoint"]
 		},
 		"is_selected_by_default": false,
-		"is_required": false
-	},
-	{
-		"id": "aio_updater",
-		"name": "AIO Switch Updater",
-		"author": "HamletDuFromage",
-		"category": "homebrew",
-		"version": "2.23.3",
-		"size": 3538231,
-		"released": "2025-11-17",
-		"logo": "aio_updater.jpg",
-		"source": "github",
-		"sources": {
-			"github": [
-				{ "repo": "HamletDuFromage/aio-switch-updater", "asset": "^aio-switch-updater\\.zip$" }
-			]
-		},
-		"is_selected_by_default": true,
 		"is_required": false
 	},
 	{
@@ -741,19 +768,18 @@
 	{
 		"id": "nx_activity_log",
 		"name": "NX Activity Log",
-		"author": "tallbl0nde",
+		"author": "tallbl0nde / zdm65477730",
 		"category": "homebrew",
-		"version": "1.4.0",
-		"size": 10121093,
-		"released": "2021-07-10",
+		"version": "1.5.9",
+		"size": 10927289,
+		"released": "2026-08-24",
 		"logo": "nx_activity_log.jpg",
 		"source": "github",
 		"sources": {
 			"github": [
-				{ "repo": "tallbl0nde/NX-Activity-Log", "asset": "^NX-Activity-Log\\.nro$", "path": "switch/NX-Activity-Log/NX-Activity-Log.nro" }
+				{ "repo": "zdm65477730/NX-Activity-Log", "asset": "^NX-Activity-Log\\.nro$", "path": "switch/NX-Activity-Log/NX-Activity-Log.nro" }
 			]
 		},
-		"deprecated": true,
 		"is_selected_by_default": false,
 		"is_required": false
 	},

@@ -1,17 +1,23 @@
 [
 	{
+		"id": "logo",
+		"step": "launch",
+		"file": "bootloader/hekate_ipl.ini",
+		"options": [
+			{ "id": "bootwait", "type": "select", "values": [0, 1, 3, 5, 10, 20], "default": 3 },
+			{ "id": "noticker", "type": "toggle", "default": false }
+		]
+	},
+	{
 		"id": "hekate",
 		"step": "system",
 		"file": "bootloader/hekate_ipl.ini",
 		"options": [
-			{ "id": "autoboot", "type": "select", "values": ["off", "emummc", "sysmmc", "stock"], "default": "emummc" },
-			{ "id": "bootwait", "type": "select", "values": [0, 1, 3, 5, 10, 20], "default": 3 },
 			{ "id": "backlight", "type": "range", "min": 0, "max": 255, "step": 5, "default": 100 },
 			{ "id": "autohosoff", "type": "select", "values": [0, 1, 2], "default": 2 },
 			{ "id": "autonogc", "type": "toggle", "default": true },
 			{ "id": "updater2p", "type": "toggle", "default": true },
-			{ "id": "bootprotect", "type": "toggle", "default": false },
-			{ "id": "noticker", "type": "toggle", "default": false }
+			{ "id": "bootprotect", "type": "toggle", "default": false }
 		]
 	},
 	{
@@ -24,7 +30,6 @@
 			{ "id": "homescreen", "type": "select", "values": [0, 1, 2, 3], "default": 0 },
 			{ "id": "verification", "type": "select", "values": [0, 1, 2], "default": 1 },
 			{ "id": "entries5col", "type": "toggle", "default": false },
-			{ "id": "timeoffset", "type": "toggle", "default": 0 },
 			{ "id": "timedst", "type": "toggle", "default": true },
 			{ "id": "umsemmcrw", "type": "toggle", "default": false },
 			{ "id": "jcdisable", "type": "toggle", "default": false },
@@ -34,7 +39,7 @@
 	},
 	{
 		"id": "dns",
-		"step": "system",
+		"step": "security",
 		"file": "atmosphere/hosts",
 		"options": [
 			{ "id": "mode", "type": "select", "values": ["block", "default", "off"], "default": "block" },
@@ -45,7 +50,7 @@
 	},
 	{
 		"id": "exosphere",
-		"step": "system",
+		"step": "security",
 		"file": "exosphere.ini",
 		"options": [
 			{ "id": "blank_prodinfo_emummc", "type": "toggle", "default": true },
@@ -100,7 +105,7 @@
 		"step": "system",
 		"file": "atmosphere/config/override_config.ini",
 		"options": [
-			{ "id": "album", "type": "toggle", "default": true },
+			{ "id": "album", "type": "toggle", "default": false },
 			{ "id": "any_app", "type": "toggle", "default": true },
 			{ "id": "key", "type": "select", "values": ["R", "L", "ZR", "ZL", "X", "Y", "MINUS", "PLUS"], "default": "R" },
 			{ "id": "mods_key", "type": "select", "values": ["L", "R", "ZL", "ZR", "X", "Y", "MINUS", "PLUS"], "default": "L" },
@@ -175,13 +180,22 @@
 		"file": "config/sys-ftpd/config.ini",
 		"requires": "sys_ftpd_light",
 		"options": [
-			{ "id": "user", "type": "text", "maxLength": 32, "default": "" },
+			{ "id": "user", "type": "text", "maxLength": 32, "default": "", "secret": true },
 			{ "id": "password", "type": "text", "maxLength": 32, "default": "", "secret": true },
 			{ "id": "anonymous", "type": "toggle", "default": false },
 			{ "id": "port", "type": "number", "min": 1, "max": 65535, "default": 5000 },
 			{ "id": "pause", "type": "toggle", "default": true },
 			{ "id": "keycombo", "type": "multiselect", "values": ["A", "B", "X", "Y", "LS", "RS", "L", "R", "ZL", "ZR", "PLUS", "MINUS", "DLEFT", "DUP", "DRIGHT", "DDOWN"], "default": ["X", "PLUS", "MINUS"], "when": { "pause": [true] } },
 			{ "id": "led", "type": "toggle", "default": true }
+		]
+	},
+	{
+		"id": "dbi_patcher",
+		"step": "modules",
+		"file": "switch/DBI/translation.bin",
+		"requires": "dbi_patcher",
+		"options": [
+			{ "id": "language", "type": "select", "values": ["be", "de", "en", "engb", "es", "es419", "et", "fr", "frca", "id", "it", "jp", "kk", "kr", "lt", "lv", "nl", "pl", "pt", "ptbr", "tr", "ua", "zhcn", "zhtw"], "default": "en" }
 		]
 	},
 	{
