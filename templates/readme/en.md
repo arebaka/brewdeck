@@ -32,7 +32,7 @@ Turn the console on: the modchip boots `payload.bin` (Hekate) from the root of t
 2. Connect the console to a computer over USB and inject `hekate_ctcaer_*.bin` from the root of the SD card with TegraRcmGUI on Windows or fusee-launcher on Linux and macOS.
 {{/modchip}}
 
-Hekate starts{{#autoboot}} and boots **{{autoboot}}**, hold **VOL-** during the logo to get into the menu{{/autoboot}}.
+Hekate starts{{#autoboot}} and boots **{{autoboot}}**, hold **VOL-** during the boot screen to get into the menu{{/autoboot}}.
 
 ## emuMMC
 

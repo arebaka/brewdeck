@@ -3,12 +3,12 @@ import { DBI_LANGUAGES } from '../autonyms';
 
 const tuning: {[group in string]: TuningGroup} = {
 	logo: {
-		title: 'Boot logo',
-		description: 'The logo hekate shows while it waits for VOL- to open the menu.',
+		title: 'Boot screen',
+		description: 'The screen hekate shows while it waits for VOL- to open the menu.',
 		options: {
 			bootwait: {
-				title: 'Logo delay',
-				description: 'Boot logo display time (in seconds). A value of 0 completely hides the logo.',
+				title: 'Boot screen delay',
+				description: 'How long the boot screen is shown (in seconds). A value of 0 hides it completely.',
 				values: {
 					0: '0 s',
 					1: '1 s',
@@ -19,14 +19,14 @@ const tuning: {[group in string]: TuningGroup} = {
 				},
 			},
 			noticker: {
-				title: 'Hide the logo countdown',
-				description: 'Do not draw the line showing the time left to enter the menu during a custom boot logo.',
+				title: 'Hide the boot screen countdown',
+				description: 'Do not draw the line showing the time left to enter the menu on a custom boot screen.',
 			},
 		},
 	},
 	hekate: {
 		title: 'Hekate',
-		description: 'Startup behavior of the bootloader. Its boot entries and logo are set on the Launch step.',
+		description: 'Startup behavior of the bootloader. Its boot entries and boot screen are set on the Launch step.',
 		options: {
 			backlight: {
 				title: 'Screen brightness',

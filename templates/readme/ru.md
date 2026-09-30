@@ -32,7 +32,7 @@
 2. Подключи консоль к компьютеру по USB и отправь `hekate_ctcaer_*.bin` из корня SD-карты через TegraRcmGUI на Windows или fusee-launcher на Linux и macOS.
 {{/modchip}}
 
-Запустится Hekate{{#autoboot}} и загрузит **{{autoboot}}**, зажми **VOL-** во время логотипа, чтобы попасть в меню{{/autoboot}}.
+Запустится Hekate{{#autoboot}} и загрузит **{{autoboot}}**, зажми **VOL-** во время экрана загрузки, чтобы попасть в меню{{/autoboot}}.
 
 ## emuMMC
 

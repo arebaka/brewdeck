@@ -5,9 +5,9 @@ root of the repository. The files of this directory belong to their owners
 and are used under the terms listed below.
 
 appearance/
-    Boot logos (bootlogo/), Nyx backgrounds (background/) and boot menu icons
+    Boot screens (bootlogo/), Nyx backgrounds (background/) and boot menu icons
     (icon/) for hekate and Nyx, redistributed under the GPL-2.0 license of the
-    projects they come from. Boot logos were converted from the rotated bitmaps
+    projects they come from. Boot screens were converted from the rotated bitmaps
     hekate expects to the orientation they are seen on screen, icons from the
     bitmaps of Nyx to PNG with their transparency.
 

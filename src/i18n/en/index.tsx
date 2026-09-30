@@ -152,7 +152,7 @@ const en: Translation = {
 			payloads: 'Payloads',
 			payloadsDescription: 'Tools started instead of the system. Every selected payload gets its own entry in the menu.',
 			autoboot: 'Autoboot',
-			autobootDescription: 'The entry hekate boots after the logo. Holding VOL- during the logo opens the menu anyway.',
+			autobootDescription: 'The entry hekate boots after the boot screen. Holding VOL- during the boot screen opens the menu anyway.',
 			menu: 'Menu',
 		},
 		system: {
@@ -205,11 +205,11 @@ const en: Translation = {
 		},
 		appearance: {
 			title: 'Appearance',
-			description: 'Boot logo, Nyx background and boot menu icons. Pick one from the gallery or upload your own: it is converted to the format hekate expects and embedded into the installers.',
+			description: 'Boot screen, Nyx background and boot menu icons. Pick one from the gallery or upload your own: it is converted to the format hekate expects and embedded into the installers.',
 			targets: {
 				bootlogo: {
-					title: 'Boot logo',
-					description: 'bootloader/bootlogo.bmp, up to 1280×720, stored rotated for the portrait screen. hekate shows it before an autoboot, during the logo delay; launching from the menu shows no logo. An entry can take a logo of its own, shown when autoboot starts that entry.',
+					title: 'Boot screen',
+					description: 'bootloader/bootlogo.bmp, up to 1280×720: a picture over the whole screen or a logo in the middle, hekate fills the rest with the color of its top-left pixel. The file is stored rotated for the portrait screen. hekate shows it before an autoboot, during the boot screen delay; launching from the menu shows none. An entry can take a boot screen of its own, shown when autoboot starts that entry.',
 				},
 				background: {
 					title: 'Nyx background',
@@ -220,12 +220,17 @@ const en: Translation = {
 					description: 'bootloader/res: 192×192 icons of the Launch menu entries. White outlines take the Nyx accent color.',
 				},
 			},
+			defaults: {
+				bootlogo: 'The own logo of hekate',
+				background: 'The theme color of Nyx',
+			},
+			thread: 'More on GBAtemp',
 			common: 'Common',
 			none: 'Default',
 			upload: 'Upload',
 			uploaded: 'Your image',
 			invalid: 'Not an image the browser can read',
-			more: 'More sets are shared on forums without licenses, so they are not bundled: download one you like and upload it here.',
+			more: 'Pictures of the GBAtemp threads are shared without licenses, so they are not bundled: download one you like and upload it here.',
 			credit: '{author}, {license}',
 		},
 		build: {

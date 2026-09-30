@@ -11,18 +11,16 @@
 	{ "id": "atmosphere-banner", "target": "bootlogo", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
 	{ "id": "atmosphere-splash", "target": "bootlogo", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
 	{ "id": "atmosphere-splash", "target": "background", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
+	{ "id": "mattera-atmosphere-hue", "target": "icon", "hue": true, "author": "Nichole Mattera, Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/atmosphere" },
 	{ "id": "hekate-switch", "target": "icon", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
-	{ "id": "hekate-payload", "target": "icon", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
-	{ "id": "hekate-lakka", "target": "icon", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
 	{ "id": "hekate-lakka-hue", "target": "icon", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
+	{ "id": "mattera-lockpick-hue", "target": "icon", "hue": true, "author": "Nichole Mattera", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/lockpick" },
+	{ "id": "hekate-payload", "target": "icon", "hue": true, "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
 	{ "id": "atmosphere-logo", "target": "icon", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
 	{ "id": "atmosphere-logo-light", "target": "icon", "author": "Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/Atmosphere-NX/Atmosphere/tree/master/img" },
 	{ "id": "mattera-atmosphere", "target": "icon", "author": "Nichole Mattera, Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/atmosphere" },
-	{ "id": "mattera-atmosphere-hue", "target": "icon", "hue": true, "author": "Nichole Mattera, Atmosphère-NX", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/atmosphere" },
 	{ "id": "mattera-switch", "target": "icon", "author": "Nichole Mattera, CTCaer", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/switch" },
-	{ "id": "mattera-switch-hue", "target": "icon", "hue": true, "author": "Nichole Mattera, CTCaer", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/switch" },
-	{ "id": "mattera-payload", "target": "icon", "author": "Nichole Mattera, CTCaer", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/payload" },
-	{ "id": "mattera-payload-hue", "target": "icon", "hue": true, "author": "Nichole Mattera, CTCaer", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/payload" },
+	{ "id": "hekate-lakka", "target": "icon", "author": "CTCaer", "license": "GPL-2.0", "url": "https://github.com/CTCaer/hekate/tree/master/nyx/resources" },
 	{ "id": "mattera-lockpick", "target": "icon", "author": "Nichole Mattera", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/lockpick" },
-	{ "id": "mattera-lockpick-hue", "target": "icon", "hue": true, "author": "Nichole Mattera", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/lockpick" }
+	{ "id": "mattera-payload", "target": "icon", "author": "Nichole Mattera, CTCaer", "license": "GPL-2.0", "url": "https://github.com/NicholeMattera/Hekate-Icons/tree/main/payload" }
 ]

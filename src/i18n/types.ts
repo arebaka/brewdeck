@@ -115,6 +115,8 @@ export interface Translation {
 		};
 		appearance: Page & {
 			targets: {[target in ImageTarget]: Page};
+			defaults: {bootlogo: string; background: string}; // what the screen shows without a picture
+			thread: string; // link to more pictures on GBAtemp
 			common: string;
 			none: string;
 			upload: string;

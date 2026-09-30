@@ -262,8 +262,10 @@ export default function App() {
 			{step == 'appearance' && (
 				<Appearance
 					lang={lang}
+					hardware={hardware}
 					appearance={appearance}
 					entries={launchEntries(launch, selectedComponentIDs)}
+					themebg={String(tuning.nyx.themebg)}
 					uploads={uploads}
 					setImage={setImage}
 					t={t} />

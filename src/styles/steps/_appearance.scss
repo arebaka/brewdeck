@@ -6,8 +6,21 @@
 	flex-direction: column;
 	gap: space(3);
 
-	> .header .title {
-		@include section-title;
+	> .header {
+		display: flex;
+		align-items: center;
+		gap: space(3);
+
+		.title {
+			flex: 1;
+			@include section-title;
+		}
+
+		// Threads with more pictures, where the settings show their files
+		.thread {
+			font-size: $size-small;
+			color: var(--color-accent);
+		}
 	}
 
 	> .description {
@@ -32,7 +45,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
 	}
 
-	// Screens keep the 16:9 of the console, the boot logo keeps its size on it
+	// Screens keep the 16:9 of the console, the boot screen keeps its size on it
 	&.bootlogo .frame,
 	&.background .frame {
 		aspect-ratio: 16 / 9;
@@ -63,6 +76,34 @@
 		img {
 			width: 100%;
 		}
+	}
+}
+
+// The console screen in its physical size, windows narrower than it shrink it.
+// The bezel is a shadow, so the screen itself keeps its size
+.screen {
+	display: grid;
+	place-items: center;
+	max-width: calc(100% - #{space(4)});
+	aspect-ratio: 16 / 9;
+	margin: space(2);
+	overflow: hidden;
+	border-radius: 2px;
+	box-shadow: 0 0 0 space(2) #000;
+
+	&.bootlogo img {
+		height: auto;
+	}
+
+	&.background img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.caption {
+		font-size: $size-small;
+		color: var(--color-muted);
 	}
 }
 

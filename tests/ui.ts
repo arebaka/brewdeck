@@ -137,6 +137,8 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 
 	await page.send('Runtime.enable');
 	await page.send('Page.enable');
+	// A headless page has no focus of its own, so focus events would never fire
+	await page.send('Emulation.setFocusEmulationEnabled', { enabled: true });
 	await page.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloads });
 	await page.send('Page.navigate', { url });
 	await sleep(3000);
@@ -199,7 +201,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`${override('CFW (emuMMC RAW1)', 'Boot config memory mode', 'off')}.click()`);
 	await page.act(`byText('.row .name', 'CFW (emuMMC RAW1)').closest('.row').querySelector('.control').click()`);
 	await check('a removed emuMMC takes its keys along', `!location.search.includes('RAW1') && location.search.includes('emummc=SD01')`);
-	await check('the logo delay is set with the menu', `byText('.row .name', 'Logo delay') != null`);
+	await check('the boot screen delay is set with the menu', `byText('.row .name', 'Boot screen delay') != null`);
 	await page.act(`byText('.component .name', 'Lockpick RCM').closest('.component').click()`);
 	await page.act(`byText('.choices .choice', 'Lockpick RCM').click()`);
 	await check('a payload can boot on its own', `location.search.includes('autoboot=lockpick_rcm')`);
@@ -207,7 +209,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	// CFW
 	await page.act(`step('CFW')`);
 	await check('every option is shown at once', `$$('.row .name').length > 20 && !$$('.batch .control').some(button => /ADVANCED/.test(button.textContent))`);
-	await check('the logo delay left the step', `byText('.row .name', 'Logo delay') == null`);
+	await check('the boot screen delay left the step', `byText('.row .name', 'Boot screen delay') == null`);
 	await check('buttons are drawn in their shapes', `$$('.buttons .button.trigger').length > 0 && $$('.buttons .button.face').length > 0`);
 	await page.act(`byText('.row .name', 'Button').closest('.row').querySelector('.button.trigger.left').click()`);
 	await check('a button picks the key', `location.search.includes('hbl.key=ZL')`);
@@ -255,14 +257,30 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`step('Appearance')`);
 	await page.act(`$$('.gallery.bootlogo .picture')[1].click()`);
 	await check('a gallery image reaches the link', `location.search.includes('img.bootlogo=hekate-a')`);
+	// Picture on the preview of the console screen
+	const shown = (target: string) => `document.querySelector('.screen.${target} img')?.src.split('/appearance/')[1]`;
+	await check('the boot screen is previewed on the screen of the console in its real size', `(() => {
+		const screen = document.querySelector('.screen.bootlogo');
+		const width = Math.min(6.2 * 16 / Math.hypot(16, 9) * 96, screen.parentElement.clientWidth - 16);
+		return Math.abs(screen.getBoundingClientRect().width - width) < 1 && ${shown('bootlogo')} == 'bootlogo/hekate-a.png';
+	})()`);
+	await page.act(`$$('.gallery.bootlogo .picture')[3].focus()`);
+	await check('the screen shows the picture in focus', `${shown('bootlogo')} == 'bootlogo/hekate-b.png'`);
+	await page.act(`$$('.gallery.bootlogo .picture')[3].blur()`);
+	await check('and returns to the chosen one', `${shown('bootlogo')} == 'bootlogo/hekate-a.png'`);
+	await check('the background without a picture takes the theme color of Nyx', `${shown('background')} == null
+		&& getComputedStyle(document.querySelector('.screen.background')).backgroundColor == 'rgb(45, 45, 45)'`);
+	await check('more pictures are a link away', `$$('.appearance .thread').length == 3 && $$('.appearance .thread')[2].href.includes('nyx-custom-icon-thread')`);
 	// Chips of the entries in the section of the target
 	const chip = (target: string, name: string) => `[...document.querySelector('.gallery.${target}').closest('.appearance').querySelectorAll('.choice')]
 		.find(chip => chip.textContent == '${name}')`;
 	await page.act(`${chip('bootlogo', 'CFW (emuMMC SD01)')}.click()`);
-	await check('an entry starts from the common logo', `document.querySelector('.gallery.bootlogo .picture.active').textContent == 'Common'`);
+	await check('an entry starts from the common boot screen', `document.querySelector('.gallery.bootlogo .picture.active').textContent == 'Common'
+		&& ${shown('bootlogo')} == 'bootlogo/hekate-a.png'`);
 	await page.act(`$$('.gallery.bootlogo .picture')[3].click()`);
-	await check('an entry takes a logo of its own', `location.search.includes('img.logo.emummc-SD01=hekate-b')
-		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && location.search.includes('img.bootlogo=hekate-a')`);
+	await check('an entry takes a boot screen of its own', `location.search.includes('img.logo.emummc-SD01=hekate-b')
+		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && location.search.includes('img.bootlogo=hekate-a')
+		&& ${shown('bootlogo')} == 'bootlogo/hekate-b.png'`);
 	await page.act(`$$('.gallery.icon .picture')[1].click()`);
 	await check('the first entry gets the icon', `location.search.includes('img.icon.emummc=hekate-switch')`);
 	await page.act(`${chip('icon', 'Lockpick RCM')}.click()`);
@@ -298,11 +316,11 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	const installer = readFileSync(join(downloads, 'install.sh'), 'utf8');
 	expect('the installer fetches the translation in the chosen language', installer.includes("'^translation_ua\\.bin$'"));
 	const images = embeddedImages(installer);
-	expect('the installer embeds the boot logo rotated and opaque', images.some(image =>
+	expect('the installer embeds the boot screen rotated and opaque', images.some(image =>
 		image.path == 'bootloader/bootlogo.bmp' && image.magic == 'BM' && image.bpp == 32 && image.width == 50 && image.height == 204 && image.isOpaque), images);
 	expect('the installer embeds the icon with its transparency', images.some(image =>
 		image.path == 'bootloader/res/brewdeck_emummc_hue.bmp' && image.width == 192 && image.height == 192 && !image.isOpaque), images);
-	expect('the installer embeds the logo of an entry', images.some(image =>
+	expect('the installer embeds the boot screen of an entry', images.some(image =>
 		image.path == 'bootloader/res/brewdeck_emummc-SD01_logo.bmp' && image.magic == 'BM' && image.bpp == 32 && image.isOpaque), images);
 	expect('the installer embeds the icon of a payload', images.some(image => image.path == 'bootloader/res/brewdeck_lockpick_rcm_hue.bmp'), images);
 	expect('install.ps1 starts with a byte order mark', readFileSync(join(downloads, 'install.ps1')).subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf])));

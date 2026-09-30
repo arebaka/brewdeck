@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
 
-import { AppearanceConfig, ImageTarget, LaunchEntry, Uploads } from '../../types';
+import { AppearanceConfig, HardwareRevision, ImageTarget, LaunchEntry, Uploads } from '../../types';
 import { Language, Translation, format } from '../../i18n';
-import { GALLERY } from '../../data';
-import { activate } from '../../utils';
+import { GALLERY, HARDWARE } from '../../data';
+import { activate, pixelsPerInch } from '../../utils';
 
 interface AppearanceProps {
 	lang: Language;
+	hardware: HardwareRevision;
 	appearance: AppearanceConfig;
-	entries: LaunchEntry[]; // entries of the Launch menu, each can have a boot logo and an icon
+	entries: LaunchEntry[]; // entries of the Launch menu, each can have a boot screen and an icon
+	themebg: string; // color of the Nyx theme, the background without a picture
 	uploads: Uploads;
 	setImage: (key: string, image?: string, blob?: Blob) => void;
 	t: Translation;
 }
 
-// Hekate centers the boot logo without scaling it up and fills the rest of the screen with its top-left pixel
+// Threads where people share their pictures without licenses, so they are linked instead of bundled
+const THREADS: {[target in ImageTarget]: string} = {
+	bootlogo: 'https://gbatemp.net/threads/share-your-custom-hekate-bootlogo-thread.513033/',
+	background: 'https://gbatemp.net/threads/share-your-custom-hekate-bootlogo-thread.513033/',
+	icon: 'https://gbatemp.net/threads/nyx-custom-icon-thread.542758/'
+};
+
+// hekate clears the screen to this gray for its own logo
+const HEKATE_GRAY = '#1b1b1b';
+
+// Hekate centers the boot screen without scaling it up and fills the rest of the screen with its top-left pixel
 function previewBootlogo(event: React.SyntheticEvent<HTMLImageElement>) {
 	const image = event.currentTarget;
 	const scale = Math.min(1, 1280 / image.naturalWidth, 720 / image.naturalHeight);
@@ -30,19 +42,37 @@ function previewBootlogo(event: React.SyntheticEvent<HTMLImageElement>) {
 
 export function Appearance({
 	lang,
+	hardware,
 	appearance,
 	entries,
+	themebg,
 	uploads,
 	setImage,
 	t
 }: AppearanceProps) {
 	// Key of the last upload the browser could not decode
 	const [failed, setFailed] = useState<string>();
-	// Entries the boot logo and the icon are picked for, an entry that left the menu gives the choice back
+	// Entries the boot screen and the icon are picked for, an entry that left the menu gives the choice back
 	const [logoEntry, setLogoEntry] = useState<string>();
 	const [iconEntry, setIconEntry] = useState<string>();
 	const logoFor = entries.find(entry => entry.id == logoEntry)?.id;
 	const iconFor = entries.find(entry => entry.id == iconEntry)?.id ?? entries[0]?.id;
+	// Picture under the pointer or the focus, the screen shows it until it is left
+	const [hovered, setHovered] = useState<{ key: string; image?: string }>();
+
+	// Width of the 16:9 screen of the console in CSS pixels
+	const screenWidth = HARDWARE.find(hw => hw.id == hardware)!.screen * 16 / Math.hypot(16, 9) * pixelsPerInch();
+
+	// File of a gallery picture or of the upload under the key
+	const source = (target: ImageTarget, key: string, image?: string) =>
+		image == 'upload' ? uploads[key]?.url : GALLERY.find(item => item.target == target && item.id == image)?.file;
+
+	// What the screen shows for the key: the hovered picture, the chosen one, for an entry without its own the common one
+	const shown = (key: string, value?: string) => hovered?.key == key ? hovered.image : value;
+	const logoKey = logoFor ? `logo.${logoFor}` : 'bootlogo';
+	const logo = shown(logoKey, logoFor ? appearance.logos[logoFor] : appearance.bootlogo);
+	const logoSource = logo ? source('bootlogo', logoKey, logo) : source('bootlogo', 'bootlogo', appearance.bootlogo);
+	const background = source('background', 'background', shown('background', appearance.background));
 
 	const upload = async (key: string, file: File) => {
 		try {
@@ -64,7 +94,24 @@ export function Appearance({
 			isFailed={failed == key}
 			select={image => setImage(key, image)}
 			upload={file => upload(key, file)}
+			preview={image => setHovered({ key, image })}
+			leave={() => setHovered(undefined)}
 			t={t} />
+	);
+
+	const header = (target: ImageTarget) => (
+		<header className="header">
+			<h3 className="title">
+				{t.pages.appearance.targets[target].title}
+			</h3>
+			<a
+				className="thread"
+				href={THREADS[target]}
+				target="_blank"
+				rel="noreferrer">
+				{t.pages.appearance.thread}
+			</a>
+		</header>
 	);
 
 	// Entries to pick from, the ones with a picture of their own are marked
@@ -85,38 +132,40 @@ export function Appearance({
 
 	return (<>
 		<section className="appearance">
-			<header className="header">
-				<h3 className="title">
-					{t.pages.appearance.targets.bootlogo.title}
-				</h3>
-			</header>
+			{header('bootlogo')}
 			<p className="description">
 				{t.pages.appearance.targets.bootlogo.description}
 			</p>
 			{entries.length > 0 && chips([{ name: t.pages.appearance.common }, ...entries], logoFor, appearance.logos, setLogoEntry)}
+			<Screen
+				key={logoSource ?? 'none'}
+				target="bootlogo"
+				src={logoSource}
+				fill={HEKATE_GRAY}
+				width={screenWidth}
+				caption={t.pages.appearance.defaults.bootlogo} />
 			{logoFor
 				? gallery('bootlogo', `logo.${logoFor}`, appearance.logos[logoFor], t.pages.appearance.common)
 				: gallery('bootlogo', 'bootlogo', appearance.bootlogo)}
 		</section>
 
 		<section className="appearance">
-			<header className="header">
-				<h3 className="title">
-					{t.pages.appearance.targets.background.title}
-				</h3>
-			</header>
+			{header('background')}
 			<p className="description">
 				{t.pages.appearance.targets.background.description}
 			</p>
+			<Screen
+				key={background ?? 'none'}
+				target="background"
+				src={background}
+				fill={themebg}
+				width={screenWidth}
+				caption={t.pages.appearance.defaults.background} />
 			{gallery('background', 'background', appearance.background)}
 		</section>
 
 		{iconFor && <section className="appearance">
-			<header className="header">
-				<h3 className="title">
-					{t.pages.appearance.targets.icon.title}
-				</h3>
-			</header>
+			{header('icon')}
 			<p className="description">
 				{t.pages.appearance.targets.icon.description}
 			</p>
@@ -130,6 +179,40 @@ export function Appearance({
 	</>);
 }
 
+interface ScreenProps {
+	target: 'bootlogo' | 'background';
+	src?: string; // picture on the screen
+	fill: string; // color of the screen without a picture
+	width: number; // width of the screen of the console in CSS pixels
+	caption: string; // what hekate or Nyx shows without a picture
+}
+
+// The screen of the console in its physical size with the picture as hekate or Nyx draws it
+function Screen({
+	target,
+	src,
+	fill,
+	width,
+	caption
+}: ScreenProps) {
+	return (
+		<div
+			className={`screen ${target}`}
+			style={{ width: `${width}px`, background: fill }}>
+			{src ? (
+				<img
+					src={src}
+					alt=""
+					onLoad={target == 'bootlogo' ? previewBootlogo : undefined} />
+			) : (
+				<span className="caption">
+					{caption}
+				</span>
+			)}
+		</div>
+	);
+}
+
 interface GalleryProps {
 	target: ImageTarget;
 	value?: string;
@@ -138,6 +221,8 @@ interface GalleryProps {
 	isFailed: boolean;
 	select: (image?: string) => void;
 	upload: (file: File) => void;
+	preview: (image?: string) => void; // the pointer or the focus is on a tile
+	leave: () => void;
 	t: Translation;
 }
 
@@ -150,6 +235,8 @@ function Gallery({
 	isFailed,
 	select,
 	upload,
+	preview,
+	leave,
 	t
 }: GalleryProps) {
 	const picture = (id: string | undefined, content: React.ReactNode, title?: string) => (
@@ -159,7 +246,11 @@ function Gallery({
 			title={title}
 			tabIndex={0}
 			onClick={() => select(id)}
-			onKeyDown={activate}>
+			onKeyDown={activate}
+			onMouseEnter={() => preview(id)}
+			onMouseLeave={leave}
+			onFocus={() => preview(id)}
+			onBlur={leave}>
 			<span className="frame">
 				{content}
 			</span>

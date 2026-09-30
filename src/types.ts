@@ -7,6 +7,7 @@ export interface HardwareInfo {
 	is_modchip_required: boolean;
 	image: string;
 	dimensions: [number, number]; // width and height in millimeters, Joy-Con attached
+	screen: number; // diagonal of the 16:9 display in inches
 }
 
 export type HOSVersionStatus = 'stable' | 'legacy' | 'dead';
