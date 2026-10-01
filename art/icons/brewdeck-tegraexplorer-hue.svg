@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- TegraExplorer: a folder under a magnifier, the folder gives way around the lens -->
+	<defs>
+		<mask id="lens">
+			<rect width="192" height="192" fill="#fff"/>
+			<circle cx="124" cy="120" r="38" fill="#000"/>
+			<path d="M144 140L170 166" stroke="#000" stroke-width="30" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+		<path mask="url(#lens)" d="M22 56A10 10 0 0 1 32 46H66L80 60H150A10 10 0 0 1 160 70V136A10 10 0 0 1 150 146H32A10 10 0 0 1 22 136Z"/>
+		<circle cx="124" cy="120" r="24"/>
+		<path d="M141 137L164 160"/>
+	</g>
+</svg>

@@ -20,7 +20,7 @@ export interface HOSVersion {
 	supported?: Date;
 }
 
-export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'homebrew' | 'themes' | 'streaming' | 'emulators' | 'developer';
+export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'tools' | 'installers' | 'saves' | 'mods' | 'amiibo' | 'themes' | 'media' | 'streaming' | 'emulators' | 'developer';
 
 export type ComponentSource = 'appstore' | 'github' | 'url' | 'manual' | 'bundled';
 

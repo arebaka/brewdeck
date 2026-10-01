@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- Fusée: a rocket, as its name says in French -->
+	<defs>
+		<clipPath id="body">
+			<path d="M96 22C121 40 129 78 123 124H69C63 78 71 40 96 22Z"/>
+		</clipPath>
+	</defs>
+	<g fill="#ff5252" stroke="#ff5252" stroke-width="8" stroke-linejoin="round">
+		<path d="M67 98L46 124V140L69 124Z"/>
+		<path d="M125 98L146 124V140L123 124Z"/>
+	</g>
+	<path d="M96 22C121 40 129 78 123 124H69C63 78 71 40 96 22Z" fill="#eef2f5"/>
+	<rect width="192" height="44" fill="#ff5252" clip-path="url(#body)"/>
+	<circle cx="96" cy="74" r="13" fill="#29b6f6" stroke="#90a4ae" stroke-width="6"/>
+	<path d="M82 132Q96 182 110 132Z" fill="#ffab00"/>
+	<path d="M89 132Q96 162 103 132Z" fill="#ffe57f"/>
+</svg>

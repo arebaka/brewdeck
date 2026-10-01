@@ -191,6 +191,60 @@ const software: {[component in string]: Software} = {
 		description: 'Смена цветов Joy-Con',
 		details: 'Меняет цвета Joy-Con и Pro Controller, записанные в их памяти и отображаемые в главном меню.',
 	},
+	nxdumptool: {
+		description: 'Дампер картриджей и установленных игр',
+		details: 'Снимает дампы картриджей и игр, установленных на SD-карту или eMMC, в XCI, NSP, HFS0, ExeFS и RomFS, вместе с сертификатами и тикетами, на карту или по USB.',
+		note: 'Ставится rewrite из App Store (nxdt_rw_poc): именно эта ветка сейчас развивается.',
+	},
+	switch_cheats_updater: {
+		description: 'Обновление читов для установленных игр',
+		details: 'Скачивает читы для установленных игр и картриджей из подборки GBAtemp в atmosphere/contents.',
+		note: 'AIO Switch Updater того же автора тоже скачивает читы.',
+	},
+	neumann: {
+		description: 'Менеджер сохранений',
+		details: 'Делает резервные копии сохранений установленных игр на SD-карту и восстанавливает их.',
+	},
+	simple_mod_manager: {
+		description: 'Менеджер модов',
+		details: 'Включает и выключает моды LayeredFS из папки mods на карте для каждой игры, с наборами из нескольких модов сразу.',
+	},
+	simple_mod_downloader: {
+		description: 'Загрузчик модов с GameBanana',
+		details: 'Находит и скачивает моды для установленных игр прямо на консоли, а SimpleModManager их устанавливает.',
+		note: 'Требует SimpleModManager.',
+	},
+	amiibo_generator: {
+		description: 'Генератор всех Amiibo для emuiibo',
+		details: 'Разом создаёт виртуальные фигурки всей базы Amiibo для emuiibo. База скачивается из интернета или кладётся вручную в emuiibo/amiibos.json.',
+		note: 'Требует emuiibo.',
+	},
+	sphaira: {
+		description: 'Альтернативное меню homebrew',
+		details: 'Может заменить hbmenu: запускает homebrew, открывает файлы, ставит приложения из App Store, создаёт форвардеры и скачивает темы с Themezer.',
+	},
+	nxmp: {
+		description: 'Медиаплеер',
+		details: 'Играет видео и музыку большинства форматов на MPV и FFmpeg: с SD-карты, USB-накопителей (FAT, NTFS, EXT4), HTTP- и FTP-серверов и ресиверов Enigma2.',
+	},
+	pplay: {
+		description: 'Видеоплеер',
+		details: 'Играет большинство видеоформатов со встроенными субтитрами, с SD-карты или по HTTP.',
+	},
+	browsenx: {
+		description: 'Запуск встроенного браузера',
+		details: 'Открывает спрятанный в системе веб-браузер без подмены DNS. Запускается из hbmenu поверх игры, а не из Альбома, HTML5-видео не играет.',
+	},
+	lennytube: {
+		description: 'YouTube во встроенном браузере',
+		details: 'Открывает YouTube во встроенном браузере системы там, где приложение YouTube не запускается, например на забаненной консоли.',
+		note: 'С 2019 года YouTube сильно изменился, сайт может уже не открыться.',
+	},
+	comicnx: {
+		description: 'Браузер nhentai (18+)',
+		details: 'Просмотр и чтение комиксов с nhentai.net на консоли.',
+		note: 'В архиве с 2020 года и, скорее всего, с нынешним сайтом уже не работает.',
+	},
 	daybreak: {
 		description: 'Установщик обновлений системы',
 		details: 'Устанавливает обновления Horizon OS из папки на SD-карте.',
@@ -218,6 +272,20 @@ const software: {[component in string]: Software} = {
 		description: 'Remote Play для PS4 и PS5',
 		details: 'Стримит игры PlayStation 4 и 5 на Switch, на основе chiaki-ng.',
 	},
+	switchfin: {
+		description: 'Клиент Jellyfin',
+		details: 'Показывает и проигрывает фильмы и сериалы с твоего сервера Jellyfin, напрямую или с транскодированием.',
+	},
+	skynx: {
+		description: 'Стриминг игр с ПК',
+		details: 'Транслирует игры с ПК со звуком на Switch в 60 FPS и передаёт на ПК до четырёх пар Joy-Con.',
+		note: 'На ПК нужен стример для Windows из релизов проекта на GitHub.',
+	},
+	switch_remote_play: {
+		description: 'Стриминг игр с ПК',
+		details: 'Позволяет играть в игры с ПК на Switch по сети, как Steam Link, через стример на Windows.',
+		note: 'На ПК нужен стример из релизов проекта на GitHub.',
+	},
 	retroarch: {
 		description: 'Мультисистемный эмулятор',
 		details: 'Фронтенд для ядер libretro: NES, SNES, Game Boy, Genesis, PlayStation и десятки других систем в одном приложении.',
@@ -235,6 +303,36 @@ const software: {[component in string]: Software} = {
 	melonds: {
 		description: 'Эмулятор Nintendo DS',
 		details: 'Порт melonDS с поддержкой сенсорного экрана.',
+	},
+	noods: {
+		description: 'Эмулятор Nintendo DS и GBA',
+		details: 'Быстрый эмулятор с точной программной отрисовкой, апскейлом и работой на нескольких ядрах. Для системного меню нужны BIOS и прошивка DS.',
+	},
+	desmume: {
+		description: 'Эмулятор Nintendo DS',
+		details: 'Ранний порт DeSmuME с простым интерфейсом. ROM-ы кладутся в switch/desmume/roms.',
+		note: 'melonDS и NooDS ушли гораздо дальше.',
+	},
+	mgba: {
+		description: 'Эмулятор Game Boy Advance',
+		details: 'Быстрый и точный эмулятор Game Boy Advance, Game Boy и Game Boy Color с сохранениями состояния.',
+	},
+	psnes: {
+		description: 'Эмулятор SNES',
+		details: 'Порт Snes9x с сохранениями состояния, масштабированием и шейдерами. ROM-ы кладутся в switch/psnes/roms.',
+	},
+	pnes: {
+		description: 'Эмулятор NES',
+		details: 'На основе Nestopia, с сохранениями состояния, масштабированием и шейдерами. ROM-ы кладутся в switch/pnes/roms.',
+	},
+	pfbneo: {
+		description: 'Эмулятор аркадных автоматов',
+		details: 'FinalBurn Neo для аркадных автоматов, Neo Geo и других систем, с сохранениями состояния и шейдерами.',
+		note: 'Раньше назывался pFBA.',
+	},
+	scummvm: {
+		description: 'Движок классических квестов',
+		details: 'Запускает point-and-click квесты и другие классические игры LucasArts, Sierra, Revolution и десятков других студий по их оригинальным файлам данных.',
 	},
 	sys_botbase: {
 		description: 'Удалённое управление по сети',

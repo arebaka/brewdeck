@@ -499,7 +499,7 @@
 		"id": "daybreak",
 		"name": "Daybreak",
 		"author": "Adubbz",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "1.12.0",
 		"size": 0,
 		"logo": "daybreak.jpg",
@@ -514,7 +514,7 @@
 		"id": "appstore",
 		"name": "Homebrew App Store",
 		"author": "4TU Team",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "2.3.2",
 		"size": 7786002,
 		"released": "2025-01-10",
@@ -527,10 +527,26 @@
 		"is_required": false
 	},
 	{
+		"id": "sphaira",
+		"name": "sphaira",
+		"author": "ITotalJustice",
+		"category": "tools",
+		"version": "1.0.7",
+		"size": 2259983,
+		"released": "2026-09-17",
+		"logo": "sphaira.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["sphaira"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "dbi",
 		"name": "DBI",
 		"author": "duckbill",
-		"category": "homebrew",
+		"category": "installers",
 		"version": "912ru",
 		"size": 16665670,
 		"released": "2026-09-18",
@@ -550,7 +566,7 @@
 		"id": "dbi_patcher",
 		"name": "DBIPatcher",
 		"author": "rashevskyv",
-		"category": "homebrew",
+		"category": "installers",
 		"version": "905",
 		"size": 16918333,
 		"released": "2026-08-29",
@@ -571,7 +587,7 @@
 		"id": "tinfoil",
 		"name": "Tinfoil",
 		"author": "blawar",
-		"category": "homebrew",
+		"category": "installers",
 		"version": "20.0",
 		"size": 8704000,
 		"source": "manual",
@@ -586,7 +602,7 @@
 		"id": "goldleaf",
 		"name": "Goldleaf",
 		"author": "XorTroll",
-		"category": "homebrew",
+		"category": "installers",
 		"version": "1.2.1",
 		"size": 5249300,
 		"released": "2026-09-23",
@@ -603,10 +619,26 @@
 		"is_required": false
 	},
 	{
+		"id": "nxdumptool",
+		"name": "nxdumptool",
+		"author": "DarkMatterCore",
+		"category": "installers",
+		"version": "2026.04.24",
+		"size": 1308155,
+		"released": "2026-05-14",
+		"logo": "nxdumptool.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["gcdumptool"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "aio_updater",
 		"name": "AIO Switch Updater",
 		"author": "HamletDuFromage",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "2.23.3",
 		"size": 3538231,
 		"released": "2025-11-17",
@@ -617,6 +649,7 @@
 				{ "repo": "HamletDuFromage/aio-switch-updater", "asset": "^aio-switch-updater\\.zip$" }
 			]
 		},
+		"replaces": ["switch_cheats_updater"],
 		"is_selected_by_default": true,
 		"is_required": false
 	},
@@ -624,7 +657,7 @@
 		"id": "jksv",
 		"name": "JKSV",
 		"author": "J-D-K",
-		"category": "homebrew",
+		"category": "saves",
 		"version": "12/02/2025",
 		"size": 4472291,
 		"released": "2025-12-03",
@@ -643,7 +676,7 @@
 		"id": "checkpoint",
 		"name": "Checkpoint",
 		"author": "FlagBrew",
-		"category": "homebrew",
+		"category": "saves",
 		"version": "5.2.0",
 		"size": 2436384,
 		"released": "2026-08-27",
@@ -656,10 +689,26 @@
 		"is_required": false
 	},
 	{
+		"id": "neumann",
+		"name": "Neumann",
+		"author": "turtle-insect",
+		"category": "saves",
+		"version": "0.0.32",
+		"size": 1170040,
+		"released": "2026-04-17",
+		"logo": "neumann.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["Neumann"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "edizon",
 		"name": "EdiZon SE",
 		"author": "tomvita",
-		"category": "homebrew",
+		"category": "mods",
 		"version": "3.8.37a",
 		"size": 10880820,
 		"released": "2025-12-10",
@@ -678,7 +727,7 @@
 		"id": "breeze",
 		"name": "Breeze",
 		"author": "tomvita",
-		"category": "homebrew",
+		"category": "mods",
 		"version": "beta108.4c",
 		"size": 9631043,
 		"released": "2026-06-17",
@@ -693,10 +742,60 @@
 		"is_required": false
 	},
 	{
+		"id": "simple_mod_manager",
+		"name": "SimpleModManager",
+		"author": "nadrino",
+		"category": "mods",
+		"version": "2.1.4",
+		"size": 4151256,
+		"released": "2026-02-24",
+		"logo": "simple_mod_manager.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["SimpleModManager"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "simple_mod_downloader",
+		"name": "SimpleModDownloader",
+		"author": "PoloNX",
+		"category": "mods",
+		"version": "2.3.0",
+		"size": 4608694,
+		"released": "2025-12-08",
+		"logo": "simple_mod_downloader.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["SimpleModDownloader"]
+		},
+		"requires": ["simple_mod_manager"],
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "switch_cheats_updater",
+		"name": "switch-cheats-updater",
+		"author": "HamletDuFromage",
+		"category": "mods",
+		"version": "1.2.1",
+		"size": 916880,
+		"released": "2020-05-12",
+		"logo": "switch_cheats_updater.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["switch-cheats-updater"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "emuiibo",
 		"name": "emuiibo",
 		"author": "XorTroll",
-		"category": "homebrew",
+		"category": "amiibo",
 		"version": "1.1.3",
 		"size": 629714,
 		"released": "2026-03-15",
@@ -715,7 +814,7 @@
 		"id": "amiigo",
 		"name": "Amiigo",
 		"author": "CompSciOrBust",
-		"category": "homebrew",
+		"category": "amiibo",
 		"version": "2.4.1",
 		"size": 3823895,
 		"released": "2026-01-20",
@@ -729,10 +828,28 @@
 		"is_required": false
 	},
 	{
+		"id": "amiibo_generator",
+		"name": "AmiiboGenerator",
+		"author": "Slluxx",
+		"category": "amiibo",
+		"version": "2.1.1",
+		"size": 666142,
+		"released": "2023-11-05",
+		"logo": "amiibo_generator.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["AmiiboGenerator"]
+		},
+		"requires": ["emuiibo"],
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "linkalho",
 		"name": "Linkalho",
 		"author": "rdmrocha / impeeza",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "2.0.2",
 		"size": 3156396,
 		"released": "2025-11-17",
@@ -750,7 +867,7 @@
 		"id": "nx_shell",
 		"name": "NX-Shell",
 		"author": "Joel16",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "4.01",
 		"size": 3614714,
 		"released": "2022-08-08",
@@ -769,7 +886,7 @@
 		"id": "nx_activity_log",
 		"name": "NX Activity Log",
 		"author": "tallbl0nde / zdm65477730",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "1.5.9",
 		"size": 10927289,
 		"released": "2026-08-24",
@@ -787,7 +904,7 @@
 		"id": "jc_color_swapper",
 		"name": "JC Color Swapper",
 		"author": "HamletDuFromage",
-		"category": "homebrew",
+		"category": "tools",
 		"version": "1.2",
 		"size": 538430,
 		"released": "2020-05-12",
@@ -795,6 +912,106 @@
 		"source": "appstore",
 		"sources": {
 			"appstore": ["JC-color-swapper"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "nxmp",
+		"name": "NXMP",
+		"author": "proconsule",
+		"category": "media",
+		"version": "0.9.3",
+		"size": 45564568,
+		"released": "2025-12-17",
+		"logo": "nxmp.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["NXMP"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "switchfin",
+		"name": "Switchfin",
+		"author": "dragonflylee",
+		"category": "media",
+		"version": "0.9.4",
+		"size": 41773615,
+		"released": "2026-09-04",
+		"logo": "switchfin.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["Switchfin"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "pplay",
+		"name": "pPlay",
+		"author": "Cpasjuste",
+		"category": "media",
+		"version": "3.8",
+		"size": 15128532,
+		"released": "2022-02-21",
+		"logo": "pplay.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["pplay"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "browsenx",
+		"name": "BrowseNX",
+		"author": "crc-32",
+		"category": "media",
+		"version": "0.4.1",
+		"size": 175374,
+		"released": "2021-04-25",
+		"logo": "browsenx.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["browsenx"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "lennytube",
+		"name": "lennytube",
+		"author": "noirscape",
+		"category": "media",
+		"version": "1.0.2",
+		"size": 142733,
+		"released": "2019-09-16",
+		"logo": "lennytube.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["lennytube"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "comicnx",
+		"name": "ComicNX",
+		"author": "HookedBehemoth",
+		"category": "media",
+		"version": "1.2.0",
+		"size": 4595248,
+		"released": "2019-10-17",
+		"logo": "comicnx.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["ComicNX"]
 		},
 		"deprecated": true,
 		"is_selected_by_default": false,
@@ -887,6 +1104,40 @@
 		"is_required": false
 	},
 	{
+		"id": "skynx",
+		"name": "SkyNX",
+		"author": "DevL0rd",
+		"category": "streaming",
+		"version": "1.5",
+		"size": 9492260,
+		"released": "2022-03-21",
+		"logo": "skynx.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["SkyNX"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "switch_remote_play",
+		"name": "switch-remote-play",
+		"author": "Moehammered",
+		"category": "streaming",
+		"version": "1.0.0",
+		"size": 9388140,
+		"released": "2021-11-29",
+		"logo": "switch_remote_play.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["switch-remote-play"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
 		"id": "retroarch",
 		"name": "RetroArch",
 		"author": "libretro",
@@ -947,6 +1198,122 @@
 		"source": "appstore",
 		"sources": {
 			"appstore": ["melonDS"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "noods",
+		"name": "NooDS",
+		"author": "Hydr8gon",
+		"category": "emulators",
+		"version": "release",
+		"size": 2714438,
+		"released": "2026-08-09",
+		"logo": "noods.png",
+		"source": "github",
+		"sources": {
+			"appstore": ["NooDS"],
+			"github": [
+				{ "repo": "Hydr8gon/NooDS", "asset": "^noods-switch\\.zip$", "into": "switch" }
+			]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "desmume",
+		"name": "DeSmuME-NX",
+		"author": "Laproxi / MasterFeizz",
+		"category": "emulators",
+		"version": "0.0.3",
+		"size": 1693444,
+		"released": "2018-07-21",
+		"logo": "desmume.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["desmume"]
+		},
+		"deprecated": true,
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "mgba",
+		"name": "mGBA",
+		"author": "endrift",
+		"category": "emulators",
+		"version": "0.10.5",
+		"size": 2990112,
+		"released": "2025-03-23",
+		"logo": "mgba.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["mGBA"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "psnes",
+		"name": "pSNES",
+		"author": "Cpasjuste",
+		"category": "emulators",
+		"version": "7.2",
+		"size": 14858460,
+		"released": "2026-08-19",
+		"logo": "psnes.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["psnes"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "pnes",
+		"name": "pNES",
+		"author": "Cpasjuste",
+		"category": "emulators",
+		"version": "7.2",
+		"size": 14989033,
+		"released": "2026-08-19",
+		"logo": "pnes.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["pNES"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "pfbneo",
+		"name": "pFBNeo",
+		"author": "Cpasjuste",
+		"category": "emulators",
+		"version": "7.2",
+		"size": 22456946,
+		"released": "2026-08-19",
+		"logo": "pfbneo.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["pFBA"]
+		},
+		"is_selected_by_default": false,
+		"is_required": false
+	},
+	{
+		"id": "scummvm",
+		"name": "ScummVM",
+		"author": "ScummVM Team",
+		"category": "emulators",
+		"version": "2026.3.0",
+		"size": 121852316,
+		"released": "2026-06-21",
+		"logo": "scummvm.png",
+		"source": "appstore",
+		"sources": {
+			"appstore": ["scummvm"]
 		},
 		"is_selected_by_default": false,
 		"is_required": false

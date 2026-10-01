@@ -12,7 +12,7 @@ export const HOS_VERSIONS: HOSVersion[] = firmware.map(v => ({
 })) as HOSVersion[];
 export const COMPONENTS: ComponentInfo[] = software as ComponentInfo[];
 // Payloads are picked on the Launch step, the other categories on the Software one
-export const CATEGORIES: ComponentCategory[] = ['base', 'sysmodules', 'overlays', 'homebrew', 'themes', 'streaming', 'emulators', 'developer'];
+export const CATEGORIES: ComponentCategory[] = ['base', 'sysmodules', 'overlays', 'tools', 'installers', 'saves', 'mods', 'amiibo', 'themes', 'media', 'streaming', 'emulators', 'developer'];
 export const BOOT_ENTRIES: BootEntry[] = launch as unknown as BootEntry[];
 export const TUNING: TuningGroup[] = tuning as TuningGroup[];
 export const PRESETS: Preset[] = presets as Preset[];

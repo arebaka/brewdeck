@@ -44,6 +44,10 @@
 	background: var(--color-panel);
 	border-radius: $radius;
 
+	@include phone {
+		padding: space(4) space(3);
+	}
+
 	> * + * {
 		margin-top: space(3);
 	}

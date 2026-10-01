@@ -12,15 +12,20 @@ BrewDeck is a static web app. It goes through the console, the software and ever
 
 **HOS version.** Every system version, with the Atmosphère release that supports it. A version Atmosphère does not support yet is an error, patches released before the support of the version are warned about.
 
-**Software.** Components in eight categories:
+**Software.** Components by purpose:
 
 - core: Atmosphère, Hekate, sys-patch;
 - sysmodules: MissionControl, sys-clk, SaltyNX, ldn_mitm, sys-con, SysDVR, sys-ftpd-light, sys-tune, Fizeau and others;
 - overlays: Tesla Menu or Ultrahand, Status Monitor, FPSLocker, ReverseNX-RT, the SysDVR and EdiZon overlays, noled;
-- homebrew: Homebrew App Store, DBI with the DBIPatcher translations into 20+ languages, Tinfoil, Goldleaf, AIO Switch Updater, JKSV, Checkpoint, EdiZon SE, NX Activity Log, emuiibo and others;
+- utilities: Daybreak, Homebrew App Store, sphaira, AIO Switch Updater, NX-Shell, Linkalho, NX Activity Log and others;
+- installers and dumpers: DBI with the DBIPatcher translations into 20+ languages, Tinfoil, Goldleaf, nxdumptool;
+- saves: JKSV, Checkpoint, Neumann;
+- cheats and mods: EdiZon SE, Breeze, SimpleModManager and SimpleModDownloader;
+- Amiibo: emuiibo, Amiigo, AmiiboGenerator;
 - themes and HOME menu: NXThemes Installer, Themezer, uLaunch;
-- streaming: Moonlight, Akira;
-- emulators: RetroArch, Flycast, PPSSPP, melonDS;
+- media: NXMP, Switchfin for Jellyfin, pPlay and others;
+- game streaming: Moonlight, Akira, SkyNX, switch-remote-play;
+- emulators: RetroArch, Flycast, PPSSPP, melonDS, NooDS, mGBA, pSNES, pNES, pFBNeo, ScummVM and others;
 - development: sys-botbase, sys-gdbstub, Twili and others.
 
 Presets (Minimal, Recommended, Gamer, Emulation, Streaming, Developer, Everything) replace the selection, a component brings its dependencies along. Conflicts such as Tesla Menu and Ultrahand, components useless on the revision and abandoned ones are explained with fixes: a conflict is solved by removing either side, a missing dependency by adding any of its alternatives. Every component comes from the Homebrew App Store or from GitHub releases, whichever is fresher. Packages of the App Store are registered as installed, so the store on the console keeps updating them.
@@ -40,7 +45,7 @@ Presets (Minimal, Recommended, Gamer, Emulation, Streaming, Developer, Everythin
 
 **Overclock.** sys-clk profiles by title ID: a template (Stock, Balanced, Performance, Battery saver) or CPU, GPU and RAM clocks for every mode, docked, handheld and charging. Clocks above the limits sys-clk applies on the revision are pointed out.
 
-**Appearance.** Boot screen, Nyx background and icons of the Launch entries, taken from the gallery of Hekate and Atmosphère art and the icons of Nichole Mattera, or uploaded. The boot screen and the background are previewed on the screen of the chosen console in its real size, as Hekate and Nyx draw them. Every entry, payloads included, can take an icon and a boot screen of its own (`logopath`), which Hekate shows when autoboot starts that entry. Images are converted to the bitmaps Hekate expects and embedded into the installers. More pictures are linked from the GBAtemp threads where people share them.
+**Appearance.** Boot screen, Nyx background and icons of the Launch entries, taken from the gallery of Hekate and Atmosphère art, the icons of Nichole Mattera and the own icon set of BrewDeck, or uploaded. The boot screen and the background are previewed on the screen of the chosen console in its real size, as Hekate and Nyx draw them. Every entry, payloads included, can take an icon and a boot screen of its own (`logopath`), which Hekate shows when autoboot starts that entry. Images are converted to the bitmaps Hekate expects and embedded into the installers. More pictures are linked from the GBAtemp threads where people share them.
 
 **Build.** Issues of every step with their fixes, the installers, the readme and every generated file with syntax highlighting, to read before running anything.
 
@@ -72,7 +77,7 @@ npm run test:ui   # every step in headless Chrome
 npm run sync      # versions, sizes, sources and logos of the catalog
 ```
 
-The catalog lives in `data/`, templates of the generated files in `templates/`, logos, photos and the gallery in `public/`.
+The catalog lives in `data/`, templates of the generated files in `templates/`, logos, photos and the gallery in `public/`. SVG sources of the gallery icons, the set of BrewDeck and the icons of Nichole Mattera fitted into the icon of Nyx, live in `art/icons/` and are rendered into the gallery with `rsvg-convert -w 192 -h 192 art/icons/<id>.svg -o public/appearance/icon/<id>.png`.
 
 ## License
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- CFW on the system NAND: the console itself charged with a bolt -->
+	<path d="M44 54H28A18 18 0 0 0 10 72V120A18 18 0 0 0 28 138H44Z" fill="#ff3c28"/>
+	<path d="M148 54H164A18 18 0 0 1 182 72V120A18 18 0 0 1 164 138H148Z" fill="#0ab9e6"/>
+	<rect x="47" y="54" width="98" height="84" rx="3" fill="#000"/>
+	<g fill="#262626">
+		<!-- Left stick over the D-pad, the buttons over the right stick -->
+		<circle cx="27" cy="78" r="8"/>
+		<circle cx="27" cy="98" r="4"/>
+		<circle cx="20" cy="106" r="4"/>
+		<circle cx="34" cy="106" r="4"/>
+		<circle cx="27" cy="114" r="4"/>
+		<circle cx="165" cy="70" r="4"/>
+		<circle cx="158" cy="78" r="4"/>
+		<circle cx="172" cy="78" r="4"/>
+		<circle cx="165" cy="86" r="4"/>
+		<circle cx="165" cy="106" r="8"/>
+	</g>
+	<path d="M101 71L83 99H95L90 121L109 90H97Z" fill="#ffe14d" stroke="#ffe14d" stroke-width="4" stroke-linejoin="round"/>
+</svg>

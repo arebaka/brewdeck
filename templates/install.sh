@@ -27,11 +27,11 @@ else
 	CLR_RESET='' CLR_BOLD='' CLR_DIM='' CLR_GREEN='' CLR_RED='' CLR_CYAN='' CLR_YELLOW=''
 fi
 
-info()    { printf "\n${CLR_CYAN}==>${CLR_RESET} ${CLR_BOLD}%s${CLR_RESET}\n" "$1"; }
-step()    { printf "    ${CLR_DIM}[..]${CLR_RESET} %s..." "$1"; }
-ok()      { printf "\r    [${CLR_GREEN}OK${CLR_RESET}] %s   \n" "$1"; }
-fail()    { printf "\r    [${CLR_RED}ERR${CLR_RESET}] %s  \n" "$1"; }
-warning() { printf "    ${CLR_YELLOW}!${CLR_RESET} %s\n" "$1"; }
+info()    { printf "\n${CLR_CYAN}>${CLR_RESET} ${CLR_BOLD}%s${CLR_RESET}\n" "$1"; }
+step()    { printf "  ${CLR_DIM}[..]${CLR_RESET} %s..." "$1"; }
+ok()      { printf "\r  [${CLR_GREEN}OK${CLR_RESET}] %s   \n" "$1"; }
+fail()    { printf "\r  [${CLR_RED}ERR${CLR_RESET}] %s  \n" "$1"; }
+warning() { printf "  ${CLR_YELLOW}!${CLR_RESET} %s\n" "$1"; }
 
 if ! command -v curl > /dev/null; then
 	echo "error: curl is required" >&2
@@ -138,7 +138,7 @@ write_image() {
 	mkdir -p "$SD_ROOT/$(dirname "$1")" && base64 --decode | gzip -dc > "$SD_ROOT/$1"
 }
 
-info "Downloading & Unpacking Components"
+info "Downloading & unpacking components"
 {{#components}}
 step '{{name}}'
 if {{#steps}}{{#appstore}}install_appstore '{{package}}' &&{{/appstore}}{{#zip}}install_zip '{{repo}}' '{{asset}}' '{{root}}' '{{into}}' &&{{/zip}}{{#file}}install_file '{{repo}}' '{{asset}}' '{{path}}' &&{{/file}}{{#urlZip}}{ archive="$(download '{{url}}')" && unpack "$archive" '{{root}}' '{{into}}'; } &&{{/urlZip}}{{#urlFile}}{ file="$(download '{{url}}')" && save "$file" '{{path}}'; } &&{{/urlFile}}{{/steps}} true; then
@@ -149,7 +149,7 @@ else
 fi
 
 {{/components}}
-info "Writing Configuration"
+info "Writing configuration"
 {{#configs}}
 step '{{path}}'
 write_config '{{path}}' << 'BREWDECK_EOF'
@@ -159,7 +159,7 @@ ok '{{path}}'
 {{/configs}}
 {{#hasImages}}
 
-info "Deploying Appearance & Assets"
+info "Deploying appearance & assets"
 {{#images}}
 step '{{path}}'
 write_image '{{path}}' << 'BREWDECK_EOF'
@@ -177,7 +177,7 @@ if [ "$(uname)" = Darwin ] && command -v dot_clean > /dev/null; then
 fi
 {{#hasManual}}
 
-info "Manual Action Required"
+info "Manual action required"
 {{#manual}}
 warning '{{name}}: {{url}}'
 {{/manual}}

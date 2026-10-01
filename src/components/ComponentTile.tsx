@@ -33,38 +33,39 @@ export function ComponentTile({
 			tabIndex={0}
 			onClick={() => toggle(component.id)}
 			onKeyDown={activate}>
-			<div className="logo-box">
-				{component.logo ? (
-					<img src={"logos/" + component.logo} alt="" className="logo" loading="lazy" />
-				) : (
-					<span className="logo monogram" aria-hidden="true">
-						{component.name[0]}
-					</span>
-				)}
-				{isRequired && (
-					<p className="badge required">
-						{t.pages.software.requiredBadge}
-					</p>
-				)}
-				{component.deprecated && (
-					<p className="badge warning">
-						{t.pages.software.deprecatedBadge}
-					</p>
-				)}
-				{component.risky && (
-					<p className="badge warning">
-						{t.pages.software.riskyBadge}
-					</p>
-				)}
-			</div>
+			{component.logo ? (
+				<img src={"logos/" + component.logo} alt="" className="logo" loading="lazy" />
+			) : (
+				<span className="logo monogram" aria-hidden="true">
+					{component.name[0]}
+				</span>
+			)}
 			<div className="info">
 				<header className="header">
 					<h4 className="name">
 						{component.name}
 					</h4>
-					<p className="version">
-						{component.version}
-					</p>
+					{/* Badges stand before the version and move with it under a long name */}
+					<div className="meta">
+						{isRequired && (
+							<p className="badge required">
+								{t.pages.software.requiredBadge}
+							</p>
+						)}
+						{component.deprecated && (
+							<p className="badge warning">
+								{t.pages.software.deprecatedBadge}
+							</p>
+						)}
+						{component.risky && (
+							<p className="badge warning">
+								{t.pages.software.riskyBadge}
+							</p>
+						)}
+						<p className="version">
+							{component.version}
+						</p>
+					</div>
 				</header>
 				<p className="source">
 					{component.author} · {parent

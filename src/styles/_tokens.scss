@@ -36,6 +36,15 @@ $radius: 4px;
 $radius-button: 6px;
 $focus-width: 3px;
 $sidebar-width: 280px;
+$sidebar-width-narrow: 220px;
+
+// Widths the layout changes at: tablets and small laptops, then phones with the steps in a strip
+$tablet: 1100px;
+$phone: 720px;
+
+// Tiles stay about 300px wide: three in a row need a window this wide, two need the next one
+$three-columns: 1260px;
+$two-columns: 880px;
 
 @function space($steps) {
 	@return $steps * 4px;

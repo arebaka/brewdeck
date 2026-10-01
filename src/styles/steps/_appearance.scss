@@ -8,16 +8,18 @@
 
 	> .header {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: space(3);
+		gap: space(1) space(3);
 
 		.title {
-			flex: 1;
+			flex: 1 1 auto;
 			@include section-title;
 		}
 
 		// Threads with more pictures, where the settings show their files
 		.thread {
+			margin-left: auto;
 			font-size: $size-small;
 			color: var(--color-accent);
 		}
@@ -27,18 +29,18 @@
 		font-size: $size-small;
 		color: var(--color-muted);
 	}
-
-	.entry {
-		display: flex;
-		flex-direction: column;
-		gap: space(2);
-	}
 }
 
 .gallery {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 	gap: space(3);
+
+	// Two screens in a row still fit a phone
+	@include phone {
+		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+		gap: space(2);
+	}
 
 	// Wide enough for the captions of the default and the upload tiles in every language
 	&.icon {

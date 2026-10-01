@@ -191,6 +191,60 @@ const software: {[component in string]: Software} = {
 		description: 'Joy-Con color changer',
 		details: 'Changes the colors of Joy-Cons and Pro Controllers stored in their memory and shown in the HOME menu.',
 	},
+	nxdumptool: {
+		description: 'Dumper of gamecards and installed titles',
+		details: 'Dumps gamecards and titles installed on the SD card or the eMMC to XCI, NSP, HFS0, ExeFS and RomFS, with their certificates and tickets, onto the card or over USB.',
+		note: 'Installs the rewrite from the App Store (nxdt_rw_poc), the branch still developed.',
+	},
+	switch_cheats_updater: {
+		description: 'Cheat updater for installed games',
+		details: 'Downloads cheats for installed games and gamecards from the GBAtemp collection into atmosphere/contents.',
+		note: 'AIO Switch Updater by the same author downloads cheats too.',
+	},
+	neumann: {
+		description: 'Save manager',
+		details: 'Backs up the saves of installed games to the SD card and restores them.',
+	},
+	simple_mod_manager: {
+		description: 'Mod manager',
+		details: 'Turns LayeredFS mods kept in the mods folder of the card on and off for every game, with presets of several mods at once.',
+	},
+	simple_mod_downloader: {
+		description: 'Mod downloader for GameBanana',
+		details: 'Finds and downloads mods for installed games right on the console, SimpleModManager installs them.',
+		note: 'Requires SimpleModManager.',
+	},
+	amiibo_generator: {
+		description: 'Generator of every Amiibo for emuiibo',
+		details: 'Creates virtual figures of the whole Amiibo database for emuiibo at once. The database is downloaded from the internet or put into emuiibo/amiibos.json by hand.',
+		note: 'Requires emuiibo.',
+	},
+	sphaira: {
+		description: 'Alternative homebrew menu',
+		details: 'Can replace hbmenu: launches homebrew, browses files, installs apps from the App Store, creates forwarders and downloads themes from Themezer.',
+	},
+	nxmp: {
+		description: 'Media player',
+		details: 'Plays video and music of most formats with MPV and FFmpeg: from the SD card, USB drives (FAT, NTFS, EXT4), HTTP and FTP servers and Enigma2 receivers.',
+	},
+	pplay: {
+		description: 'Video player',
+		details: 'Plays most video formats with embedded subtitles, from the SD card or over HTTP.',
+	},
+	browsenx: {
+		description: 'Launcher of the built-in browser',
+		details: 'Opens the web browser hidden in the system without a DNS trick. It starts from hbmenu over a game, not from the Album, and plays no HTML5 video.',
+	},
+	lennytube: {
+		description: 'YouTube in the built-in browser',
+		details: 'Opens YouTube in the built-in browser of the system where the YouTube app does not start, on a banned console for example.',
+		note: 'YouTube has changed a lot since 2019, the site may not open any more.',
+	},
+	comicnx: {
+		description: 'nhentai browser (18+)',
+		details: 'Browses and reads the comics of nhentai.net on the console.',
+		note: 'Archived since 2020 and most likely does not work with the current site.',
+	},
 	daybreak: {
 		description: 'System update installer',
 		details: 'Installs Horizon OS updates from a folder on the SD card.',
@@ -218,6 +272,20 @@ const software: {[component in string]: Software} = {
 		description: 'PS4 and PS5 Remote Play',
 		details: 'Streams PlayStation 4 and 5 games to the Switch, based on chiaki-ng.',
 	},
+	switchfin: {
+		description: 'Jellyfin client',
+		details: 'Browses and plays the movies and series of your Jellyfin server, directly or with transcoding.',
+	},
+	skynx: {
+		description: 'PC game streaming',
+		details: 'Streams PC games with sound to the Switch at 60 FPS and passes up to four pairs of Joy-Cons to the PC.',
+		note: 'The PC needs the streamer for Windows from the GitHub releases of the project.',
+	},
+	switch_remote_play: {
+		description: 'PC game streaming',
+		details: 'Plays PC games on the Switch over the network, like Steam Link, with a streamer running on Windows.',
+		note: 'The PC needs the streamer from the GitHub releases of the project.',
+	},
 	retroarch: {
 		description: 'Multi-system emulator',
 		details: 'Frontend for libretro cores: NES, SNES, Game Boy, Genesis, PlayStation and dozens of other systems in one app.',
@@ -235,6 +303,36 @@ const software: {[component in string]: Software} = {
 	melonds: {
 		description: 'Nintendo DS emulator',
 		details: 'Port of melonDS with touchscreen support.',
+	},
+	noods: {
+		description: 'Nintendo DS and GBA emulator',
+		details: 'A fast emulator with accurate software rendering, upscaling and work on several cores. The system menu needs the BIOS and the firmware of a DS.',
+	},
+	desmume: {
+		description: 'Nintendo DS emulator',
+		details: 'An early port of DeSmuME with a simple interface. ROMs go into switch/desmume/roms.',
+		note: 'melonDS and NooDS have gone much further.',
+	},
+	mgba: {
+		description: 'Game Boy Advance emulator',
+		details: 'A fast and accurate emulator of Game Boy Advance, Game Boy and Game Boy Color with save states.',
+	},
+	psnes: {
+		description: 'SNES emulator',
+		details: 'A port of Snes9x with save states, screen scaling and shaders. ROMs go into switch/psnes/roms.',
+	},
+	pnes: {
+		description: 'NES emulator',
+		details: 'Based on Nestopia, with save states, screen scaling and shaders. ROMs go into switch/pnes/roms.',
+	},
+	pfbneo: {
+		description: 'Arcade emulator',
+		details: 'FinalBurn Neo for arcade machines, Neo Geo and other systems, with save states and shaders.',
+		note: 'Formerly pFBA.',
+	},
+	scummvm: {
+		description: 'Engine of classic adventure games',
+		details: 'Runs point-and-click adventures and other classic games of LucasArts, Sierra, Revolution and dozens of other studios from their original data files.',
 	},
 	sys_botbase: {
 		description: 'Remote control over the network',

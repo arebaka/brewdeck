@@ -15,17 +15,35 @@
 	animation: highlight 1.4s ease-in-out infinite;
 }
 
-// Hover and keyboard focus get the highlight, a press flashes like on the console
+// Hover and keyboard focus get the highlight, a press flashes like on the console.
+// Touch screens keep the hover of the last tap, so only real pointers hover
 @mixin interactive {
 	cursor: pointer;
 
-	&:hover,
 	&:focus-visible {
 		@include highlight;
 	}
 
+	@media (hover: hover) {
+		&:hover {
+			@include highlight;
+		}
+	}
+
 	&:active {
 		background-color: color-mix(in srgb, var(--color-focus-1) 20%, var(--color-focus-bg));
+	}
+}
+
+@mixin tablet {
+	@media (max-width: $tablet) {
+		@content;
+	}
+}
+
+@mixin phone {
+	@media (max-width: $phone) {
+		@content;
 	}
 }
 

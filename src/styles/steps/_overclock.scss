@@ -52,26 +52,39 @@
 	background: var(--color-panel);
 	border-radius: $radius;
 
-	.header {
-		display: flex;
-		align-items: baseline;
-		gap: space(3);
+	@include phone {
+		padding: space(3) space(3) space(3) space(5);
 	}
 
+	.header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: space(1) space(3);
+	}
+
+	// A long game name takes its line, the title ID and the button go under it on the right
 	.name {
-		flex: 1;
+		flex: 1 1 auto;
 		font-size: $size-large;
 	}
 
 	.id {
+		margin-left: auto;
 		font: #{$size-mono} $font-mono;
 		color: var(--color-muted);
 	}
 }
 
-// Modes down, modules across. Stock cells stay muted, set ones take the accent, capped ones warn
+.clocks-frame {
+	overflow-x: auto;
+}
+
+// Modes down, modules across. Stock cells stay muted, set ones take the accent, capped ones warn.
+// The table never gets too narrow to read its clocks, its frame scrolls instead
 .clocks {
 	width: 100%;
+	min-width: 520px;
 	border-collapse: collapse;
 
 	th {
@@ -81,6 +94,11 @@
 		text-align: start;
 		white-space: nowrap;
 		color: var(--color-muted);
+
+		// Long mode names give their width to the clocks
+		@include phone {
+			white-space: normal;
+		}
 	}
 
 	td {

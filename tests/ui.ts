@@ -159,7 +159,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('a hand edit turns into a custom selection', `document.querySelector('.choice.custom') != null && location.search.includes('moonlight')`);
 	await page.act(`byText('.component .name', 'Atmosphere').closest('.component').click()`);
 	await check('required components stay', `byText('.component .name', 'Atmosphere').closest('.component').classList.contains('active')`);
-	await check('Daybreak opens the homebrew and is required with Atmosphere', `(() => {
+	await check('Daybreak opens the utilities and is required with Atmosphere', `(() => {
 		const daybreak = byText('.component .name', 'Daybreak').closest('.component');
 		return daybreak.parentElement.firstElementChild == daybreak && daybreak.querySelector('.badge.required') != null;
 	})()`);
@@ -255,7 +255,9 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 
 	// Appearance
 	await page.act(`step('Appearance')`);
-	await page.act(`$$('.gallery.bootlogo .picture')[1].click()`);
+	// Tile of a gallery picture by its ID, whatever the order of the gallery
+	const tile = (target: string, id: string) => `document.querySelector('.gallery.${target} img[alt="${id}"]').closest('.picture')`;
+	await page.act(`${tile('bootlogo', 'hekate-a')}.click()`);
 	await check('a gallery image reaches the link', `location.search.includes('img.bootlogo=hekate-a')`);
 	// Picture on the preview of the console screen
 	const shown = (target: string) => `document.querySelector('.screen.${target} img')?.src.split('/appearance/')[1]`;
@@ -264,9 +266,9 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 		const width = Math.min(6.2 * 16 / Math.hypot(16, 9) * 96, screen.parentElement.clientWidth - 16);
 		return Math.abs(screen.getBoundingClientRect().width - width) < 1 && ${shown('bootlogo')} == 'bootlogo/hekate-a.png';
 	})()`);
-	await page.act(`$$('.gallery.bootlogo .picture')[3].focus()`);
+	await page.act(`${tile('bootlogo', 'hekate-b')}.focus()`);
 	await check('the screen shows the picture in focus', `${shown('bootlogo')} == 'bootlogo/hekate-b.png'`);
-	await page.act(`$$('.gallery.bootlogo .picture')[3].blur()`);
+	await page.act(`${tile('bootlogo', 'hekate-b')}.blur()`);
 	await check('and returns to the chosen one', `${shown('bootlogo')} == 'bootlogo/hekate-a.png'`);
 	await check('the background without a picture takes the theme color of Nyx', `${shown('background')} == null
 		&& getComputedStyle(document.querySelector('.screen.background')).backgroundColor == 'rgb(45, 45, 45)'`);
@@ -277,14 +279,14 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`${chip('bootlogo', 'CFW (emuMMC SD01)')}.click()`);
 	await check('an entry starts from the common boot screen', `document.querySelector('.gallery.bootlogo .picture.active').textContent == 'Common'
 		&& ${shown('bootlogo')} == 'bootlogo/hekate-a.png'`);
-	await page.act(`$$('.gallery.bootlogo .picture')[3].click()`);
+	await page.act(`${tile('bootlogo', 'hekate-b')}.click()`);
 	await check('an entry takes a boot screen of its own', `location.search.includes('img.logo.emummc-SD01=hekate-b')
 		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && location.search.includes('img.bootlogo=hekate-a')
 		&& ${shown('bootlogo')} == 'bootlogo/hekate-b.png'`);
-	await page.act(`$$('.gallery.icon .picture')[1].click()`);
+	await page.act(`${tile('icon', 'hekate-switch')}.click()`);
 	await check('the first entry gets the icon', `location.search.includes('img.icon.emummc=hekate-switch')`);
 	await page.act(`${chip('icon', 'Lockpick RCM')}.click()`);
-	await page.act(`$$('.gallery.icon .picture')[2].click()`);
+	await page.act(`${tile('icon', 'hekate-payload')}.click()`);
 	await check('a payload gets an icon too', `location.search.includes('img.icon.lockpick_rcm=hekate-payload')`);
 
 	// Keyboard

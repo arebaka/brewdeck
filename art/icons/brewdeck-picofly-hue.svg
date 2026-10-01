@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- Picofly Toolbox: a modchip with the pulse of its glitch -->
+	<g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="48" y="48" width="96" height="96" rx="14"/>
+		<path d="M72 28V40M96 28V40M120 28V40M72 152V164M96 152V164M120 152V164M28 72H40M28 96H40M28 120H40M152 72H164M152 96H164M152 120H164"/>
+		<path d="M62 104H78L88 80L104 124L114 96H130"/>
+	</g>
+</svg>

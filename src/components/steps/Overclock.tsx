@@ -186,50 +186,53 @@ export function Overclock({
 								))}
 							</ul>
 
-							<table className="clocks">
-								<thead>
-									<tr>
-										<th></th>
-										{MODULES.map(module => (
-											<th key={module}>
-												{t.pages.overclock.modules[module]}
-											</th>
-										))}
-									</tr>
-								</thead>
-								<tbody>
-									{MODES.map(mode => (
-										<tr key={mode}>
-											<th>
-												{t.pages.overclock.modes[mode]}
-											</th>
-											{MODULES.map(module => {
-												const key: ClockKey = `${mode}_${module}`;
-												const mhz = profile.clocks[key];
-												const cap = OVERCLOCK.caps[key]?.[hardware];
-
-												return (
-													<td key={module}>
-														<select
-															className={`field ${cap && mhz && mhz > cap ? 'capped' : ''} ${mhz ? 'set' : ''}`}
-															value={mhz ?? ''}
-															onChange={event => setClock(profile, key, Number(event.target.value))}>
-															<option value="">
-																{t.pages.overclock.stock}
-															</option>
-															{OVERCLOCK.frequencies[module].map(frequency => (
-																<option key={frequency} value={frequency}>
-																	{frequency} {t.pages.overclock.mhz}
-																</option>
-															))}
-														</select>
-													</td>
-												);
-											})}
+							{/* A table wider than a phone scrolls sideways instead of cutting the clocks */}
+							<div className="clocks-frame">
+								<table className="clocks">
+									<thead>
+										<tr>
+											<th></th>
+											{MODULES.map(module => (
+												<th key={module}>
+													{t.pages.overclock.modules[module]}
+												</th>
+											))}
 										</tr>
-									))}
-								</tbody>
-							</table>
+									</thead>
+									<tbody>
+										{MODES.map(mode => (
+											<tr key={mode}>
+												<th>
+													{t.pages.overclock.modes[mode]}
+												</th>
+												{MODULES.map(module => {
+													const key: ClockKey = `${mode}_${module}`;
+													const mhz = profile.clocks[key];
+													const cap = OVERCLOCK.caps[key]?.[hardware];
+
+													return (
+														<td key={module}>
+															<select
+																className={`field ${cap && mhz && mhz > cap ? 'capped' : ''} ${mhz ? 'set' : ''}`}
+																value={mhz ?? ''}
+																onChange={event => setClock(profile, key, Number(event.target.value))}>
+																<option value="">
+																	{t.pages.overclock.stock}
+																</option>
+																{OVERCLOCK.frequencies[module].map(frequency => (
+																	<option key={frequency} value={frequency}>
+																		{frequency} {t.pages.overclock.mhz}
+																	</option>
+																))}
+															</select>
+														</td>
+													);
+												})}
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
 						</li>
 					))}
 				</ul>

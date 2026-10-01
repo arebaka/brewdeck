@@ -6,18 +6,22 @@
 	flex-direction: column;
 	gap: space(2);
 
+	// A narrow screen puts the file under the title, still on the right
 	> .header {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: space(3);
+		gap: space(1) space(3);
 
 		.title {
-			flex: 1;
+			flex: 1 1 auto;
 			@include section-title;
 		}
 
 		.file {
+			margin-left: auto;
 			font: #{$size-mono} $font-mono;
+			overflow-wrap: anywhere;
 			color: var(--color-muted);
 		}
 	}

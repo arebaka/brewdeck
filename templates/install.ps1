@@ -144,7 +144,7 @@ try {
 
 # Downloads land on the SD card next to the script and are removed at the end
 try {
-	Write-Info 'Downloading & Unpacking Components'
+	Write-Info 'Downloading & unpacking components'
 {{#components}}
 	Write-Step '{{name}}'
 	try {
@@ -159,7 +159,7 @@ try {
 	}
 
 {{/components}}
-	Write-Info 'Writing Configuration'
+	Write-Info 'Writing configuration'
 {{#configs}}
 	Write-Step '{{path}}'
 	Write-Config '{{path}}' @'
@@ -169,7 +169,7 @@ try {
 {{/configs}}
 {{#hasImages}}
 
-	Write-Info 'Deploying Appearance & Assets'
+	Write-Info 'Deploying appearance & assets'
 {{#images}}
 	Write-Step '{{path}}'
 	Write-Image '{{path}}' @'
@@ -180,7 +180,7 @@ try {
 {{/hasImages}}
 {{#hasManual}}
 
-	Write-Info 'Manual Action Required'
+	Write-Info 'Manual action required'
 {{#manual}}
 	Write-Notice '{{name}}: {{url}}'
 {{/manual}}

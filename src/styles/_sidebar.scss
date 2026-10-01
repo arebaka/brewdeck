@@ -82,4 +82,49 @@
 			color: var(--color-text);
 		}
 	}
+
+	@include tablet {
+		.step {
+			padding-right: space(4);
+			padding-left: space(8);
+			font-size: $size-base;
+
+			&.active::before {
+				left: space(4);
+			}
+		}
+	}
+
+	// Phones scroll the steps sideways like tabs, the bar under the active one takes the place of the side bar
+	@include phone {
+		padding: 0;
+
+		.steps {
+			display: flex;
+			overflow-x: auto;
+			padding: 0 space(2);
+			scrollbar-width: none;
+		}
+
+		.step {
+			width: auto;
+			padding: space(3);
+			font-size: $size-base;
+			white-space: nowrap;
+
+			&.active::before {
+				top: auto;
+				right: space(3);
+				bottom: 0;
+				left: space(3);
+				width: auto;
+				height: 3px;
+			}
+		}
+
+		.step .value,
+		.metrics {
+			display: none;
+		}
+	}
 }

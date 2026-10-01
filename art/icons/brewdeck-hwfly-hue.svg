@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- HWFLY Toolbox: a modchip that flies -->
+	<g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="68" y="76" width="56" height="56" rx="10"/>
+		<path d="M82 58V70M96 58V70M110 58V70M82 138V150M96 138V150M110 138V150"/>
+		<path d="M68 94C48 58 16 54 20 82C23 102 46 108 68 106M124 94C144 58 176 54 172 82C169 102 146 108 124 106"/>
+	</g>
+	<circle cx="96" cy="104" r="9" fill="#fff"/>
+</svg>

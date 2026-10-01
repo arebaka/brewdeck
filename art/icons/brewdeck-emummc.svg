@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+	<!-- CFW on the emuMMC: an SD card charged with a bolt -->
+	<path d="M59 26H121L145 50V154A12 12 0 0 1 133 166H59A12 12 0 0 1 47 154V38A12 12 0 0 1 59 26Z" fill="#2f6fed" stroke="#8fb4ff" stroke-width="6" stroke-linejoin="round"/>
+	<path d="M67 44V58M83 44V58M99 44V58" fill="none" stroke="#ffc83d" stroke-width="10" stroke-linecap="round"/>
+	<path d="M104 78L78 118H95L88 150L116 106H99Z" fill="#ffe14d" stroke="#ffe14d" stroke-width="4" stroke-linejoin="round"/>
+</svg>

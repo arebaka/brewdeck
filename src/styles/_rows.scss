@@ -22,10 +22,12 @@
 		pointer-events: none;
 	}
 
+	// A field too wide for the line of a narrow screen moves under the name
 	.line {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: baseline;
-		gap: space(4);
+		gap: space(2) space(4);
 	}
 
 	.name {

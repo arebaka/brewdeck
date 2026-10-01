@@ -1,11 +1,13 @@
-// A console wider than the window scrolls instead of shrinking below its physical size
+// A console wider than the window keeps its physical size and shows its middle, the screen
 .preview {
+	display: flex;
+	justify-content: center;
 	overflow: hidden;
 
 	.photo {
+		flex: none;
 		display: block;
 		max-width: none;
 		height: auto;
-		margin: 0 auto;
 	}
 }

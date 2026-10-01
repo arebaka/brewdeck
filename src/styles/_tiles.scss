@@ -12,6 +12,18 @@
 
 .grid3 {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
+
+	@media (max-width: $three-columns) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+// One tile in a row on portrait tablets and phones, whatever the grid
+.grid2,
+.grid3 {
+	@media (max-width: $two-columns) {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 
 .item,
@@ -22,6 +34,10 @@
 	background: var(--color-panel);
 	border-radius: $radius;
 	@include interactive;
+
+	@include phone {
+		padding: space(3) space(3) space(3) space(5);
+	}
 
 	// Selected tiles are marked like the active sidebar step: accent bar and accent name
 	&.active {
