@@ -1,4 +1,4 @@
-import { BootMode, ClockMode, EntryOverride, ClockModule, ComponentCategory, ComponentSource, HardwareRevision, HOSVersionStatus, ImageTarget, StepId } from '@/types';
+import { BootMode, ClockMode, EntryOverride, ClockModule, ComponentCategory, ComponentSource, FirmwareStatus, HardwareRevision, ImageTarget, PlatformId, StepId } from '@/types';
 
 export type Language = 'en' | 'ru' | 'uk';
 
@@ -31,10 +31,20 @@ type Page = {
 	description: string;
 };
 
+// What a platform says its own way
+type Platform = {
+	name: string; // heading of its consoles
+	subtitle: string; // under the title of the page
+	steps?: Partial<{[step in StepId]: string}>;
+	pages?: Partial<{[step in StepId]: Page}>;
+	unsupported?: string; // note of a firmware the custom firmware does not run on
+	summary?: { hardware: string; firmware: string }; // names of the console and its system in the summary of the build
+};
+
 export interface Translation {
 	language: string; // short name in the language switch
 	title: string;
-	subtitle: string;
+	platforms: {[platform in PlatformId]: Platform};
 	steps: {[step in StepId]: string};
 	wizard: {
 		back: string;
@@ -43,8 +53,8 @@ export interface Translation {
 		step: string;
 	};
 	hardware: {[revision in HardwareRevision]: Hardware};
-	software: {[component in string]: Software};
-	tuning: {[group in string]: TuningGroup};
+	software: {[platform in PlatformId]: {[component in string]: Software}}; // catalogs of platforms may share IDs
+	tuning: {[platform in PlatformId]: {[group in string]: TuningGroup}};
 	buttons: {[button in string]: string}; // names of the controller buttons for tooltips
 	pages: {
 		hardware: Page & {
@@ -53,7 +63,7 @@ export interface Translation {
 			size: string;
 		};
 		firmware: Page & {
-			status: {[status in HOSVersionStatus]: string};
+			status: {[status in FirmwareStatus]: string};
 			unsupported: string;
 		};
 		software: Page & {
@@ -98,6 +108,11 @@ export interface Translation {
 		security: Page;
 		modules: Page & {
 			empty: string;
+		};
+		plugins: Page & {
+			list: string; // heading of the plugins file
+			runlevels: {[runlevel in string]: string}; // where a plugin loads
+			off: string; // a plugin that loads nowhere
 		};
 		overclock: Page & {
 			templates: {[template in string]: string};
@@ -159,10 +174,15 @@ export interface Translation {
 		atmosphereTracks: string;
 		ftpCredentials: string;
 		gpuCap: string;
+		firmwareUpdate: string;
+		firmwareCurrent: string;
+		aemuCache: string;
+		overclock: string;
 		add: string;
 		remove: string;
 		or: string;
 		go: string;
+		dismiss: string; // closes a toast
 	};
 	metrics: {
 		size: string;

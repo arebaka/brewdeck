@@ -1,10 +1,13 @@
 @use 'sass:map';
+@use 'sass:meta';
 @use 'tokens' as *;
 
+// Colors and the font of a console, inspected so the quotes of font names stay
 @mixin palette($name) {
 	@each $key, $value in map.get($palettes, $name) {
 		--color-#{$key}: #{$value};
 	}
+	--font-sans: #{meta.inspect(map.get($fonts, $name))};
 }
 
 // Pulsing frame of the focused element, as in the Switch system UI

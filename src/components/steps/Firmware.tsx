@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Fix, Issue } from '../../types';
 import { Language, Translation } from '../../i18n';
-import { HOS_VERSIONS, isHOSSupported } from '../../data';
+import { Platform } from '../../platforms';
 import { activate } from '../../utils';
 import { Issues } from '../Issues';
 
 interface VersionProps {
 	lang: Language;
+	platform: Platform;
 	version: string;
 	setVersion: (version: string) => void;
 	issues: Issue[];
@@ -17,6 +18,7 @@ interface VersionProps {
 
 export function Firmware({
 	lang,
+	platform,
 	version,
 	setVersion,
 	issues,
@@ -26,11 +28,12 @@ export function Firmware({
 	return (<>
 		<Issues
 			issues={issues}
+			platform={platform}
 			applyFix={applyFix}
 			t={t} />
 
 		<ul className="grid grid3">
-			{HOS_VERSIONS.map(v => (
+			{platform.firmware.map(v => (
 				<li
 					key={v.version}
 					className={`item ${v.status} ${version == v.version ? 'active' : ''}`}
@@ -48,9 +51,9 @@ export function Firmware({
 							{t.pages.firmware.status[v.status]}
 						</p>
 					</header>
-					{!isHOSSupported(v.version) && (
+					{!platform.isFirmwareSupported(v.version) && (
 						<p className="note">
-							{t.pages.firmware.unsupported}
+							{t.platforms[platform.id].unsupported ?? t.pages.firmware.unsupported}
 						</p>
 					)}
 				</li>

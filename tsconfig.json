@@ -20,8 +20,8 @@
 			"@data/*": ["data/*"],
 			"@templates": ["templates"],
 			"@templates/*": ["templates/*"],
-			"@sd": ["templates/sd"],
-			"@sd/*": ["templates/sd/*"]
+			"@sd": ["templates/switch/sd"],
+			"@sd/*": ["templates/switch/sd/*"]
 		}
 	},
 	"include": ["src", "tests", "vite.config.ts"]

@@ -153,8 +153,10 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 
 	// Software
 	await page.act(`step('Software')`);
-	await page.act(`byText('.batch .choice', 'Gamer').click()`);
-	await check('a preset replaces the selection and stays marked', `byText('.batch .choice.active', 'Gamer') != null && location.search.includes('sw=')`);
+	await page.act(`byText('.batch .choice', 'Minimal').click()`);
+	await check('a preset replaces the selection and stays marked', `byText('.batch .choice.active', 'Minimal') != null
+		&& location.search.includes('sw=') && !location.search.includes('sys_patch')`);
+	await page.act(`byText('.batch .choice', 'Recommended').click()`);
 	await page.act(`byText('.component .name', 'Moonlight').closest('.component').click()`);
 	await check('a hand edit turns into a custom selection', `document.querySelector('.choice.custom') != null && location.search.includes('moonlight')`);
 	await page.act(`byText('.component .name', 'Atmosphere').closest('.component').click()`);
@@ -163,17 +165,30 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 		const daybreak = byText('.component .name', 'Daybreak').closest('.component');
 		return daybreak.parentElement.firstElementChild == daybreak && daybreak.querySelector('.badge.required') != null;
 	})()`);
+	await page.act(`byText('.component .name', 'FPSLocker').closest('.component').click()`);
 	await page.act(`byText('.component .name', 'SaltyNX').closest('.component').click()`);
 	await check('a removed dependency leaves a fix', `$$('.notice .fix').some(button => button.textContent == 'Add SaltyNX')`);
 	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Add SaltyNX').click()`);
 	await check('the fix brings it back', `byText('.component .name', 'SaltyNX').closest('.component').classList.contains('active')`);
-	await page.act(`byText('.component .name', 'Ultrahand').closest('.component').click()`);
+	await page.act(`byText('.component .name', 'Tesla Menu').closest('.component').click()`);
 	await check('a conflict offers to remove either side', `['Remove Tesla Menu', 'Remove Ultrahand'].every(text => $$('.notice .fix').some(button => button.textContent == text))`);
-	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Remove Ultrahand').click()`);
+	// The list of the step may be scrolled away, so the issue a click brings pops up
+	await check('the conflict pops up with its fixes', `(() => {
+		const toast = document.querySelector('.toasts .toast.warning');
+		return toast?.querySelector('.text').textContent == 'Tesla Menu conflicts with Ultrahand'
+			&& $$('.toast .fix').map(button => button.textContent).join() == 'Remove Tesla Menu,Remove Ultrahand';
+	})()`);
+	await page.act(`$$('.toast .fix').find(button => button.textContent == 'Remove Ultrahand').click()`);
 	await check('the chosen side goes away', `(() => {
 		const active = name => byText('.component .name', name).closest('.component').classList.contains('active');
 		return !active('Ultrahand') && active('Tesla Menu');
 	})()`);
+	await check('and the toast with it', `document.querySelector('.toast') == null`);
+	await page.act(`byText('.component .name', 'Checkpoint').closest('.component').click()`);
+	await check('an overlap pops up too and goes away by its button', `document.querySelector('.toast.info .text')?.textContent == 'JKSV covers Checkpoint, one of them is enough'`);
+	await page.act(`document.querySelector('.toast .dismiss').click()`);
+	await check('the dismissed toast leaves the issue in the list', `document.querySelector('.toast') == null
+		&& $$('.advices .notice').some(notice => notice.textContent.startsWith('JKSV covers Checkpoint'))`);
 
 	await page.act(`byText('.component .name', 'DBIPatcher').closest('.component').click()`);
 	await check('a risky component is marked and warned about', `byText('.component .name', 'DBIPatcher').closest('.component').querySelector('.badge.warning') != null
@@ -202,9 +217,9 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.row .name', 'CFW (emuMMC RAW1)').closest('.row').querySelector('.control').click()`);
 	await check('a removed emuMMC takes its keys along', `!location.search.includes('RAW1') && location.search.includes('emummc=SD01')`);
 	await check('the boot screen delay is set with the menu', `byText('.row .name', 'Boot screen delay') != null`);
-	await page.act(`byText('.component .name', 'Lockpick RCM').closest('.component').click()`);
-	await page.act(`byText('.choices .choice', 'Lockpick RCM').click()`);
-	await check('a payload can boot on its own', `location.search.includes('autoboot=lockpick_rcm')`);
+	await page.act(`byText('.component .name', 'CommonProblemResolver').closest('.component').click()`);
+	await page.act(`byText('.choices .choice', 'CommonProblemResolver').click()`);
+	await check('a payload can boot on its own', `location.search.includes('autoboot=common_problem_resolver')`);
 
 	// CFW
 	await page.act(`step('CFW')`);
@@ -331,6 +346,44 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the language changes in place', `byText('.sidebar .step.active .label', 'Сборка') != null && document.documentElement.lang == 'ru'`);
 	await page.act(`byText('.lang-switch button', 'ua').click()`);
 	await check('Ukrainian is there too', `byText('.sidebar .step.active .label', 'Збірка') != null && document.documentElement.lang == 'uk'`);
+
+	// PSP
+	await page.act(`byText('.lang-switch button', 'en').click()`);
+	await page.act(`step('Hardware')`);
+	await page.act(`byText('.consoles .item .name', 'PSP-3000').closest('.item').click()`);
+	await check('a PSP turns the page into its own', `document.documentElement.dataset.platform == 'psp' && location.search.startsWith('?hw=psp3000&fw=6.61&sw=')
+		&& document.querySelector('.topbar .subtitle').textContent == 'PSP custom firmware builder'
+		&& getComputedStyle(document.body).fontFamily.includes('M PLUS 1p')`);
+	await check('a PSP goes through steps of its own', `$$('.sidebar .step .label').map(label => label.textContent).join() == 'Hardware,Firmware,Software,CFW,Plugins,Build'`);
+	await check('the steps of a PSP are categories of its XMB', `$$('.sidebar .step .icon').every(icon => getComputedStyle(icon).display != 'none')
+		&& new Set($$('.sidebar .step').map(step => Math.round(step.getBoundingClientRect().top))).size == 1`);
+	await check('the buttons of a PSP show its symbols', `$$('.controls .glyph').length > 0 && $$('.controls .glyph').every(glyph => glyph.querySelector('svg'))`);
+	await page.act(`step('Firmware')`);
+	// The strip slides for .3s
+	await sleep(400);
+	await check('the active category keeps its place', `(() => {
+		const strip = document.querySelector('.sidebar .steps');
+		const left = strip.getBoundingClientRect().left + parseFloat(getComputedStyle(strip).paddingLeft);
+		return Math.abs(document.querySelector('.sidebar .step.active').getBoundingClientRect().left - left) < 1;
+	})()`);
+	await page.act(`byText('.item .name', '6.35').closest('.item').click()`);
+	await check('an old firmware takes the official update', `$$('.notice .fix').some(button => button.textContent == 'Add System Update 6.61')`);
+	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Add System Update 6.61').click()`);
+	await check('the update solves it', `$$('.notice').length == 0 && location.search.includes('update661')`);
+	await page.act(`step('Plugins')`);
+	await page.act(`byText('.row .name', 'Game Categories Lite').closest('.row').querySelectorAll('.choice')[2].click()`);
+	await check('a plugin takes another runlevel', `location.search.includes('plugin.gclite=vsh,game')
+		&& byText('.row .name', 'Game Categories Lite').closest('.row').querySelector('.keys').textContent == 'vsh game, gclite/category_lite.prx, on'`);
+	await page.act(`step('Build')`);
+	await sleep(1000);
+	await page.act(`byText('.generated .choice', 'SEPLUGINS/PLUGINS.TXT').click()`);
+	await check('the plugins reach PLUGINS.TXT', `document.querySelector('.generated .code').textContent.includes('vsh game, gclite/category_lite.prx, on')`);
+	await check('the readme asks for the update first', `document.querySelector('.readme').textContent.includes('PSP Update ver 6.61')`);
+	await page.act(`step('Hardware')`);
+	await page.act(`byText('.consoles .item .name', 'Erista (V1)').closest('.item').click()`);
+	await check('the Switch keeps its build', `document.documentElement.dataset.platform == 'switch' && location.search.includes('emummc=SD01')`);
+	await check('the Switch keeps its side bar and letters', `$$('.sidebar .step .icon').every(icon => getComputedStyle(icon).display == 'none')
+		&& $$('.controls .glyph').every(glyph => !glyph.querySelector('svg') && /^[A-Z]$/.test(glyph.textContent))`);
 
 	expect('the console stays clean', page.console.length == 0, page.console);
 	return failures;

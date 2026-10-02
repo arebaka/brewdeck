@@ -1,17 +1,19 @@
-# BrewDeck installer: Nintendo Switch {{hardware}}, Horizon OS {{hos}}
+# BrewDeck installer: {{title}}
 #
-# Usage: put the script into the root of the SD card and run it there:
+# Usage: put the script into the root of the {{card}} and run it there:
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #
-# Downloads the selected components from the Homebrew App Store, GitHub releases and direct links,
-# unpacks them onto the SD card next to the script and writes the configuration and images.
+# Downloads the selected components from {{#hasAppstore}}the Homebrew App Store, {{/hasAppstore}}GitHub releases and direct links,
+# unpacks them onto the {{card}} next to the script and writes the configuration and images.
 # Set $env:GITHUB_TOKEN to lift the GitHub API limit of 60 requests per hour.
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' # the progress bar slows Invoke-WebRequest down dramatically on PowerShell 5
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+{{#hasAppstore}}
 $AppStore = 'https://switch.cdn.fortheusers.org'
+{{/hasAppstore}}
 $SdRoot = $PSScriptRoot
 $WorkDir = Join-Path $SdRoot '.brewdeck'
 $Releases = @{}
@@ -82,7 +84,7 @@ function Expand-Download([string]$File) {
 	return $unpacked
 }
 
-# Merges the archive, or its Root directory, into the Into directory of the SD card
+# Merges the archive, or its Root directory, into the Into directory of the card
 function Install-Archive([string]$File, [string]$Root, [string]$Into) {
 	$unpacked = Expand-Download $File
 	$source = if ($Root) { Join-Path $unpacked $Root } else { $unpacked }
@@ -91,13 +93,14 @@ function Install-Archive([string]$File, [string]$Root, [string]$Into) {
 	Copy-Item -Path (Join-Path $source '*') -Destination $target -Recurse -Force
 }
 
-# Copies the file to Path on the SD card
+# Copies the file to Path on the card
 function Install-Download([string]$File, [string]$Path) {
 	$target = Join-Path $SdRoot $Path
 	New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
 	Copy-Item -LiteralPath $File -Destination $target -Force
 }
 
+{{#hasAppstore}}
 # Unpacks a Homebrew App Store package and registers it, so the store on the console sees it installed
 function Install-AppStore([string]$Package) {
 	$unpacked = Expand-Download (Get-Download "$AppStore/zips/$Package.zip")
@@ -112,6 +115,7 @@ function Install-AppStore([string]$Package) {
 	Copy-Item -Path (Join-Path $unpacked '*') -Destination $SdRoot -Recurse -Force
 }
 
+{{/hasAppstore}}
 # Writes UTF-8 without BOM and with LF line endings, as the console expects
 function Write-Config([string]$Path, [string]$Content) {
 	$target = Join-Path $SdRoot $Path
@@ -119,7 +123,7 @@ function Write-Config([string]$Path, [string]$Content) {
 	[IO.File]::WriteAllText($target, ($Content -replace "`r`n", "`n") + "`n")
 }
 
-# Decodes a gzip-compressed base64 image to Path on the SD card
+# Decodes a gzip-compressed base64 image to Path on the card
 function Write-Image([string]$Path, [string]$Data) {
 	$target = Join-Path $SdRoot $Path
 	New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
@@ -133,8 +137,6 @@ function Write-Image([string]$Path, [string]$Data) {
 	}
 }
 
-# --- Installation ---
-
 try {
 	New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
 } catch {
@@ -142,10 +144,10 @@ try {
 	exit 1
 }
 
-# Downloads land on the SD card next to the script and are removed at the end
 try {
 	Write-Info 'Downloading & unpacking components'
 {{#components}}
+
 	Write-Step '{{name}}'
 	try {
 {{#steps}}
@@ -157,10 +159,11 @@ try {
 		Write-Host "        $($_.Exception.Message)" -ForegroundColor DarkGray
 		$Failed += '{{name}}'
 	}
-
 {{/components}}
+
 	Write-Info 'Writing configuration'
 {{#configs}}
+
 	Write-Step '{{path}}'
 	Write-Config '{{path}}' @'
 {{content}}
@@ -171,6 +174,7 @@ try {
 
 	Write-Info 'Deploying appearance & assets'
 {{#images}}
+
 	Write-Step '{{path}}'
 	Write-Image '{{path}}' @'
 {{data}}
@@ -185,8 +189,13 @@ try {
 	Write-Notice '{{name}}: {{url}}'
 {{/manual}}
 {{/hasManual}}
+
 } finally {
 	Remove-Item -LiteralPath $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
+	# The script and what archives leave in the root of the card go away, wherever the script was started from
+	foreach ($leftover in 'install.ps1', 'LICENSE.txt', 'README.txt', 'README.md', 'screen1.png', 'screen2.png') {
+		Remove-Item -LiteralPath (Join-Path $SdRoot $leftover) -Force -ErrorAction SilentlyContinue
+	}
 }
 
 Write-Host ''
@@ -195,7 +204,7 @@ if ($Failed.Count -gt 0) {
 	Write-Host ($Failed -join ' ')
 } else {
 	Write-Host 'Done! ' -ForegroundColor Green -NoNewline
-	Write-Host 'Eject the SD card safely and boot your Nintendo Switch.'
+	Write-Host 'Eject the {{card}} safely and boot your {{console}}.'
 }
 Write-Host ''
 

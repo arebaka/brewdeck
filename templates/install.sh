@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# BrewDeck installer: Nintendo Switch {{hardware}}, Horizon OS {{hos}}
+# BrewDeck installer: {{title}}
 #
-# Usage: put the script into the root of the SD card and run it there:
+# Usage: put the script into the root of the {{card}} and run it there:
 #   bash install.sh
 #
-# Downloads the selected components from the Homebrew App Store, GitHub releases and direct links,
-# unpacks them onto the SD card next to the script and writes the configuration and images.
+# Downloads the selected components from {{#hasAppstore}}the Homebrew App Store, {{/hasAppstore}}GitHub releases and direct links,
+# unpacks them onto the {{card}} next to the script and writes the configuration and images.
 # Set GITHUB_TOKEN to lift the GitHub API limit of 60 requests per hour.
 
 set -euo pipefail
 
+{{#hasAppstore}}
 APPSTORE='https://switch.cdn.fortheusers.org'
+{{/hasAppstore}}
 SD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK_DIR="$SD_ROOT/.brewdeck"
 FAILED=()
@@ -58,15 +60,16 @@ if [ ! -w "$SD_ROOT" ]; then
 	exit 1
 fi
 
+# The script and what archives leave in the root of the card go away, wherever the script was started from
 cleanup() {
 	rm -rf "$WORK_DIR"
-	rm -f install.sh
+	rm -f "$SD_ROOT/install.sh"
 	rm -f \
-		LICENSE.txt \
-		README.txt \
-		README.md \
-		screen1.png \
-		screen2.png
+		"$SD_ROOT/LICENSE.txt" \
+		"$SD_ROOT/README.txt" \
+		"$SD_ROOT/README.md" \
+		"$SD_ROOT/screen1.png" \
+		"$SD_ROOT/screen2.png"
 }
 
 mkdir -p "$WORK_DIR"
@@ -107,6 +110,7 @@ save() {
 	mkdir -p "$SD_ROOT/$(dirname "$2")" && cp "$1" "$SD_ROOT/$2"
 }
 
+{{#hasAppstore}}
 install_appstore() {
 	local file unpacked="$WORK_DIR/unpacked" registry="$SD_ROOT/switch/appstore/.get/packages/$1"
 	file="$(download "$APPSTORE/zips/$1.zip")" || return 1
@@ -120,6 +124,7 @@ install_appstore() {
 	cp -R "$unpacked/." "$SD_ROOT/"
 }
 
+{{/hasAppstore}}
 install_zip() {
 	local url file
 	url="$(asset_url "$1" "$2")" && file="$(download "$url")" && unpack "$file" "${3:-}" "${4:-}"
@@ -140,6 +145,7 @@ write_image() {
 
 info "Downloading & unpacking components"
 {{#components}}
+
 step '{{name}}'
 if {{#steps}}{{#appstore}}install_appstore '{{package}}' &&{{/appstore}}{{#zip}}install_zip '{{repo}}' '{{asset}}' '{{root}}' '{{into}}' &&{{/zip}}{{#file}}install_file '{{repo}}' '{{asset}}' '{{path}}' &&{{/file}}{{#urlZip}}{ archive="$(download '{{url}}')" && unpack "$archive" '{{root}}' '{{into}}'; } &&{{/urlZip}}{{#urlFile}}{ file="$(download '{{url}}')" && save "$file" '{{path}}'; } &&{{/urlFile}}{{/steps}} true; then
 	ok '{{name}}'
@@ -147,10 +153,11 @@ else
 	fail '{{name}}'
 	FAILED+=('{{name}}')
 fi
-
 {{/components}}
+
 info "Writing configuration"
 {{#configs}}
+
 step '{{path}}'
 write_config '{{path}}' << 'BREWDECK_EOF'
 {{content}}
@@ -161,6 +168,7 @@ ok '{{path}}'
 
 info "Deploying appearance & assets"
 {{#images}}
+
 step '{{path}}'
 write_image '{{path}}' << 'BREWDECK_EOF'
 {{data}}
@@ -169,7 +177,7 @@ ok '{{path}}'
 {{/images}}
 {{/hasImages}}
 
-# macOS leaves AppleDouble ._ files on FAT32, Atmosphere tries to load them as contents
+# macOS leaves AppleDouble ._ files on FAT32, the console takes them for files of its own
 if [ "$(uname)" = Darwin ] && command -v dot_clean > /dev/null; then
 	step "Cleaning macOS dotfiles"
 	dot_clean -m "$SD_ROOT"
@@ -189,4 +197,4 @@ if [ ${#FAILED[@]} -gt 0 ]; then
 	exit 1
 fi
 
-printf '%b%bDone!%b Eject the SD card safely and boot your Nintendo Switch.\n\n' "$CLR_GREEN" "$CLR_BOLD" "$CLR_RESET"
+printf '%b%bDone!%b Eject the {{card}} safely and boot your {{console}}.\n\n' "$CLR_GREEN" "$CLR_BOLD" "$CLR_RESET"

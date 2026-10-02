@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 import { AppearanceConfig, HardwareRevision, ImageTarget, LaunchEntry, Uploads } from '../../types';
 import { Language, Translation, format } from '../../i18n';
-import { GALLERY, HARDWARE } from '../../data';
+import { HARDWARE } from '../../data';
+import { GALLERY } from '../../platforms/switch';
 import { activate, pixelsPerInch } from '../../utils';
 
 interface AppearanceProps {

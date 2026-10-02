@@ -1,20 +1,58 @@
 import { Translation } from '../types';
 
-import software from './software';
-import tuning from './tuning';
+import switchSoftware from './switch/software';
+import switchTuning from './switch/tuning';
+import pspSoftware from './psp/software';
+import pspTuning from './psp/tuning';
 
 const ru: Translation = {
 	language: 'ru',
 	title: 'BrewDeck',
-	subtitle: 'Конструктор кастомной прошивки Nintendo Switch',
+	platforms: {
+		switch: {
+			name: 'Nintendo Switch',
+			subtitle: 'Конструктор кастомной прошивки Nintendo Switch',
+		},
+		psp: {
+			name: 'PlayStation Portable',
+			subtitle: 'Конструктор кастомной прошивки PSP',
+			steps: {
+				firmware: 'Прошивка',
+			},
+			pages: {
+				firmware: {
+					title: 'Версия системы',
+					description: 'Укажи прошивку, которая стоит на твоей PSP: Settings → System Settings → System Information. ARK-5 работает на 6.60 и 6.61, на более старую PSP сначала ставится официальное обновление до 6.61.',
+				},
+				software: {
+					title: 'Программное обеспечение',
+					description: 'Компоненты скачиваются из релизов разработчиков. ARK-5 поставляется как FasterARK, который ставит кастомную прошивку прямо на PSP.',
+				},
+				system: {
+					title: 'Настройки CFW',
+					description: 'Настройки ARK-5, записанные в SETTINGS.TXT так же, как их пишет меню настроек, которое ARK добавляет в XMB. Значения по умолчанию совпадают с теми, с которыми поставляется ARK.',
+				},
+				build: {
+					title: 'Сборка установщика',
+					description: 'Запусти скрипт в корне Memory Stick. Он скачает свежие релизы компонентов и применит твою конфигурацию.',
+				},
+			},
+			unsupported: 'сначала обнови до 6.61',
+			summary: {
+				hardware: 'Модель',
+				firmware: 'Прошивка',
+			},
+		},
+	},
 	steps: {
-		hardware: 'Ревизия',
+		hardware: 'Консоль',
 		firmware: 'Версия HOS',
 		software: 'Софт',
 		launch: 'Запуск',
 		system: 'CFW',
 		security: 'Безопасность',
 		modules: 'Плагины',
+		plugins: 'Плагины',
 		overclock: 'Разгон',
 		appearance: 'Оформление',
 		build: 'Сборка',
@@ -46,9 +84,40 @@ const ru: Translation = {
 			description: 'Компактная портативная консоль без съемных джойконов',
 			note: 'Пайка чипа требует аккуратности с конденсаторами вокруг процессора.',
 		},
+		psp1000: {
+			name: 'PSP-1000',
+			description: 'Первая модель 2004 года, она же Fat',
+			note: 'У неё 32 МБ оперативной памяти, у следующих моделей 64. Полный ARK-5 умеет делать из её батареи батарею Pandora для раскирпичивания.',
+		},
+		psp2000: {
+			name: 'PSP-2000',
+			description: 'Slim & Lite 2007 года: тоньше, легче, с 64 МБ памяти и выходом на телевизор',
+			note: 'Ранние платы до TA-088v2 тоже умеют делать батарею Pandora для раскирпичивания, как PSP-1000.',
+		},
+		psp3000: {
+			name: 'PSP-3000',
+			description: 'Brite 2008 года с более ярким экраном и микрофоном',
+			note: 'Самая распространённая модель. ARK-5 ставится на любую её плату, cIPL делает его постоянным.',
+		},
+		pspgo: {
+			name: 'PSP Go',
+			description: 'Слайдер 2009 года с 16 ГБ встроенной памяти, слотом Memory Stick Micro и без привода UMD',
+			note: 'Ставь на встроенную память или на карту M2. ARK перенаправляет во встроенную память плагины, рассчитанные на Memory Stick.',
+		},
+		pspstreet: {
+			name: 'PSP Street',
+			description: 'Бюджетная E1000 2011 года без Wi-Fi, продавалась в Европе',
+			note: 'Без Wi-Fi нет игры по сети и сетевых обновлений ARK, всё остальное работает как на других моделях.',
+		},
 	},
-	software,
-	tuning,
+	software: {
+		switch: switchSoftware,
+		psp: pspSoftware,
+	},
+	tuning: {
+		switch: switchTuning,
+		psp: pspTuning,
+	},
 	buttons: {
 		A: 'A',
 		B: 'B',
@@ -69,8 +138,8 @@ const ru: Translation = {
 	},
 	pages: {
 		hardware: {
-			title: 'Ревизия консоли',
-			description: 'Укажи свою ревизию Switch. Это определит тип уязвимости, базовый набор файлов и содержание инструкций по первому запуску.',
+			title: 'Консоль',
+			description: 'Укажи свою консоль и её ревизию. Это определит, как запускается кастомная прошивка, базовый набор файлов и содержание инструкций по первому запуску.',
 			isModchipRequired: 'требуется чип',
 			isModchipNotRequired: 'программный взлом',
 			size: '{width} × {height} мм',
@@ -90,7 +159,7 @@ const ru: Translation = {
 			description: 'Компоненты скачиваются из Homebrew App Store или из релизов разработчиков, откуда свежее. Отключи ненужные, чтобы сэкономить место на карте памяти.',
 			presets: {
 				minimal: 'Минимум',
-				recommended: 'Рекомендуемый',
+				base: 'Рекомендуемый',
 				gamer: 'Геймер',
 				emulation: 'Эмуляция',
 				streaming: 'Стриминг',
@@ -103,6 +172,7 @@ const ru: Translation = {
 				payloads: 'Первичные загрузчики',
 				sysmodules: 'Системные модули',
 				overlays: 'Оверлеи',
+				plugins: 'Плагины',
 				tools: 'Утилиты',
 				installers: 'Установка и дампы',
 				saves: 'Сохранения',
@@ -175,6 +245,18 @@ const ru: Translation = {
 			title: 'Системные модули и оверлеи',
 			description: 'Настройки выбранных системных модулей, оверлеев и приложений. Здесь только компоненты с проверенным форматом конфигурации.',
 			empty: 'У выбранных модулей нет настроек.',
+		},
+		plugins: {
+			title: 'Плагины',
+			description: 'Где загружается каждый выбранный плагин. ARK читает список из SEPLUGINS/PLUGINS.TXT, его менеджер плагинов в XMB потом включает и выключает их.',
+			list: 'Загружать плагины',
+			runlevels: {
+				always: 'Всегда',
+				vsh: 'XMB',
+				game: 'Игры и homebrew',
+				pops: 'Игры PS1',
+			},
+			off: 'Выключен',
 		},
 		overclock: {
 			title: 'Разгон',
@@ -278,10 +360,15 @@ const ru: Translation = {
 		atmosphereTracks: '{component} не обновлялся после Atmosphere {version}, часть его патчей может не сработать',
 		ftpCredentials: 'У sys-ftpd-light нет логина и пароля: задай их или разреши анонимный доступ',
 		gpuCap: '{game}: sys-clk ограничит GPU до {cap} МГц в режиме "{mode}"',
+		firmwareUpdate: 'ARK-5 нужна прошивка 6.60 или 6.61, а на PSP стоит {firmware}',
+		firmwareCurrent: 'На PSP уже 6.61, обновление не нужно',
+		aemuCache: 'æmu нужны выключенные кэш Memory Stick и кэш ISO',
+		overclock: 'Процессор работает на {mhz} МГц: проверь, что PSP их держит, тестером разгона из полного ARK-5',
 		add: 'Добавить {component}',
 		remove: 'Убрать {component}',
 		or: ' или ',
 		go: 'Открыть',
+		dismiss: 'Скрыть',
 	},
 	metrics: {
 		size: 'Общий вес',

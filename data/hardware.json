@@ -1,6 +1,7 @@
 [
 	{
 		"id": "erista",
+		"platform": "switch",
 		"name": "Erista (V1)",
 		"codename": "Icosa",
 		"is_modchip_required": false,
@@ -10,6 +11,7 @@
 	},
 	{
 		"id": "mariko",
+		"platform": "switch",
 		"name": "Mariko (V2)",
 		"codename": "Iowa",
 		"is_modchip_required": true,
@@ -19,6 +21,7 @@
 	},
 	{
 		"id": "oled",
+		"platform": "switch",
 		"name": "OLED",
 		"codename": "Aula",
 		"is_modchip_required": true,
@@ -28,11 +31,62 @@
 	},
 	{
 		"id": "lite",
+		"platform": "switch",
 		"name": "Lite",
 		"codename": "Hoag",
 		"is_modchip_required": true,
 		"image": "110663-nintendo-switch-lite-turquoise-front-screen-on-1200x675.avif",
 		"dimensions": [208, 91.1],
 		"screen": 5.5
+	},
+	{
+		"id": "psp1000",
+		"platform": "psp",
+		"name": "PSP-1000",
+		"codename": "Fat",
+		"is_modchip_required": false,
+		"image": "psp-1000.avif",
+		"dimensions": [170, 74],
+		"screen": 4.3
+	},
+	{
+		"id": "psp2000",
+		"platform": "psp",
+		"name": "PSP-2000",
+		"codename": "Slim & Lite",
+		"is_modchip_required": false,
+		"image": "psp-2000.avif",
+		"dimensions": [169.4, 71.4],
+		"screen": 4.3
+	},
+	{
+		"id": "psp3000",
+		"platform": "psp",
+		"name": "PSP-3000",
+		"codename": "Brite",
+		"is_modchip_required": false,
+		"image": "psp-3000.avif",
+		"dimensions": [169.4, 71.4],
+		"screen": 4.3
+	},
+	{
+		"id": "pspgo",
+		"platform": "psp",
+		"name": "PSP Go",
+		"codename": "N1000",
+		"is_modchip_required": false,
+		"image": "psp-go.avif",
+		"dimensions": [128, 69],
+		"screen": 3.8
+	},
+	{
+		"id": "pspstreet",
+		"platform": "psp",
+		"name": "PSP Street",
+		"codename": "E1000",
+		"is_modchip_required": false,
+		"image": "psp-street.avif",
+		"dimensions": [172, 73.4],
+		"screen": 4.3
 	}
 ]

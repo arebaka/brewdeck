@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 400" preserveAspectRatio="none">
+	<!-- Waves of the XMB: one period per tile, so the strip repeats without seams -->
+	<defs>
+		<linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#fff" stop-opacity=".08"/>
+			<stop offset="1" stop-color="#fff" stop-opacity="0"/>
+		</linearGradient>
+	</defs>
+	<path d="M0 220 C240 140 480 140 720 220 S1200 300 1440 220 V400 H0 Z" fill="url(#glow)"/>
+	<path d="M0 260 C240 320 480 320 720 260 S1200 200 1440 260 V400 H0 Z" fill="url(#glow)" opacity=".7"/>
+	<g fill="none" stroke="#fff" stroke-linecap="round">
+		<path d="M0 220 C240 140 480 140 720 220 S1200 300 1440 220" stroke-opacity=".24" stroke-width="1.5"/>
+		<path d="M0 260 C240 320 480 320 720 260 S1200 200 1440 260" stroke-opacity=".16" stroke-width="1.2"/>
+		<path d="M0 200 C240 170 480 170 720 200 S1200 230 1440 200" stroke-opacity=".1" stroke-width="1"/>
+	</g>
+</svg>

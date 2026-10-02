@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { Fix, Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '../../types';
 import { Language, Translation } from '../../i18n';
-import { TUNING, isRequirementMet, isTuningOptionActive } from '../../data';
+import { isTuningOptionActive, tuningGroups } from '../../data';
+import { Platform } from '../../platforms';
 import { activate } from '../../utils';
 import { Issues } from '../Issues';
 import { Buttons, isButtons } from '../Buttons';
@@ -11,6 +12,7 @@ type SetTuningOption = (group: string, option: string, value: TuningValue) => vo
 
 interface TuningProps {
 	lang: Language;
+	platform: Platform;
 	step: 'system' | 'security' | 'modules';
 	tuning: TuningConfig;
 	selectedComponentIDs: string[];
@@ -21,13 +23,9 @@ interface TuningProps {
 	t: Translation;
 }
 
-// Groups of the step whose components are selected
-export function tuningGroups(step: TuningStep, selectedComponentIDs: string[]): TuningGroup[] {
-	return TUNING.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, selectedComponentIDs)));
-}
-
 export function Tuning({
 	lang,
+	platform,
 	step,
 	tuning,
 	selectedComponentIDs,
@@ -37,7 +35,7 @@ export function Tuning({
 	applyFix,
 	t
 }: TuningProps) {
-	const groups = tuningGroups(step, selectedComponentIDs);
+	const groups = tuningGroups(platform.catalog.tuning, step, selectedComponentIDs);
 
 	return (<>
 		<section className="batch">
@@ -50,12 +48,14 @@ export function Tuning({
 
 		<Issues
 			issues={issues}
+			platform={platform}
 			applyFix={applyFix}
 			t={t} />
 
 		{groups.map(group => (
 			<TuningSection
 				key={group.id}
+				platform={platform}
 				group={group}
 				tuning={tuning}
 				setTuningOption={setTuningOption}
@@ -71,6 +71,7 @@ export function Tuning({
 }
 
 interface TuningSectionProps {
+	platform: Platform;
 	group: TuningGroup;
 	tuning: TuningConfig;
 	setTuningOption: SetTuningOption;
@@ -79,28 +80,32 @@ interface TuningSectionProps {
 
 // One configuration file with its options
 export function TuningSection({
+	platform,
 	group,
 	tuning,
 	setTuningOption,
 	t
 }: TuningSectionProps) {
+	const text = t.tuning[platform.id][group.id];
+
 	return (
 		<section className="tuning">
 			<header className="header">
 				<h3 className="title">
-					{t.tuning[group.id]?.title ?? group.id}
+					{text?.title ?? group.id}
 				</h3>
 				<p className="file">
 					{group.file}
 				</p>
 			</header>
 			<p className="description">
-				{t.tuning[group.id]?.description}
+				{text?.description}
 			</p>
 			<ul className="rows">
 				{group.options.map(option => (
 					<Option
 						key={option.id}
+						platform={platform}
 						group={group}
 						option={option}
 						tuning={tuning}
@@ -114,6 +119,7 @@ export function TuningSection({
 }
 
 interface OptionProps {
+	platform: Platform;
 	group: TuningGroup;
 	option: TuningOption;
 	tuning: TuningConfig;
@@ -124,6 +130,7 @@ interface OptionProps {
 
 // An option as a row of the settings list: a toggle switches by a click, other types carry their control
 function Option({
+	platform,
 	group,
 	option,
 	tuning,
@@ -132,7 +139,7 @@ function Option({
 	t
 }: OptionProps) {
 	// An option added to the data before its texts shows its key instead of breaking the page
-	const text = t.tuning[group.id]?.options[option.id] ?? { title: option.id, description: '' };
+	const text = t.tuning[platform.id][group.id]?.options[option.id] ?? { title: option.id, description: '' };
 	const value = tuning[group.id][option.id];
 	const label = (value: string | number) => text.values?.[value] ?? String(value);
 	const set = (value: TuningValue) => isEnabled && setValue(value);

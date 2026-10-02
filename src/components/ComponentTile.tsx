@@ -2,11 +2,12 @@ import React from 'react';
 
 import { ComponentInfo } from '../types';
 import { Translation, format } from '../i18n';
-import { COMPONENTS } from '../data';
+import { Platform } from '../platforms';
 import { activate, formatSize } from '../utils';
 
 interface ComponentTileProps {
 	component: ComponentInfo;
+	platform: Platform;
 	isSelected: boolean;
 	toggle: (id: string) => void;
 	t: Translation;
@@ -15,12 +16,13 @@ interface ComponentTileProps {
 // A component of the catalog with its logo, source and texts, selected by a click
 export function ComponentTile({
 	component,
+	platform,
 	isSelected,
 	toggle,
 	t
 }: ComponentTileProps) {
-	const text = t.software[component.id];
-	const parent = COMPONENTS.find(comp => comp.id == component.sources.bundled);
+	const text = t.software[platform.id][component.id];
+	const parent = platform.catalog.components.find(comp => comp.id == component.sources.bundled);
 	// What ships with a required component cannot be switched off either
 	const isRequired = component.is_required || !!parent?.is_required;
 
@@ -34,7 +36,7 @@ export function ComponentTile({
 			onClick={() => toggle(component.id)}
 			onKeyDown={activate}>
 			{component.logo ? (
-				<img src={"logos/" + component.logo} alt="" className="logo" loading="lazy" />
+				<img src={`logos/${platform.id}/${component.logo}`} alt="" className="logo" loading="lazy" />
 			) : (
 				<span className="logo monogram" aria-hidden="true">
 					{component.name[0]}
@@ -62,16 +64,16 @@ export function ComponentTile({
 								{t.pages.software.riskyBadge}
 							</p>
 						)}
-						<p className="version">
-							{component.version}
+						<p className="size">
+							{component.size > 0 && formatSize(component.size)}
 						</p>
 					</div>
 				</header>
 				<p className="source">
 					{component.author} · {parent
 						? format(t.pages.software.bundledBadge, { component: parent.name })
-						: t.pages.software.sources[component.source]}
-					{component.size > 0 && ` · ${formatSize(component.size)}`}
+						: t.pages.software.sources[component.source]
+					} · {component.version}
 				</p>
 				<p className="description">
 					{text?.description}

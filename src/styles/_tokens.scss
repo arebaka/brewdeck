@@ -20,9 +20,49 @@ $palettes: (
 		logo-left: #ff3c28,
 		logo-right: #0ab9e6,
 	),
+	// XrossMediaBar of the PSP: white text over dark glass and waves, the accent follows the month
+	psp: (
+		bg: #07080c,
+		panel: rgb(12 14 20 / 68%),
+		sunken: rgb(0 0 0 / 45%),
+		text: #ffffff,
+		muted: #b3b8c4,
+		line: rgb(255 255 255 / 24%),
+		accent: #cbcbcb,
+		on-accent: #000000,
+		focus-1: #ffffff,
+		focus-2: #9cc8ff,
+		focus-bg: rgb(255 255 255 / 12%),
+		warning: #ffc83d,
+		danger: #ff6b6b,
+		logo-left: #ffffff,
+		logo-right: #8e96a6,
+	),
 );
 
-$font-sans: 'BIZ UDPGothic', 'Montserrat', sans-serif;
+// Colors of the XMB by month, as the firmware draws its background, with the text that reads on each
+$months: (
+	(#cbcbcb, #000000),
+	(#d8bf1a, #000000),
+	(#6db217, #000000),
+	(#e17e9a, #000000),
+	(#178816, #ffffff),
+	(#9a61c8, #ffffff),
+	(#02cdc7, #000000),
+	(#0c76c0, #ffffff),
+	(#b444c0, #ffffff),
+	(#e5a708, #000000),
+	(#875b1e, #ffffff),
+	(#e3412a, #000000),
+);
+
+// Every console reads in a font of its own, set as a custom property with its palette
+$fonts: (
+	nx: ('BIZ UDPGothic', 'Montserrat', sans-serif),
+	psp: ('M PLUS 1p', sans-serif),
+);
+
+$font-sans: var(--font-sans);
 $font-mono: monospace;
 
 $size-base: 15px;

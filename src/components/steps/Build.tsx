@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Fix, Issue, StepId, Uploads } from '../../types';
+import { BuildState, Fix, Issue, StepId, Uploads } from '../../types';
 import { Language, Translation, format } from '../../i18n';
-import { GALLERY, HARDWARE } from '../../data';
-import { build } from '../../build';
+import { HARDWARE } from '../../data';
+import { Platform } from '../../platforms';
 import { encodeImage } from '../../images';
 import { highlight, renderMarkdown } from '../../markup';
-import { AppState } from '../../state';
 import { activate, downloadFile, formatSize } from '../../utils';
 import { Issues } from '../Issues';
 
 interface BuildProps {
 	lang: Language;
-	state: AppState;
+	platform: Platform;
+	build: BuildState;
 	uploads: Uploads;
 	totalSize: number;
 	tuningChanges: number;
@@ -33,7 +33,8 @@ const withBOM = (path: string, content: string) => path.endsWith('.ps1') ? `\uFE
 
 export function Build({
 	lang,
-	state,
+	platform,
+	build,
 	uploads,
 	totalSize,
 	tuningChanges,
@@ -42,17 +43,15 @@ export function Build({
 	setStep,
 	t
 }: BuildProps) {
-	const { hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance } = state;
-	const request = { hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance, lang, t };
-	const result = useMemo(() => build(request), [hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance, lang, t]);
+	const { hardware, firmware, selectedComponentIDs } = build;
+	const request = { ...build, lang, t };
+	const result = useMemo(() => platform.build(request), [platform, build, lang, t]);
 
 	// Images are converted in the background and embedded into the installers once ready
 	const sources = result.assets.map(asset => ({
 		path: asset.path,
 		target: asset.target,
-		source: asset.image == 'upload'
-			? uploads[asset.key].url
-			: GALLERY.find(item => item.target == asset.target && item.id == asset.image)!.file
+		source: asset.image == 'upload' ? uploads[asset.key].url : asset.file!
 	}));
 	const sourcesKey = JSON.stringify(sources);
 	const [encoded, setEncoded] = useState<Encoded>();
@@ -71,13 +70,13 @@ export function Build({
 	const error = encoded?.key == sourcesKey ? encoded.error : undefined;
 
 	// Installers to download carry the images, their preview only tells the size of every image
-	const files = useMemo(() => images && build({ ...request, images }).files, [result, images]);
+	const files = useMemo(() => images && platform.build({ ...request, images }).files, [result, images]);
 	const previews = useMemo(() => {
 		const placeholders = Object.fromEntries(result.assets.map(asset => [
 			asset.path,
 			`# ${images ? format(t.pages.build.imageData, { size: formatSize(images[asset.path].length) }) : '…'}`
 		]));
-		const { files, configs } = build({ ...request, images: placeholders });
+		const { files, configs } = platform.build({ ...request, images: placeholders });
 		return [...files.filter(file => file.path != 'README.md'), ...configs];
 	}, [result, images]);
 
@@ -90,15 +89,16 @@ export function Build({
 
 	// Manual components are listed with their links below
 	const notices = issues.filter(issue => issue.code != 'manual');
+	const summary = { ...t.pages.build.summary, ...t.platforms[platform.id].summary };
 
 	return (<>
 		<ul className="rows summary">
 			{[
-				{ key: t.pages.build.summary.hardware, value: HARDWARE.find(hw => hw.id == hardware)?.name },
-				{ key: t.pages.build.summary.firmware, value: hosVersion },
-				{ key: t.pages.build.summary.components, value: selectedComponentIDs.length },
-				{ key: t.pages.build.summary.size, value: formatSize(totalSize) },
-				{ key: t.pages.build.summary.tuning, value: tuningChanges }
+				{ key: summary.hardware, value: HARDWARE.find(hw => hw.id == hardware)?.name },
+				{ key: summary.firmware, value: firmware },
+				{ key: summary.components, value: selectedComponentIDs.length },
+				{ key: summary.size, value: formatSize(totalSize) },
+				{ key: summary.tuning, value: tuningChanges }
 			].map(metric => (
 				<li key={metric.key} className="row">
 					<div className="line">
@@ -120,6 +120,7 @@ export function Build({
 				</h3>
 				<Issues
 					issues={notices}
+					platform={platform}
 					applyFix={applyFix}
 					setStep={setStep}
 					t={t} />

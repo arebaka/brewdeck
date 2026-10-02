@@ -1,8 +1,21 @@
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// Revisions of a platform under its name
+.consoles {
+	display: flex;
+	flex-direction: column;
+	gap: space(3);
+
+	> .title {
+		@include section-title;
+	}
+}
+
 // A console wider than the window keeps its physical size and shows its middle, the screen
 .preview {
 	display: flex;
 	justify-content: center;
-	overflow: hidden;
 
 	.photo {
 		flex: none;

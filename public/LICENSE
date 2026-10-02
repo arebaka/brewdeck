@@ -12,23 +12,23 @@ appearance/
     hekate from the bitmaps of Nyx to PNG with their transparency, the others
     rendered from SVG.
 
-    */hekate-*.png           CTCaer, GPL-2.0
-                             https://github.com/CTCaer/hekate
-    */atmosphere-*.png       Atmosphère-NX, GPL-2.0
-                             https://github.com/Atmosphere-NX/Atmosphere
-    icon/mattera-*.png       Nichole Mattera, GPL-2.0, as stated for every icon
-                             in its folder of the repository: the Atmosphère
-                             one uses the logo by jaames for Atmosphère-NX, the
-                             Switch and payload ones are redrawn after the Nyx
-                             icons of CTCaer. Rendered from the SVG sources of
-                             the repository fitted into the 192×192 icon of
-                             Nyx, the white lockpick recolored from the colored
-                             one; the fitted SVG files are in art/icons of the
-                             repository of BrewDeck
-                             https://github.com/NicholeMattera/Hekate-Icons
-    icon/brewdeck-*.png      BrewDeck, MIT, drawn for the project, the SVG
-                             sources are in art/icons of the repository
-                             https://github.com/arebaka/brewdeck
+    */hekate-*.png              CTCaer, GPL-2.0
+                                https://github.com/CTCaer/hekate
+    */atmosphere-*.png          Atmosphère-NX, GPL-2.0
+                                https://github.com/Atmosphere-NX/Atmosphere
+    icon/mattera-*.png          Nichole Mattera, GPL-2.0, as stated for every icon
+                                in its folder of the repository: the Atmosphère
+                                one uses the logo by jaames for Atmosphère-NX, the
+                                Switch and payload ones are redrawn after the Nyx
+                                icons of CTCaer. Rendered from the SVG sources of
+                                the repository fitted into the 192×192 icon of
+                                Nyx, the white lockpick recolored from the colored
+                                one; the fitted SVG files are in art/icons of the
+                                repository of BrewDeck
+                                https://github.com/NicholeMattera/Hekate-Icons
+    icon/brewdeck-*.png         BrewDeck, MIT, drawn for the project, the SVG
+                                sources are in art/icons of the repository
+                                https://github.com/arebaka/brewdeck
 
 images/
     Product photos of the Nintendo Switch consoles from the Nintendo online
@@ -36,126 +36,155 @@ images/
     trademarks and copyrighted works of Nintendo. They only illustrate the
     console revisions, BrewDeck is not affiliated with Nintendo.
 
-logos/
+    Photos of the PSP models from Wikimedia Commons, trimmed to the console
+    and scaled down, the adaptations are under the licenses of the originals.
+    PlayStation Portable, PSP and their logos are trademarks of Sony
+    Interactive Entertainment, BrewDeck is not affiliated with Sony.
+
+    psp-1000.avif               Evan-Amos, public domain
+                                https://commons.wikimedia.org/wiki/File:Sony-PSP-1000-Body.png
+    psp-2000.avif               Evan-Amos, public domain
+                                https://commons.wikimedia.org/wiki/File:PSP-2000-trans.png
+    psp-3000.avif               Evan-Amos, CC BY-SA 3.0
+                                https://commons.wikimedia.org/wiki/File:PSP-3000-Silver.png
+    psp-go.avif                 Evan-Amos, CC0
+                                https://commons.wikimedia.org/wiki/File:PSP-Go-FL-Open.png
+    psp-street.avif             Tokyoship, CC BY 3.0, rendered from the SVG
+                                https://commons.wikimedia.org/wiki/File:PSP_E1000_illustration.svg
+
+logos/switch/
     Icons of the homebrew applications, taken from the Homebrew App Store
     (https://hb-app.store), from the releases or the repositories of the
     projects. Every icon belongs to the authors of its application.
 
-    aio_updater.jpg          AIO Switch Updater, HamletDuFromage
-                             https://github.com/HamletDuFromage/aio-switch-updater
-    akira.png                Akira (chiaki-ng), xlanor
-                             https://github.com/xlanor/akira
-    amiibo_generator.png     AmiiboGenerator, Slluxx
-                             https://github.com/Slluxx/AmiiboGenerator
-    amiigo.png               Amiigo, CompSciOrBust
-                             https://github.com/CompSciOrBust/Amiigo
-    appstore.png             Homebrew App Store, 4TU Team
-                             https://github.com/vgmoose/appstorenx
-    atmosphere.png           Atmosphere, SciresM
-                             https://github.com/Atmosphere-NX/Atmosphere
-    breeze.jpg               Breeze, tomvita
-                             https://github.com/tomvita/Breeze-Beta
-    browsenx.png             BrowseNX, crc-32
-                             https://github.com/crc-32/BrowseNX
-    checkpoint.png           Checkpoint, FlagBrew
-                             https://github.com/FlagBrew/Checkpoint
-    comicnx.png              ComicNX, HookedBehemoth
-                             https://github.com/HookedBehemoth/ComicNX
-    daybreak.jpg             Daybreak, Adubbz
-                             https://github.com/Atmosphere-NX/Atmosphere
-    dbi.png                  DBI, duckbill
-                             https://github.com/rashevskyv/dbi
-    desmume.png              DeSmuME-NX, Laproxi / MasterFeizz
-                             https://github.com/Laproxi/DeSmuME-NX
-    edizon_overlay.png       EdiZon Overlay, proferabg / WerWolv
-                             https://github.com/proferabg/EdiZon-Overlay
-    edizon.png               EdiZon SE, tomvita
-                             https://github.com/tomvita/EdiZon-SE
-    emuiibo.png              emuiibo, XorTroll
-                             https://github.com/XorTroll/emuiibo
-    fizeau.png               Fizeau, averne
-                             https://github.com/averne/Fizeau
-    goldleaf.png             Goldleaf, XorTroll
-                             https://github.com/XorTroll/Goldleaf
-    hekate.png               Hekate, CTCaer
-                             https://github.com/CTCaer/hekate
-    jc_color_swapper.png     JC Color Swapper, HamletDuFromage
-                             https://github.com/HamletDuFromage/JC-color-swapper
-    jksv.png                 JKSV, J-D-K
-                             https://github.com/J-D-K/JKSV
-    ldn_mitm.png             ldn_mitm, spacemeowx2
-                             https://github.com/spacemeowx2/ldn_mitm
-    lennytube.png            lennytube, noirscape
-                             https://github.com/noirscape/lennytube
-    linkalho.png             Linkalho, rdmrocha / impeeza
-                             https://github.com/impeeza/linkalho
-    melonds.png              melonDS, Arisotura / ArcDelta
-                             https://github.com/ArcDelta/melonDS
-    mgba.png                 mGBA, endrift
-                             https://github.com/mgba-emu/mgba
-    missioncontrol.png       MissionControl, ndeadly
-                             https://github.com/ndeadly/MissionControl
-    moonlight.png            Moonlight, XITRIX
-                             https://github.com/XITRIX/Moonlight-Switch
-    neumann.png              Neumann, turtle-insect
-                             https://github.com/turtle-insect/Neumann
-    noods.png                NooDS, Hydr8gon
-                             https://github.com/Hydr8gon/NooDS
-    nx_activity_log.jpg      NX Activity Log, tallbl0nde / zdm65477730
-                             https://github.com/zdm65477730/NX-Activity-Log
-    nx_shell.png             NX-Shell, Joel16
-                             https://github.com/Joel16/NX-Shell
-    nxdumptool.png           nxdumptool, DarkMatterCore
-                             https://github.com/DarkMatterCore/nxdumptool
-    nxmp.png                 NXMP, proconsule
-                             https://github.com/proconsule/nxmp
-    nxthemes_installer.png   NXThemes Installer, exelix11
-                             https://github.com/exelix11/SwitchThemeInjector
-    ovlmenu.png              Tesla Menu, WerWolv
-                             https://github.com/WerWolv/Tesla-Menu
-    pfbneo.png               pFBNeo, Cpasjuste
-                             https://github.com/Cpasjuste/pemu
-    pnes.png                 pNES, Cpasjuste
-                             https://github.com/Cpasjuste/pemu
-    pplay.png                pPlay, Cpasjuste
-                             https://github.com/Cpasjuste/pplay
-    ppsspp.png               PPSSPP, hrydgard / m4xw
-                             https://www.ppsspp.org
-    psnes.png                pSNES, Cpasjuste
-                             https://github.com/Cpasjuste/pemu
-    retroarch.png            RetroArch, libretro
-                             https://github.com/libretro/RetroArch
-    scummvm.png              ScummVM, ScummVM Team
-                             https://www.scummvm.org
-    simple_mod_downloader.png
-                             SimpleModDownloader, PoloNX
-                             https://github.com/PoloNX/SimpleModDownloader
-    simple_mod_manager.png   SimpleModManager, nadrino
-                             https://github.com/nadrino/SimpleModManager
-    skynx.png                SkyNX, DevL0rd
-                             https://github.com/DevL0rd/SkyNX
-    sphaira.png              sphaira, ITotalJustice
-                             https://github.com/ITotalJustice/sphaira
-    switch_cheats_updater.png
-                             switch-cheats-updater, HamletDuFromage
-                             https://github.com/HamletDuFromage/switch-cheats-updater
-    switch_remote_play.png   switch-remote-play, Moehammered
-                             https://github.com/Moehammered/switch-remote-play
-    switchfin.png            Switchfin, dragonflylee
-                             https://github.com/dragonflylee/switchfin
-    sys_clk.png              sys-clk, RetroNX
-                             https://github.com/retronx-team/sys-clk
-    sys_con.png              sys-con, cathery / o0Zz
-                             https://github.com/o0Zz/sys-con
-    sys_tune.png             sys-tune, HookedBehemoth
-                             https://github.com/HookedBehemoth/sys-tune
-    sysdvr_overlay.png       SysDVR Overlay, Hartie95
-                             https://github.com/Hartie95/sysdvr-overlay
-    sysdvr.png               SysDVR, exelix11
-                             https://github.com/exelix11/SysDVR
-    themezer.png             Themezer, suchmememanyskill
-                             https://github.com/suchmememanyskill/themezer-nx
-    ulaunch.png              uLaunch, XorTroll
-                             https://github.com/XorTroll/uLaunch
-    ultrahand.png            Ultrahand, ppkantorski
-                             https://github.com/ppkantorski/Ultrahand-Overlay
+    aio_updater.jpg             AIO Switch Updater, HamletDuFromage
+                                https://github.com/HamletDuFromage/aio-switch-updater
+    akira.jpg                   Akira (chiaki-ng), xlanor
+                                https://github.com/xlanor/akira
+    amiibo_generator.png        AmiiboGenerator, Slluxx
+                                https://github.com/Slluxx/AmiiboGenerator
+    amiigo.png                  Amiigo, CompSciOrBust
+                                https://github.com/CompSciOrBust/Amiigo
+    appstore.png                Homebrew App Store, 4TU Team
+                                https://github.com/vgmoose/appstorenx
+    atmosphere.png              Atmosphere, SciresM
+                                https://github.com/Atmosphere-NX/Atmosphere
+    breeze.jpg                  Breeze, tomvita
+                                https://github.com/tomvita/Breeze-Beta
+    browsenx.png                BrowseNX, crc-32
+                                https://github.com/crc-32/BrowseNX
+    checkpoint.png              Checkpoint, FlagBrew
+                                https://github.com/FlagBrew/Checkpoint
+    comicnx.png                 ComicNX, HookedBehemoth
+                                https://github.com/HookedBehemoth/ComicNX
+    daybreak.jpg                Daybreak, Adubbz
+                                https://github.com/Atmosphere-NX/Atmosphere/tree/master/troposphere/daybreak
+    dbi.jpg                     DBI, duckbill
+                                https://github.com/rashevskyv/dbi
+    dbi_patcher.jpg             DBIPatcher, rashevskyv
+                                https://github.com/rashevskyv/DBIPatcher
+    desmume.png                 DeSmuME-NX, Laproxi / MasterFeizz
+                                https://github.com/Laproxi/DeSmuME-NX
+    edizon_overlay.png          EdiZon Overlay, proferabg / WerWolv
+                                https://github.com/proferabg/EdiZon-Overlay
+    edizon.png                  EdiZon SE, tomvita
+                                https://github.com/tomvita/EdiZon-SE
+    emuiibo.png                 emuiibo, XorTroll
+                                https://github.com/XorTroll/emuiibo
+    fizeau.jpg                  Fizeau, averne
+                                https://github.com/averne/Fizeau
+    goldleaf.png                Goldleaf, XorTroll
+                                https://github.com/XorTroll/Goldleaf
+    hekate.png                  Hekate, CTCaer
+                                https://github.com/CTCaer/hekate
+    jc_color_swapper.png        JC Color Swapper, HamletDuFromage
+                                https://github.com/HamletDuFromage/JC-color-swapper
+    jksv.png                    JKSV, J-D-K
+                                https://github.com/J-D-K/JKSV
+    ldn_mitm.png                ldn_mitm, spacemeowx2
+                                https://github.com/spacemeowx2/ldn_mitm
+    lennytube.png               lennytube, noirscape
+                                https://github.com/noirscape/lennytube
+    linkalho.jpg                Linkalho, rdmrocha / impeeza
+                                https://github.com/impeeza/linkalho
+    melonds.png                 melonDS, Arisotura / ArcDelta
+                                https://github.com/ArcDelta/melonDS
+    mgba.png                    mGBA, endrift
+                                https://github.com/mgba-emu/mgba
+    missioncontrol.png          MissionControl, ndeadly
+                                https://github.com/ndeadly/MissionControl
+    moonlight.png               Moonlight, XITRIX
+                                https://github.com/XITRIX/Moonlight-Switch
+    neumann.png                 Neumann, turtle-insect
+                                https://github.com/turtle-insect/Neumann
+    noods.png                   NooDS, Hydr8gon
+                                https://github.com/Hydr8gon/NooDS
+    nx_activity_log.jpg         NX Activity Log, tallbl0nde / zdm65477730
+                                https://github.com/zdm65477730/NX-Activity-Log
+    nx_shell.png                NX-Shell, Joel16
+                                https://github.com/Joel16/NX-Shell
+    nxdumptool.png              nxdumptool, DarkMatterCore
+                                https://github.com/DarkMatterCore/nxdumptool
+    nxmp.png                    NXMP, proconsule
+                                https://github.com/proconsule/nxmp
+    nxthemes_installer.png      NXThemes Installer, exelix11
+                                https://github.com/exelix11/SwitchThemeInjector
+    ovlmenu.png                 Tesla Menu, WerWolv
+                                https://github.com/WerWolv/Tesla-Menu
+    pfbneo.png                  pFBNeo, Cpasjuste
+                                https://github.com/Cpasjuste/pemu
+    pnes.png                    pNES, Cpasjuste
+                                https://github.com/Cpasjuste/pemu
+    pplay.png                   pPlay, Cpasjuste
+                                https://github.com/Cpasjuste/pplay
+    ppsspp.png                  PPSSPP, hrydgard / m4xw
+                                https://www.ppsspp.org
+    psnes.png                   pSNES, Cpasjuste
+                                https://github.com/Cpasjuste/pemu
+    retroarch.png               RetroArch, libretro
+                                https://github.com/libretro/RetroArch
+    scummvm.png                 ScummVM, ScummVM Team
+                                https://www.scummvm.org
+    simple_mod_downloader.png   SimpleModDownloader, PoloNX
+                                https://github.com/PoloNX/SimpleModDownloader
+    simple_mod_manager.png      SimpleModManager, nadrino
+                                https://github.com/nadrino/SimpleModManager
+    skynx.png                   SkyNX, DevL0rd
+                                https://github.com/DevL0rd/SkyNX
+    sphaira.png                 sphaira, ITotalJustice
+                                https://github.com/ITotalJustice/sphaira
+    switch_cheats_updater.png   switch-cheats-updater, HamletDuFromage
+                                https://github.com/HamletDuFromage/switch-cheats-updater
+    switch_remote_play.png      switch-remote-play, Moehammered
+                                https://github.com/Moehammered/switch-remote-play
+    switchfin.png               Switchfin, dragonflylee
+                                https://github.com/dragonflylee/switchfin
+    sys_clk.png                 sys-clk, RetroNX
+                                https://github.com/retronx-team/sys-clk
+    sys_con.png                 sys-con, cathery / o0Zz
+                                https://github.com/o0Zz/sys-con
+    sys_tune.png                sys-tune, HookedBehemoth
+                                https://github.com/HookedBehemoth/sys-tune
+    sysdvr_overlay.png          SysDVR Overlay, Hartie95
+                                https://github.com/Hartie95/sysdvr-overlay
+    sysdvr.png                  SysDVR, exelix11
+                                https://github.com/exelix11/SysDVR
+    themezer.png                Themezer, suchmememanyskill
+                                https://github.com/suchmememanyskill/themezer-nx
+    ulaunch.png                 uLaunch, XorTroll
+                                https://github.com/XorTroll/uLaunch
+    ultrahand.png               Ultrahand, ppkantorski
+                                https://github.com/ppkantorski/Ultrahand-Overlay
+
+logos/psp/
+    Icons of the PSP homebrew, the ICON0 of their EBOOT.PBP from the releases
+    of the projects. Every icon belongs to the authors of its application.
+
+    ark.png                     ARK-5 (FasterARK), PSP-Arkfive
+                                https://github.com/PSP-Arkfive/FasterARK
+    cmfilemanager.png           CMFileManager, joel16
+                                https://github.com/joel16/CMFileManager-PSP
+    daedalusx64.png             DaedalusX64, DaedalusX64 Team
+                                https://github.com/DaedalusX64/daedalus
+    tempgba.png                 TempGBA4PSP-mod, andymcca
+                                https://github.com/andymcca/TempGBA4PSP-mod

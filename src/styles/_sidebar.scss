@@ -44,6 +44,11 @@
 			}
 		}
 
+		// Only themes that draw steps as categories of a menu show their icons
+		.icon {
+			display: none;
+		}
+
 		.label {
 			flex: 1;
 		}

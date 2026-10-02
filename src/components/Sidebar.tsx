@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 
-import { IssueLevel, StepId } from '../types';
-import { Translation } from '../i18n';
+import { IssueLevel, PlatformId, StepId } from '../types';
+import { Translation, stepName } from '../i18n';
 import { formatSize } from '../utils';
+import { StepIcon } from './StepIcon';
 
 export interface SidebarItem {
 	step: StepId;
@@ -12,6 +13,7 @@ export interface SidebarItem {
 
 interface SidebarProps {
 	items: SidebarItem[];
+	platform: PlatformId; // names some steps its own way
 	activeStep: StepId;
 	setActiveStep: (step: StepId) => void;
 	totalSize: number;
@@ -20,6 +22,7 @@ interface SidebarProps {
 
 export function Sidebar({
 	items,
+	platform,
 	activeStep,
 	setActiveStep,
 	totalSize,
@@ -35,15 +38,17 @@ export function Sidebar({
 
 	return (
 		<aside className="sidebar">
-			<ul className="steps">
+			{/* The XMB of the PSP slides the strip of steps by the index of the active one */}
+			<ul className="steps" style={{ '--active': activeIndex } as React.CSSProperties}>
 				{items.map((item, index) => (
 					<li key={item.step}>
 						<button
 							ref={item.step == activeStep ? activeRef : undefined}
 							className={`step ${item.step == activeStep ? 'active' : ''} ${index < activeIndex ? 'done' : ''}`}
 							onClick={() => setActiveStep(item.step)}>
+							<StepIcon step={item.step} />
 							<span className="label">
-								{t.steps[item.step]}
+								{stepName(t, platform, item.step)}
 							</span>
 							{item.alert && item.alert != 'info' && (
 								<span className={`alert ${item.alert}`}></span>

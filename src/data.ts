@@ -1,27 +1,9 @@
-import { BootEntry, BootMode, ComponentCategory, ComponentInfo, EntryOverride, GalleryImage, HardwareInfo, HOSVersion, LaunchConfig, LaunchEntry, OverclockData, Preset, Requirement, TuningConfig, TuningGroup, TuningOption } from '@/types';
+import { Catalog, HardwareInfo, Preset, Requirement, TuningConfig, TuningGroup, TuningOption, TuningStep } from '@/types';
 
-import { appearance, firmware, hardware, launch, overclock, presets, software, tuning } from '@data';
+import { hardware } from '@data';
 
+// Consoles of every platform, the revision of a build tells its platform
 export const HARDWARE: HardwareInfo[] = hardware as HardwareInfo[];
-export const HOS_VERSIONS: HOSVersion[] = firmware.map(v => ({
-	version: v.version,
-	date: new Date(v.date),
-	status: v.status,
-	atmosphere: v.atmosphere,
-	supported: v.supported ? new Date(v.supported) : undefined
-})) as HOSVersion[];
-export const COMPONENTS: ComponentInfo[] = software as ComponentInfo[];
-// Payloads are picked on the Launch step, the other categories on the Software one
-export const CATEGORIES: ComponentCategory[] = ['base', 'sysmodules', 'overlays', 'tools', 'installers', 'saves', 'mods', 'amiibo', 'themes', 'media', 'streaming', 'emulators', 'developer'];
-export const BOOT_ENTRIES: BootEntry[] = launch as unknown as BootEntry[];
-export const TUNING: TuningGroup[] = tuning as TuningGroup[];
-export const PRESETS: Preset[] = presets as Preset[];
-export const OVERCLOCK: OverclockData = overclock as OverclockData;
-// Pictures lie in the folder of their target under their ID: appearance/icon/hekate-switch.png
-export const GALLERY: GalleryImage[] = (appearance as Omit<GalleryImage, 'file'>[])
-	.map(image => ({ ...image, file: `appearance/${image.target}/${image.id}.png` }));
-
-export const DEFAULT_COMPONENTS = COMPONENTS.filter(comp => comp.is_selected_by_default || comp.is_required).map(comp => comp.id);
 
 // Compares dotted versions part by part: -1, 0 or 1
 export function compareVersions(a: string, b: string): number {
@@ -32,16 +14,9 @@ export function compareVersions(a: string, b: string): number {
 	return 0;
 }
 
-// Versions newer than the last one some Atmosphere release added support for cannot boot CFW yet
-const NEWEST_SUPPORTED_HOS = HOS_VERSIONS
-	.filter(v => v.atmosphere)
-	.reduce((max, v) => compareVersions(v.version, max) > 0 ? v.version : max, '0.0.0');
-
-export const isHOSSupported = (version: string) => compareVersions(version, NEWEST_SUPPORTED_HOS) <= 0;
-
 // Default values of every option, by group
-export function getTuningDefaults(): TuningConfig {
-	return Object.fromEntries(TUNING.map(group => [
+export function getTuningDefaults(groups: TuningGroup[]): TuningConfig {
+	return Object.fromEntries(groups.map(group => [
 		group.id,
 		Object.fromEntries(group.options.map(option => [option.id, option.default]))
 	]));
@@ -63,13 +38,19 @@ export function isRequirementMet(requirement: Requirement, selectedComponentIDs:
 		: requirement.some(id => selectedComponentIDs.includes(id));
 }
 
+// Groups of the step whose components are selected
+export function tuningGroups(groups: TuningGroup[], step: TuningStep, selectedComponentIDs: string[]): TuningGroup[] {
+	return groups.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, selectedComponentIDs)));
+}
+
 // Adds required components and missing dependencies (the first of alternatives), bundled components follow their parent.
 // Removing a component keeps dependencies as they are, so a dependency can be dropped and reported instead
-export function resolveSelection(ids: string[], dependencies: boolean = true): string[] {
-	const selected = new Set([...COMPONENTS.filter(comp => comp.is_required).map(comp => comp.id), ...ids]);
+export function resolveSelection(catalog: Catalog, ids: string[], dependencies: boolean = true): string[] {
+	const { components } = catalog;
+	const selected = new Set([...components.filter(comp => comp.is_required).map(comp => comp.id), ...ids]);
 	for (let changed = dependencies; changed;) {
 		changed = false;
-		for (const comp of COMPONENTS.filter(comp => selected.has(comp.id))) {
+		for (const comp of components.filter(comp => selected.has(comp.id))) {
 			for (const requirement of comp.requires ?? []) {
 				if (!isRequirementMet(requirement, [...selected])) {
 					selected.add(typeof requirement == 'string' ? requirement : requirement[0]);
@@ -78,64 +59,30 @@ export function resolveSelection(ids: string[], dependencies: boolean = true): s
 			}
 		}
 	}
-	for (const comp of COMPONENTS.filter(comp => comp.sources.bundled)) {
+	for (const comp of components.filter(comp => comp.sources.bundled)) {
 		if (selected.has(comp.sources.bundled!)) selected.add(comp.id);
 		else selected.delete(comp.id);
 	}
-	return COMPONENTS.filter(comp => selected.has(comp.id)).map(comp => comp.id);
+	return components.filter(comp => selected.has(comp.id)).map(comp => comp.id);
 }
 
-// Everything that does not conflict with an earlier component of the catalog
-function allComponents(): string[] {
-	const ids: string[] = [];
-	for (const comp of COMPONENTS) {
-		if (!(comp.conflicts_with ?? []).some(id => ids.includes(id))) ids.push(comp.id);
-	}
-	return ids;
+// Every component of the catalog, both sides of conflicts too: the user picks one
+function allComponents(catalog: Catalog): string[] {
+	return catalog.components
+		.map(comp => comp.id);
 }
 
 // Components of a preset with their dependencies
-export function presetSelection(preset: Preset): string[] {
+export function presetSelection(catalog: Catalog, preset: Preset): string[] {
 	return resolveSelection(
-		preset.components == 'default' ? DEFAULT_COMPONENTS
-			: preset.components == 'all' ? allComponents()
+		catalog,
+		preset.components == 'all' ? allComponents(catalog)
 			: preset.components
 	);
 }
 
 // The preset the selection equals to, if any
-export function matchingPreset(selectedComponentIDs: string[]): Preset | undefined {
+export function matchingPreset(catalog: Catalog, selectedComponentIDs: string[]): Preset | undefined {
 	const current = [...selectedComponentIDs].sort().join();
-	return PRESETS.find(preset => presetSelection(preset).sort().join() == current);
-}
-
-// Keys an entry sets over exosphere.ini and system_settings.ini, 0 or 1. A missing key keeps the configs
-export const ENTRY_OVERRIDES: EntryOverride[] = ['cal0blank', 'usb3force', 'memmode'];
-
-// Folders of emuMMCs as hekate names them (SD00, RAW1) or a user renames them. FAT ignores the case,
-// so folders are kept in upper case and `sd01` never turns into a second entry of `SD01`
-export const isEmuMMCFolder = (folder: string) => /^[A-Z0-9_-]{1,32}$/.test(folder);
-
-// Entries of the Launch menu in their order: the emuMMC ones, sysMMC and stock, then payloads of the selected components.
-// Entries booting the system carry the Exosphere keys set for them
-export function launchEntries(launch: LaunchConfig, selectedComponentIDs: string[]): LaunchEntry[] {
-	const mode = (id: BootMode) => BOOT_ENTRIES.filter(entry => entry.id == id && launch.modes.includes(id));
-	const emummc = BOOT_ENTRIES.find(entry => entry.id == 'emummc')!;
-
-	return [
-		...[
-			...mode('emummc'),
-			...launch.emummcs.map(folder => ({
-				id: `emummc-${folder}`,
-				name: `CFW (emuMMC ${folder})`,
-				caption: emummc.caption,
-				keys: { ...emummc.keys, emupath: `emuMMC/${folder}` }
-			})),
-			...mode('sysmmc'),
-			...mode('stock')
-		].map(entry => ({ ...entry, keys: { ...entry.keys, ...launch.overrides[entry.id] } })),
-		...COMPONENTS
-			.filter(comp => comp.payload && selectedComponentIDs.includes(comp.id))
-			.map(comp => ({ id: comp.id, name: comp.name, caption: 'Payloads', keys: { payload: comp.payload! } }))
-	];
+	return catalog.presets.find(preset => presetSelection(catalog, preset).sort().join() == current);
 }

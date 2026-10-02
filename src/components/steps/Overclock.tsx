@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-import { ClockKey, ClockMode, ClockModule, GameProfile, HardwareRevision, Fix, Issue, TuningConfig, TuningStep, TuningValue } from '../../types';
+import { ClockKey, ClockMode, ClockModule, GameProfile, SwitchRevision, Fix, Issue, TuningConfig, TuningStep, TuningValue } from '../../types';
 import { Language, Translation } from '../../i18n';
-import { OVERCLOCK } from '../../data';
-import { gameName, templateClocks } from '../../url';
+import { tuningGroups } from '../../data';
+import { CATALOG, OVERCLOCK, SWITCH, gameName, templateClocks } from '../../platforms/switch';
 import { activate } from '../../utils';
 import { Issues } from '../Issues';
-import { TuningSection, tuningGroups } from './Tuning';
+import { TuningSection } from './Tuning';
 
 interface OverclockProps {
 	lang: Language;
-	hardware: HardwareRevision;
+	hardware: SwitchRevision;
 	overclock: GameProfile[];
 	setOverclock: (overclock: GameProfile[]) => void;
 	tuning: TuningConfig;
@@ -41,7 +41,7 @@ export function Overclock({
 	applyFix,
 	t
 }: OverclockProps) {
-	const groups = tuningGroups('overclock', selectedComponentIDs);
+	const groups = tuningGroups(CATALOG.tuning, 'overclock', selectedComponentIDs);
 	const [titleId, setTitleId] = useState('');
 
 	const setProfile = (id: string, patch: Partial<GameProfile>) =>
@@ -91,6 +91,7 @@ export function Overclock({
 
 		<Issues
 			issues={issues}
+			platform={SWITCH}
 			applyFix={applyFix}
 			t={t} />
 
@@ -242,6 +243,7 @@ export function Overclock({
 		{groups.map(group => (
 			<TuningSection
 				key={group.id}
+				platform={SWITCH}
 				group={group}
 				tuning={tuning}
 				setTuningOption={setTuningOption}

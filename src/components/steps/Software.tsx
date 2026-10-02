@@ -2,13 +2,15 @@ import React, { useMemo } from 'react';
 
 import { Fix, Issue } from '../../types';
 import { Language, Translation } from '../../i18n';
-import { CATEGORIES, COMPONENTS, PRESETS, matchingPreset } from '../../data';
+import { matchingPreset } from '../../data';
+import { Platform } from '../../platforms';
 import { activate } from '../../utils';
 import { Issues } from '../Issues';
 import { ComponentTile } from '../ComponentTile';
 
 interface SoftwareProps {
 	lang: Language;
+	platform: Platform;
 	selectedComponentIDs: string[];
 	toggleComponent: (id: string) => void;
 	applyPreset: (id: string) => void;
@@ -19,6 +21,7 @@ interface SoftwareProps {
 
 export function Software({
 	lang,
+	platform,
 	selectedComponentIDs,
 	toggleComponent,
 	applyPreset,
@@ -26,13 +29,14 @@ export function Software({
 	applyFix,
 	t
 }: SoftwareProps) {
+	const { categories, components, presets } = platform.catalog;
 	// A selection edited by hand matches no preset and shows up as a custom one
-	const preset = useMemo(() => matchingPreset(selectedComponentIDs), [selectedComponentIDs]);
+	const preset = useMemo(() => matchingPreset(platform.catalog, selectedComponentIDs), [platform, selectedComponentIDs]);
 
 	return (<>
 		<section className="batch">
 			<ul className="choices">
-				{PRESETS.map(item => (
+				{presets.map(item => (
 					<li
 						key={item.id}
 						className={`choice ${preset?.id == item.id ? 'active' : ''}`}
@@ -52,23 +56,25 @@ export function Software({
 
 		<Issues
 			issues={issues}
+			platform={platform}
 			applyFix={applyFix}
 			t={t} />
 
 		<ul className="list">
-			{CATEGORIES.map(category => {
-				const components = COMPONENTS.filter(comp => comp.category == category);
+			{categories.map(category => {
+				const items = components.filter(comp => comp.category == category);
 
 				return (
 					<section key={category} className="components">
 						<h3 className="title">
 							{t.pages.software.categories[category]}
 						</h3>
-						<ul className={`grid ${components.length % 2 == 0 ? 'grid2' : 'grid3'}`}>
-							{components.map(component => (
+						<ul className={`grid ${items.length % 2 == 0 && items.length % 3 != 0 ? 'grid2' : 'grid3'}`}>
+							{items.map(component => (
 								<ComponentTile
 									key={component.id}
 									component={component}
+									platform={platform}
 									isSelected={selectedComponentIDs.includes(component.id)}
 									toggle={toggleComponent}
 									t={t} />

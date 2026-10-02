@@ -1,7 +1,14 @@
-export type HardwareRevision = 'erista' | 'mariko' | 'oled' | 'lite';
+// Consoles BrewDeck builds for, each with a catalog, steps and templates of its own
+export type PlatformId = 'switch' | 'psp';
+export const PLATFORM_IDS: PlatformId[] = ['switch', 'psp'];
+
+export type SwitchRevision = 'erista' | 'mariko' | 'oled' | 'lite';
+export type PspRevision = 'psp1000' | 'psp2000' | 'psp3000' | 'pspgo' | 'pspstreet';
+export type HardwareRevision = SwitchRevision | PspRevision;
 
 export interface HardwareInfo {
 	id: HardwareRevision;
+	platform: PlatformId;
 	name: string;
 	codename: string;
 	is_modchip_required: boolean;
@@ -10,17 +17,18 @@ export interface HardwareInfo {
 	screen: number; // diagonal of the 16:9 display in inches
 }
 
-export type HOSVersionStatus = 'stable' | 'legacy' | 'dead';
+export type FirmwareStatus = 'stable' | 'legacy' | 'dead';
 
-export interface HOSVersion {
+// Version of the system software of a console
+export interface FirmwareVersion {
 	version: string;
 	date: Date;
-	status: HOSVersionStatus;
-	atmosphere?: string; // Atmosphere version
+	status: FirmwareStatus;
+	atmosphere?: string; // Atmosphere release supporting the HOS version
 	supported?: Date;
 }
 
-export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'tools' | 'installers' | 'saves' | 'mods' | 'amiibo' | 'themes' | 'media' | 'streaming' | 'emulators' | 'developer';
+export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'plugins' | 'tools' | 'installers' | 'saves' | 'mods' | 'amiibo' | 'themes' | 'media' | 'streaming' | 'emulators' | 'developer';
 
 export type ComponentSource = 'appstore' | 'github' | 'url' | 'manual' | 'bundled';
 
@@ -71,18 +79,24 @@ export interface ComponentInfo {
 	deprecated?: boolean;
 	risky?: boolean; // its note tells what may go wrong, the build warns about it too
 	payload?: string; // SD path of the payload, it gets an entry in the Launch menu of hekate
-	is_selected_by_default: boolean;
+	plugin?: CfwPlugin; // a CFW plugin the build lists in the plugins file of its platform
 	is_required: boolean;
+}
+
+// Plugin of a custom firmware and where it loads by default
+export interface CfwPlugin {
+	path: string; // relative to the folder of the plugins file
+	scope: string[]; // runlevels, such as `vsh` or `game`, empty to leave the plugin off
 }
 
 export interface Preset {
 	id: string;
-	components: string[] | 'default' | 'all';
+	components: string[] | 'all';
 }
 
 export type TuningValue = boolean | number | string | string[];
 
-export type TuningStep = 'launch' | 'system' | 'security' | 'modules' | 'overclock';
+export type TuningStep = 'launch' | 'system' | 'security' | 'modules' | 'plugins' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
@@ -111,6 +125,23 @@ export interface TuningGroup {
 
 export type TuningConfig = Record<string, Record<string, TuningValue>>;
 
+// Software of a platform: its components, presets of them and options of their configs
+export interface Catalog {
+	platform: PlatformId;
+	components: ComponentInfo[];
+	categories: ComponentCategory[]; // picked on the Software step in this order, the others on steps of their own
+	presets: Preset[];
+	tuning: TuningGroup[];
+}
+
+// What a build keeps on every platform: the console, its system version, the software and the options
+export interface BuildState {
+	hardware: HardwareRevision;
+	firmware: string;
+	selectedComponentIDs: string[];
+	tuning: TuningConfig;
+}
+
 export type ClockModule = 'cpu' | 'gpu' | 'mem';
 export type ClockMode = 'docked' | 'handheld' | 'handheld_charging' | 'handheld_charging_usb' | 'handheld_charging_official';
 export type ClockKey = `${ClockMode}_${ClockModule}`;
@@ -118,7 +149,7 @@ export type Clocks = Partial<Record<ClockKey, number>>;
 
 export interface OverclockData {
 	frequencies: Record<ClockModule, number[]>;
-	caps: Partial<Record<ClockKey, Record<HardwareRevision, number>>>; // sys-clk lowers requested clocks to these
+	caps: Partial<Record<ClockKey, Record<SwitchRevision, number>>>; // sys-clk lowers requested clocks to these
 	templates: Record<string, Clocks>;
 	games: { id: string; name: string }[];
 }
@@ -178,8 +209,21 @@ export interface AppearanceConfig {
 // Images picked from the disk by `bootlogo`, `background`, `logo.<entry>` or `icon.<entry>`, kept only in this tab: links cannot carry them
 export type Uploads = Record<string, { blob: Blob; url: string }>;
 
-export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'modules' | 'overclock' | 'appearance' | 'build';
-export const STEP_IDS: StepId[] = ['hardware', 'firmware', 'software', 'launch', 'system', 'security', 'modules', 'overclock', 'appearance', 'build'];
+// Build of a Nintendo Switch: the Launch menu of hekate, sys-clk profiles and pictures on top of the common part
+export interface SwitchState extends BuildState {
+	hardware: SwitchRevision;
+	launch: LaunchConfig;
+	overclock: GameProfile[];
+	appearance: AppearanceConfig;
+}
+
+// Build of a PSP: runlevels the plugins load in, by plugin, where they differ from the catalog
+export interface PspState extends BuildState {
+	hardware: PspRevision;
+	plugins: Record<string, string[]>;
+}
+
+export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'modules' | 'plugins' | 'overclock' | 'appearance' | 'build';
 
 export type IssueLevel = 'error' | 'warning' | 'info';
 

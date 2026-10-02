@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { build } from '@/build';
-import { COMPONENTS, resolveSelection } from '@/data';
+import { resolveSelection } from '@/data';
+import { CATALOG, COMPONENTS, SWITCH } from '@/platforms/switch';
 import { translations } from '@/i18n';
-import { defaultState } from '@/state';
-import { BITMAPS, customState, encodeBitmaps } from './fixtures';
+import { BITMAPS, customBuild, encodeBitmaps } from './fixtures';
 
 describe('build', () => {
-	const result = build({ ...customState(), t: translations.en });
+	const result = SWITCH.build({ ...customBuild(), lang: 'en', t: translations.en });
 	const paths = result.configs.map(config => config.path);
 	const config = (path: string) => result.configs.find(config => config.path == path)?.content;
 	const installers = result.files.filter(file => file.path.startsWith('install.'));
@@ -15,9 +14,9 @@ describe('build', () => {
 	const section = (name: string) => `\n${config('bootloader/hekate_ipl.ini')}`.split(`\n[${name}]\n`)[1]?.split('\n\n')[0].trim().split('\n');
 
 	it('writes the Launch menu: boot modes, then payloads, autoboot by number', () => {
-		const state = customState();
+		const build = customBuild();
 		const ini = config('bootloader/hekate_ipl.ini')!;
-		const payloads = COMPONENTS.filter(comp => comp.payload && state.selectedComponentIDs.includes(comp.id));
+		const payloads = COMPONENTS.filter(comp => comp.payload && build.selectedComponentIDs.includes(comp.id));
 		expect([...ini.matchAll(/^\[(.+)\]$/gm)].map(match => match[1])).toEqual(['config', 'CFW (emuMMC)', 'CFW (emuMMC SD01)', 'Stock', ...payloads.map(comp => comp.name)]);
 		expect(ini).toMatch(/^autoboot=3$/m);
 		expect(section('config')).toEqual(expect.arrayContaining(['bootwait=5', 'noticker=1', 'backlight=50']));
@@ -78,12 +77,25 @@ describe('build', () => {
 		expect(section('Fusee')).toContain('icon=bootloader/res/brewdeck_fusee_hue.bmp');
 	});
 
+	it('points the page at the pictures of the gallery', () => {
+		expect(result.assets.map(asset => asset.file)).toEqual([
+			'appearance/bootlogo/hekate-a.png',
+			undefined,
+			undefined,
+			'appearance/bootlogo/hekate-b.png',
+			'appearance/icon/hekate-switch.png',
+			undefined,
+			'appearance/icon/hekate-payload.png'
+		]);
+	});
+
 	it('embeds images into both installers', () => {
 		const images = encodeBitmaps(BITMAPS);
-		const { files } = build({
-			...defaultState(),
+		const { files } = SWITCH.build({
+			...SWITCH.defaults(),
 			appearance: { bootlogo: 'hekate-a', background: 'atmosphere-splash', logos: {}, icons: { emummc: 'hekate-switch' } },
 			images,
+			lang: 'en',
 			t: translations.en
 		});
 		for (const file of files.filter(file => file.path.startsWith('install.'))) {
@@ -95,11 +107,12 @@ describe('build', () => {
 	});
 
 	it('names assets after the options of their components', () => {
-		const state = customState();
-		const { files } = build({
-			...state,
-			selectedComponentIDs: resolveSelection([...state.selectedComponentIDs, 'dbi_patcher']),
-			tuning: { ...state.tuning, dbi_patcher: { language: 'ua' } },
+		const build = customBuild();
+		const { files } = SWITCH.build({
+			...build,
+			selectedComponentIDs: resolveSelection(CATALOG, [...build.selectedComponentIDs, 'dbi_patcher']),
+			tuning: { ...build.tuning, dbi_patcher: { language: 'ua' } },
+			lang: 'en',
 			t: translations.en
 		});
 		for (const file of files.filter(file => file.path.startsWith('install.'))) {

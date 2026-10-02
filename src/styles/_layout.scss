@@ -77,6 +77,11 @@
 	}
 }
 
+// Only the PSP shows the time, as in the corner of its XMB
+.clock {
+	display: none;
+}
+
 .lang-switch {
 	display: flex;
 	gap: space(4);

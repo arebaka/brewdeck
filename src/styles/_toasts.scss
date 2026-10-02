@@ -1,0 +1,90 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// Notices a click brings float over the content above the footer, as notifications of the console do
+.toasts {
+	position: fixed;
+	right: space(6);
+	bottom: space(20);
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	gap: space(2);
+	width: min(440px, calc(100vw - #{space(12)}));
+	// Only the toasts take clicks, the gaps between them let clicks through to the page
+	pointer-events: none;
+
+	@include phone {
+		left: space(3);
+		right: space(3);
+		bottom: space(16);
+		width: auto;
+	}
+}
+
+.toast {
+	--tone: var(--color-warning);
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: space(2);
+	padding: space(3) space(10) space(3) space(4);
+	background: color-mix(in srgb, var(--tone) 12%, var(--color-panel));
+	border-left: 4px solid var(--tone);
+	border-radius: $radius;
+	box-shadow: 0 space(1) space(6) rgb(0 0 0 / 50%);
+	pointer-events: auto;
+	animation: toast-in .2s ease-out;
+
+	&.info {
+		--tone: var(--color-accent);
+	}
+
+	&.error {
+		--tone: var(--color-danger);
+
+		.text {
+			color: var(--color-danger);
+		}
+	}
+
+	// The text takes a line of its own, the fixes follow under it
+	.text {
+		flex: 1 1 100%;
+	}
+
+	.dismiss {
+		position: absolute;
+		top: space(2);
+		right: space(2);
+		display: grid;
+		place-items: center;
+		width: 28px;
+		height: 28px;
+		font-size: $size-small;
+		color: var(--color-muted);
+		background: none;
+		border: none;
+		border-radius: 50%;
+		@include interactive;
+
+		@media (pointer: coarse) {
+			width: 36px;
+			height: 36px;
+		}
+	}
+}
+
+@keyframes toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(space(2));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.toast {
+		animation: none;
+	}
+}

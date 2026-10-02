@@ -1,12 +1,49 @@
 import { Translation } from '../types';
 
-import software from './software';
-import tuning from './tuning';
+import switchSoftware from './switch/software';
+import switchTuning from './switch/tuning';
+import pspSoftware from './psp/software';
+import pspTuning from './psp/tuning';
 
 const en: Translation = {
 	language: 'en',
 	title: 'BrewDeck',
-	subtitle: 'Nintendo Switch custom firmware builder',
+	platforms: {
+		switch: {
+			name: 'Nintendo Switch',
+			subtitle: 'Nintendo Switch custom firmware builder',
+		},
+		psp: {
+			name: 'PlayStation Portable',
+			subtitle: 'PSP custom firmware builder',
+			steps: {
+				firmware: 'Firmware',
+			},
+			pages: {
+				firmware: {
+					title: 'System software',
+					description: 'Select the firmware installed on your PSP: Settings → System Settings → System Information. ARK-5 runs on 6.60 and 6.61, an older PSP takes the official update to 6.61 first.',
+				},
+				software: {
+					title: 'Software components',
+					description: 'Components are downloaded from the releases of their developers. ARK-5 comes as FasterARK, which installs the custom firmware on the PSP itself.',
+				},
+				system: {
+					title: 'CFW settings',
+					description: 'Settings of ARK-5, written to SETTINGS.TXT the same way the settings menu ARK adds to the XMB writes them. Default values match the ones ARK ships with.',
+				},
+				build: {
+					title: 'Build installer',
+					description: 'Run the script at the root of the Memory Stick. It will download the latest component releases and apply your configuration.',
+				},
+			},
+			unsupported: 'update to 6.61 first',
+			summary: {
+				hardware: 'Model',
+				firmware: 'Firmware',
+			},
+		},
+	},
 	steps: {
 		hardware: 'Hardware',
 		firmware: 'HOS Version',
@@ -15,6 +52,7 @@ const en: Translation = {
 		system: 'CFW',
 		security: 'Security',
 		modules: 'Plugins',
+		plugins: 'Plugins',
 		overclock: 'Overclock',
 		appearance: 'Appearance',
 		build: 'Build',
@@ -46,9 +84,40 @@ const en: Translation = {
 			description: 'Compact model with non-detachable controllers',
 			note: 'Requires a modchip soldered directly onto the APU capacitors. Requires extra precision with micro-soldering.',
 		},
+		psp1000: {
+			name: 'PSP-1000',
+			description: 'The original model of 2004, also known as Fat',
+			note: 'Has 32 MB of RAM, later models have 64. The full ARK-5 can turn its battery into a Pandora battery for unbricking.',
+		},
+		psp2000: {
+			name: 'PSP-2000',
+			description: 'Slim & Lite of 2007: thinner, lighter, with 64 MB of RAM and TV output',
+			note: 'Early boards up to TA-088v2 can make a Pandora battery for unbricking, like the PSP-1000.',
+		},
+		psp3000: {
+			name: 'PSP-3000',
+			description: 'Brite of 2008 with a brighter screen and a microphone',
+			note: 'The most common model. ARK-5 installs on any of its boards, the cIPL makes it permanent.',
+		},
+		pspgo: {
+			name: 'PSP Go',
+			description: 'Slider of 2009 with 16 GB of internal memory, a Memory Stick Micro slot and no UMD drive',
+			note: 'Install onto the internal memory or the M2 card. ARK redirects plugins made for the Memory Stick to the internal memory.',
+		},
+		pspstreet: {
+			name: 'PSP Street',
+			description: 'Budget E1000 of 2011, sold in Europe, without Wi-Fi',
+			note: 'Without Wi-Fi there is no online play and no network updates of ARK, everything else works as on other models.',
+		},
 	},
-	software,
-	tuning,
+	software: {
+		switch: switchSoftware,
+		psp: pspSoftware,
+	},
+	tuning: {
+		switch: switchTuning,
+		psp: pspTuning,
+	},
 	buttons: {
 		A: 'A',
 		B: 'B',
@@ -69,8 +138,8 @@ const en: Translation = {
 	},
 	pages: {
 		hardware: {
-			title: 'Console revision',
-			description: 'Select your Switch revision. This determines the vulnerability type, base file set, and first-boot instructions.',
+			title: 'Console',
+			description: 'Select your console and its revision. This determines how the custom firmware starts, the base file set and the first-boot instructions.',
 			isModchipRequired: 'requires modchip',
 			isModchipNotRequired: 'softmod',
 			size: '{width} × {height} mm',
@@ -90,7 +159,7 @@ const en: Translation = {
 			description: 'Components are downloaded from the Homebrew App Store or the developers\' releases, whichever is fresher. Uncheck unnecessary components to save SD card space.',
 			presets: {
 				minimal: 'Minimal',
-				recommended: 'Recommended',
+				base: 'Recommended',
 				gamer: 'Gamer',
 				emulation: 'Emulation',
 				streaming: 'Streaming',
@@ -103,6 +172,7 @@ const en: Translation = {
 				payloads: 'Primary payloads',
 				sysmodules: 'System modules (background plugins)',
 				overlays: 'Overlays',
+				plugins: 'Plugins',
 				tools: 'Utilities',
 				installers: 'Installers and dumpers',
 				saves: 'Saves',
@@ -175,6 +245,18 @@ const en: Translation = {
 			title: 'Sysmodules and overlays',
 			description: 'Settings of the selected system modules, overlays and applications. Only components with a verified configuration format are listed.',
 			empty: 'None of the selected modules has settings.',
+		},
+		plugins: {
+			title: 'Plugins',
+			description: 'Where every selected plugin loads. ARK reads the list from SEPLUGINS/PLUGINS.TXT, its plugin manager in the XMB turns plugins on and off later.',
+			list: 'Load plugins',
+			runlevels: {
+				always: 'Always',
+				vsh: 'XMB',
+				game: 'Games and homebrew',
+				pops: 'PS1 games',
+			},
+			off: 'Off',
 		},
 		overclock: {
 			title: 'Overclock',
@@ -278,10 +360,15 @@ const en: Translation = {
 		atmosphereTracks: '{component} has not been updated since Atmosphere {version}, some of its patches may not apply',
 		ftpCredentials: 'sys-ftpd-light has no login and password: set them or allow anonymous access',
 		gpuCap: '{game}: sys-clk caps the GPU at {cap} MHz in the "{mode}" mode',
+		firmwareUpdate: 'ARK-5 needs the firmware 6.60 or 6.61, while the PSP has {firmware}',
+		firmwareCurrent: 'The PSP already has 6.61, it needs no update',
+		aemuCache: 'æmu needs the Memory Stick cache and the ISO cache off',
+		overclock: 'The CPU runs at {mhz} MHz: check that the PSP holds it with the overclock tester of the full ARK-5',
 		add: 'Add {component}',
 		remove: 'Remove {component}',
 		or: ' or ',
 		go: 'Open',
+		dismiss: 'Dismiss',
 	},
 	metrics: {
 		size: 'Total size',

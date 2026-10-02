@@ -1,0 +1,27 @@
+import { BuildState, Catalog, FirmwareVersion, Issue, PlatformId, StepId } from '@/types';
+import { Translation } from '@/i18n';
+import { BuildRequest, BuildResult } from '@/build';
+import { SWITCH } from './switch';
+import { PSP } from './psp';
+
+// A console BrewDeck builds for: its software, system versions and steps, its links and what a build turns into
+export interface Platform<S extends BuildState = BuildState> {
+	id: PlatformId;
+	catalog: Catalog;
+	firmware: FirmwareVersion[]; // newest first
+	isFirmwareSupported(version: string): boolean;
+	defaults(): S;
+	glyphs: { next: string; back: string; rebuild: string }; // buttons of the console the footer hints at, letters or PlayStation symbols
+
+	steps(build: S): StepId[]; // steps the build goes through, in their order
+	values(build: S): Partial<Record<StepId, string | number>>; // what the sidebar shows next to the steps of its own
+	encode(build: S): string; // query of a link reproducing the build
+	decode(params: URLSearchParams): S; // the build of a link, anything invalid keeps its default
+	validate(build: S, t: Translation): Issue[];
+	build(request: BuildRequest<S>): BuildResult;
+}
+
+export const PLATFORMS: {[platform in PlatformId]: Platform} = {
+	switch: SWITCH,
+	psp: PSP
+};

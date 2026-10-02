@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 
 import { BootMode, EntryOverride, Fix, Issue, LaunchConfig, TuningConfig, TuningValue } from '../../types';
 import { Language, Translation, format } from '../../i18n';
-import { BOOT_ENTRIES, COMPONENTS, ENTRY_OVERRIDES, isEmuMMCFolder, launchEntries } from '../../data';
+import { tuningGroups } from '../../data';
+import { BOOT_ENTRIES, CATALOG, COMPONENTS, ENTRY_OVERRIDES, SWITCH, isEmuMMCFolder, launchEntries } from '../../platforms/switch';
 import { activate } from '../../utils';
 import { Issues } from '../Issues';
 import { ComponentTile } from '../ComponentTile';
-import { TuningSection, tuningGroups } from './Tuning';
+import { TuningSection } from './Tuning';
 
 interface LaunchProps {
 	lang: Language;
@@ -84,6 +85,7 @@ export function Launch({
 	return (<>
 		<Issues
 			issues={issues}
+			platform={SWITCH}
 			applyFix={applyFix}
 			t={t} />
 
@@ -200,11 +202,12 @@ export function Launch({
 			<p className="description">
 				{t.pages.launch.payloadsDescription}
 			</p>
-			<ul className={`grid ${PAYLOADS.length % 2 == 0 ? 'grid2' : 'grid3'}`}>
+			<ul className={`grid ${PAYLOADS.length % 2 == 0 && PAYLOADS.length % 3 != 0 ? 'grid2' : 'grid3'}`}>
 				{PAYLOADS.map(component => (
 					<ComponentTile
 						key={component.id}
 						component={component}
+						platform={SWITCH}
 						isSelected={selectedComponentIDs.includes(component.id)}
 						toggle={toggleComponent}
 						t={t} />
@@ -235,9 +238,10 @@ export function Launch({
 			</ul>
 		</section>
 
-		{tuningGroups('launch', selectedComponentIDs).map(group => (
+		{tuningGroups(CATALOG.tuning, 'launch', selectedComponentIDs).map(group => (
 			<TuningSection
 				key={group.id}
+				platform={SWITCH}
 				group={group}
 				tuning={tuning}
 				setTuningOption={setTuningOption}

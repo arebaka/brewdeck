@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { defaultState } from '@/state';
+import { decodeState, defaultState, encodeState } from '@/state';
 import { resolveSelection } from '@/data';
-import { decodeState, encodeState } from '@/url';
+import { CATALOG } from '@/platforms/switch';
 import { customState } from './fixtures';
 
 describe('links', () => {
@@ -11,9 +11,9 @@ describe('links', () => {
 
 	it('restore the build', () => {
 		const expected = structuredClone(state);
-		expected.tuning.sys_ftpd_light.user = '';
-		expected.tuning.sys_ftpd_light.password = '';
-		expected.appearance = { bootlogo: 'hekate-a', logos: { stock: 'hekate-b' }, icons: { emummc: 'hekate-switch', fusee: 'hekate-payload' } };
+		expected.builds.switch.tuning.sys_ftpd_light.user = '';
+		expected.builds.switch.tuning.sys_ftpd_light.password = '';
+		expected.builds.switch.appearance = { bootlogo: 'hekate-a', logos: { stock: 'hekate-b' }, icons: { emummc: 'hekate-switch', fusee: 'hekate-payload' } };
 		expect(decodeState(`?${query}`)).toEqual(expected);
 	});
 
@@ -32,22 +32,25 @@ describe('links', () => {
 	});
 
 	it('always pin the revision, the HOS version and the whole software selection', () => {
-		const defaults = defaultState();
-		expect(encodeState(defaults)).toBe(`hw=${defaults.hardware}&hos=${defaults.hosVersion}&sw=${defaults.selectedComponentIDs.join(',')}`);
+		const defaults = defaultState().builds.switch;
+		expect(encodeState(defaultState())).toBe(`hw=${defaults.hardware}&hos=${defaults.firmware}&sw=${defaults.selectedComponentIDs.join(',')}`);
+	});
+
+	it('take the platform of the revision', () => {
+		expect(decodeState('?hw=lite')).toMatchObject({ platform: 'switch', builds: { switch: { hardware: 'lite' } } });
 	});
 
 	it('take the software as listed, whatever the recommendations are', () => {
-		expect(decodeState('?sw=dbi,fps_locker').selectedComponentIDs).toEqual(resolveSelection(['dbi', 'fps_locker'], false));
-		expect(decodeState('?sw=dbi,fps_locker').selectedComponentIDs).not.toContain('saltynx');
-		expect(decodeState('?sw=').selectedComponentIDs).toEqual(resolveSelection([], false));
+		expect(decodeState('?sw=dbi,fps_locker').builds.switch.selectedComponentIDs).toEqual(resolveSelection(CATALOG, ['dbi', 'fps_locker'], false));
+		expect(decodeState('?sw=dbi,fps_locker').builds.switch.selectedComponentIDs).not.toContain('saltynx');
+		expect(decodeState('?sw=').builds.switch.selectedComponentIDs).toEqual(resolveSelection(CATALOG, [], false));
 	});
 
 	it('turn every boot mode off with an empty list', () => {
-		expect(decodeState('?boot=&autoboot=menu').launch).toEqual({ modes: [], emummcs: [], overrides: {}, autoboot: 'menu' });
+		expect(decodeState('?boot=&autoboot=menu').builds.switch.launch).toEqual({ modes: [], emummcs: [], overrides: {}, autoboot: 'menu' });
 	});
 
 	it('spell more emuMMCs by their folders and overrides by their entries', () => {
-		const query = encodeState(customState());
 		expect(query).toContain('emummc=SD01');
 		expect(query).toContain('launch.emummc.cal0blank=0');
 		expect(query).toContain('launch.emummc-SD01.usb3force=1&launch.emummc-SD01.memmode=1');
@@ -63,8 +66,8 @@ describe('links', () => {
 			+ '&emummc=SD01,../x,SD01,sd02&launch.emummc-RAW9.memmode=1&launch.emummc-SD01.memmode=2&launch.stock.cal0writesys=1'
 			+ '&img.logo.emummc-RAW9=hekate-b&img.logo.fusee=hekate-switch&img.icon.evil=hekate-switch');
 		const expected = defaultState();
-		expected.overclock = [{ id: '0100F2C0115B6001', name: '0100F2C0115B6001', template: 'custom', clocks: {} }];
-		expected.launch.emummcs = ['SD01'];
+		expected.builds.switch.overclock = [{ id: '0100F2C0115B6001', name: '0100F2C0115B6001', template: 'custom', clocks: {} }];
+		expected.builds.switch.launch.emummcs = ['SD01'];
 		expect(decoded).toEqual(expected);
 	});
 });

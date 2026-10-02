@@ -1,0 +1,81 @@
+@use 'sass:list';
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// The page takes the look of the console of the build, the Switch one until another is picked
+:root[data-platform='psp'] {
+	@include palette(psp);
+
+	@for $month from 1 through list.length($months) {
+		&[data-month='#{$month}'] {
+			--color-accent: #{list.nth(list.nth($months, $month), 1)};
+			--color-on-accent: #{list.nth(list.nth($months, $month), 2)};
+		}
+	}
+
+	// The color of the month glows from under the black, as behind the XMB
+	body {
+		background:
+			radial-gradient(130% 80% at 50% 115%, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent 70%),
+			linear-gradient(color-mix(in srgb, var(--color-accent) 14%, var(--color-bg)), var(--color-bg) 60%);
+		background-attachment: fixed;
+	}
+
+	// Waves drift slowly behind the page
+	body::before {
+		content: '';
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		background: url('./xmb-waves.svg') 0 100% / 1440px 70% repeat-x;
+		pointer-events: none;
+		animation: xmb-waves 90s linear infinite;
+	}
+
+	// Icons of PSP homebrew are 144×80
+	.component .logo {
+		width: 72px;
+		height: 40px;
+	}
+
+	// Buttons of the PSP in their own colors
+	.glyph {
+		color: var(--glyph);
+		background: none;
+		box-shadow: inset 0 0 0 1.5px currentColor;
+
+		svg {
+			width: 100%;
+			height: 100%;
+			fill: none;
+			stroke: currentColor;
+			stroke-width: 2;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+		}
+
+		&.next {
+			--glyph: #8fb8ee;
+		}
+
+		&.back {
+			--glyph: #f47878;
+		}
+
+		&.rebuild {
+			--glyph: #5fd6a0;
+		}
+	}
+}
+
+@keyframes xmb-waves {
+	to {
+		background-position-x: 1440px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root[data-platform='psp'] body::before {
+		animation: none;
+	}
+}

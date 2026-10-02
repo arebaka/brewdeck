@@ -1,7 +1,7 @@
 {
 	"name": "brewdeck",
 	"version": "0.1.0",
-	"description": "Nintendo Switch custom firmware builder",
+	"description": "Custom firmware builder for the Nintendo Switch and the PSP",
 	"license": "MIT",
 	"author": "arelive <me@are.moe> (https://are.moe)",
 	"repository": "github:arebaka/brewdeck",
@@ -40,11 +40,14 @@
 		"hekate",
 		"ultra",
 		"kefir",
-		"homebrew"
+		"homebrew",
+		"psp",
+		"ark"
 	],
 	"dependencies": {
 		"@arelive/reset.css": "^1.2.0",
 		"@fontsource/biz-udpgothic": "^5.3.0",
+		"@fontsource/m-plus-1p": "^5.3.0",
 		"@fontsource/montserrat": "^5.3.0",
 		"highlight.js": "^11.12.0",
 		"marked": "^18.0.14",

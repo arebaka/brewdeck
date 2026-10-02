@@ -1,9 +1,0 @@
-[
-	{ "id": "minimal", "components": [] },
-	{ "id": "recommended", "components": "default" },
-	{ "id": "gamer", "components": ["sys_patch", "appstore", "sys_clk", "saltynx", "missioncontrol", "ovlmenu", "status_monitor", "fps_locker", "reversenx_rt", "edizon_overlay", "emuiibo", "dbi", "jksv"] },
-	{ "id": "emulation", "components": ["sys_patch", "appstore", "sys_clk", "missioncontrol", "sys_con", "ovlmenu", "status_monitor", "retroarch", "flycast", "ppsspp", "melonds", "jksv"] },
-	{ "id": "streaming", "components": ["appstore", "sysdvr", "sysdvr_overlay", "sys_ftpd_light", "ovlmenu", "moonlight", "akira"] },
-	{ "id": "developer", "components": ["sys_patch", "appstore", "lockpick_rcm", "tegraexplorer", "common_problem_resolver", "sys_botbase", "sys_ftpd_light", "ovlmenu", "status_monitor", "nx_shell"] },
-	{ "id": "all", "components": "all" }
-]

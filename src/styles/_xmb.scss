@@ -1,0 +1,181 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// The XMB of the PSP: steps cross the screen as categories with icons, the active one keeps its place
+// and the page hangs under it, the way the items of a category do
+:root[data-platform='psp'] {
+	// Width of a category, the place the active one keeps from the left and the indent of the page under it.
+	// The previous category stays in sight whole, the ones before it leave the screen without leftovers
+	--slot: 124px;
+	--anchor: calc(var(--slot) + #{space(6)});
+	--indent: var(--anchor);
+	// The strip fades out at its edges, where categories leave the screen and run into the size
+	--fade: #{space(12)};
+
+	// The page takes the whole width of a phone
+	@include phone {
+		--slot: 96px;
+		--anchor: var(--slot);
+		--indent: #{space(3)};
+		--fade: #{space(6)};
+	}
+
+	#root {
+		grid-template-areas:
+			'topbar'
+			'sidebar'
+			'content'
+			'controls';
+		grid-template-rows: auto auto minmax(0, 1fr) auto;
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	// No lines: the XMB floats over its waves
+	.topbar {
+		border-bottom: none;
+	}
+
+	.controls {
+		border-top: none;
+	}
+
+	.clock {
+		display: block;
+		margin-left: auto;
+		font-size: $size-small;
+		font-variant-numeric: tabular-nums;
+		color: var(--color-muted);
+	}
+
+	.lang-switch {
+		margin-left: space(4);
+	}
+
+	.sidebar {
+		flex-direction: row;
+		align-items: center;
+		padding: 0;
+		overflow: visible;
+		background: none;
+
+		// The strip stands still, the categories slide inside it.
+		// It only clips: phones would scroll it as tabs, and the browser would scroll it to the active step
+		.steps {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			// Room for the glow of the active icon and the frame of the focused step, the mask cuts at the border
+			padding: space(4) 0 space(4) var(--anchor);
+			overflow-x: clip;
+			mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+
+			> li {
+				flex: none;
+				transform: translateX(calc(var(--active) * var(--slot) * -1));
+				transition: transform .3s ease-out;
+			}
+		}
+
+		.step {
+			flex-direction: column;
+			gap: space(1);
+			width: var(--slot);
+			padding: space(2) space(1);
+			font-size: $size-small;
+			white-space: nowrap;
+			color: var(--color-text);
+			opacity: .55;
+
+			&.done {
+				color: var(--color-text);
+			}
+
+			&.active {
+				opacity: 1;
+				color: var(--color-text);
+
+				&::before {
+					display: none;
+				}
+
+				.icon {
+					transform: scale(1.3);
+					filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-accent) 80%, transparent));
+				}
+
+				.label {
+					font-size: $size-base;
+				}
+
+				.value {
+					visibility: visible;
+				}
+			}
+
+			.icon {
+				display: block;
+				width: 36px;
+				height: 36px;
+				margin-bottom: space(1);
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 1.5;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+				transition: transform .3s ease-out;
+			}
+
+			.label {
+				flex: none;
+			}
+
+			// Only the active category tells its value, the others keep the line so the strip keeps its height
+			.value {
+				display: block;
+				min-height: 1lh;
+				font-size: $size-small;
+				color: var(--color-accent);
+				visibility: hidden;
+			}
+
+			// A step with something to look at marks its icon
+			.alert {
+				position: absolute;
+				top: space(2);
+				left: calc(50% + 18px);
+			}
+		}
+
+		.metrics {
+			flex: none;
+			margin: 0 space(6);
+			padding: 0;
+			border: none;
+
+			// A flex item drops the space at the end of its text, the gap stands for it
+			.metric {
+				gap: space(1);
+			}
+
+			.key::after {
+				content: ': ';
+			}
+
+			@include phone {
+				display: none;
+			}
+		}
+	}
+
+	// The page starts under the active category
+	.content {
+		padding-left: var(--indent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.sidebar .steps > li,
+		.sidebar .step .icon {
+			transition: none;
+		}
+	}
+}

@@ -1,4 +1,4 @@
-// Refreshes the catalog from the Homebrew App Store and GitHub: versions, sizes, release dates,
+// Refreshes the catalogs of every platform from the Homebrew App Store and GitHub: versions, sizes, release dates,
 // the fresher source of every component and logos. Maps HOS versions to the Atmosphere releases supporting them.
 //
 // Usage: npm run sync                  GITHUB_TOKEN or a logged in gh CLI lifts the GitHub API limit
@@ -6,18 +6,24 @@
 
 import { readFile, writeFile, readdir, stat, unlink } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import JSZip from 'jszip';
 
 const APPSTORE = 'https://switch.cdn.fortheusers.org';
 const SWITCHBREW_VERSIONS = 'https://switchbrew.org/wiki/System_Versions';
 
-const SOFTWARE = new URL('../data/software.json', import.meta.url);
-const TUNING = new URL('../data/tuning.json', import.meta.url);
-const FIRMWARE = new URL('../data/firmware.json', import.meta.url);
-const LOGOS = new URL('../public/logos/', import.meta.url);
+// Every platform keeps its catalog in data/<platform> and the logos of its components in public/logos/<platform>
+const CATALOGS = ['switch', 'psp'].map(platform => ({
+	platform,
+	software: new URL(`../data/${platform}/software.json`, import.meta.url),
+	tuning: new URL(`../data/${platform}/tuning.json`, import.meta.url),
+	logos: new URL(`../public/logos/${platform}/`, import.meta.url)
+}));
+const FIRMWARE = new URL('../data/switch/firmware.json', import.meta.url);
 
 const MAX_ICON_SOURCE = 40 * 1024 * 1024; // archives bigger than this are not downloaded for an icon
 const STUB_LOGO = 1024; // logos smaller than this are placeholders
+const DEFAULT_ICON = 'a9f3fdc1312063579bee0fdf91cb79ed75804457'; // SHA-1 of the gray console with a question mark libnx gives homebrew without an icon
 
 const refreshLogos = process.argv.includes('--logos');
 const token = process.env.GITHUB_TOKEN || ghToken();
@@ -45,10 +51,14 @@ const github = async (path) => (await request(`https://api.github.com/${path}`, 
 
 const download = async (url) => Buffer.from(await (await request(url)).arrayBuffer());
 
-// Size of a download in bytes, 0 when the server does not tell
+// Size of a download in bytes, 0 when the server does not tell. Some servers, such as the one of Sony, only tell it for a part
 async function contentLength(url) {
 	try {
-		return Number((await fetch(url, { method: 'HEAD' })).headers.get('content-length')) || 0;
+		const length = Number((await fetch(url, { method: 'HEAD' })).headers.get('content-length'));
+		if (length) return length;
+		const part = await fetch(url, { headers: { Range: 'bytes=0-0' } });
+		await part.body?.cancel();
+		return Number(part.headers.get('content-range')?.split('/')[1]) || 0;
 	} catch {
 		return 0;
 	}
@@ -81,25 +91,36 @@ function pickSource(component, store, release) {
 	return (compareVersions(store.version, release.version) || (store.date >= release.date ? 1 : -1)) > 0 ? 'appstore' : 'github';
 }
 
-// Icon from the asset section of a homebrew executable (.nro, .ovl)
+// Icon from the asset section of a homebrew executable (.nro, .ovl), the default one of libnx tells nothing about it
 function nroIcon(buffer) {
 	if (buffer.length < 0x20 || buffer.toString('ascii', 0x10, 0x14) != 'NRO0') return null;
 	const assets = buffer.readUInt32LE(0x18);
 	if (buffer.length < assets + 0x18 || buffer.toString('ascii', assets, assets + 4) != 'ASET') return null;
 	const offset = Number(buffer.readBigUInt64LE(assets + 8));
 	const size = Number(buffer.readBigUInt64LE(assets + 16));
-	return size ? buffer.subarray(assets + offset, assets + offset + size) : null;
+	const icon = size ? buffer.subarray(assets + offset, assets + offset + size) : null;
+	return icon && createHash('sha1').update(icon).digest('hex') != DEFAULT_ICON ? icon : null;
 }
+
+// ICON0.PNG of a PSP executable (EBOOT.PBP): the header holds the offsets of its eight files, the icon is the second one
+function pbpIcon(buffer) {
+	if (buffer.length < 0x28 || buffer.toString('hex', 0, 4) != '00504250') return null;
+	const start = buffer.readUInt32LE(0x0c);
+	const end = buffer.readUInt32LE(0x10);
+	return end > start ? buffer.subarray(start, end) : null;
+}
+
+const executableIcon = (name, data) => /\.pbp$/i.test(name) ? pbpIcon(data) : nroIcon(data);
 
 // Largest executable of an archive is the application itself, not a bundled helper
 async function archiveIcon(buffer) {
 	const zip = await JSZip.loadAsync(buffer);
 	const executables = Object.values(zip.files)
-		.filter(file => !file.dir && /\.(nro|ovl)$/i.test(file.name) && !/hbmenu|reboot_to/i.test(file.name));
+		.filter(file => !file.dir && /\.(nro|ovl|pbp)$/i.test(file.name) && !/hbmenu|reboot_to/i.test(file.name));
 	const sizes = await Promise.all(executables.map(async file => ({ file, data: await file.async('nodebuffer') })));
 	sizes.sort((a, b) => b.data.length - a.data.length);
-	for (const { data } of sizes) {
-		const icon = nroIcon(data);
+	for (const { file, data } of sizes) {
+		const icon = executableIcon(file.name, data);
 		if (icon) return icon;
 	}
 	return null;
@@ -120,7 +141,7 @@ async function findLogo(component, release, packages, tuning) {
 
 	const assets = (component.sources.github ?? [])
 		.map(item => release?.assets.find(asset => assetPattern(component, item, tuning).test(asset.name)))
-		.filter(asset => asset && asset.size < MAX_ICON_SOURCE && /\.(nro|ovl|zip)$/i.test(asset.name));
+		.filter(asset => asset && asset.size < MAX_ICON_SOURCE && /\.(nro|ovl|pbp|zip)$/i.test(asset.name));
 	const archives = packages
 		.filter(pkg => pkg.filesize * 1024 < MAX_ICON_SOURCE)
 		.map(pkg => `${APPSTORE}/zips/${pkg.name}.zip`);
@@ -128,17 +149,17 @@ async function findLogo(component, release, packages, tuning) {
 	for (const url of [...assets.map(asset => asset.browser_download_url), ...archives]) {
 		try {
 			const data = await download(url);
-			const icon = /\.zip$/i.test(url) ? await archiveIcon(data) : nroIcon(data);
+			const icon = /\.zip$/i.test(url) ? await archiveIcon(data) : executableIcon(url, data);
 			if (icon) return { data: icon, extension: icon[0] == 0x89 ? 'png' : 'jpg' };
 		} catch {}
 	}
 	return null;
 }
 
-async function existingLogo(component) {
+async function existingLogo(component, logos) {
 	if (!component.logo) return false;
 	try {
-		return (await stat(new URL(component.logo, LOGOS))).size >= STUB_LOGO;
+		return (await stat(new URL(component.logo, logos))).size >= STUB_LOGO;
 	} catch {
 		return false;
 	}
@@ -163,15 +184,27 @@ function format(value, depth = 0, inline = false) {
 	return JSON.stringify(value);
 }
 
-async function syncSoftware() {
+// Packages of the Homebrew App Store by name, fetched once for every catalog that uses the store
+let storePackages;
+async function appStore() {
+	storePackages ??= Object.fromEntries((await (await request(`${APPSTORE}/repo.json`)).json()).packages.map(pkg => [pkg.name, pkg]));
+	return storePackages;
+}
+
+async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logos: LOGOS }) {
 	const software = JSON.parse(await readFile(SOFTWARE, 'utf8'));
 	const tuning = JSON.parse(await readFile(TUNING, 'utf8'));
-	const store = Object.fromEntries((await (await request(`${APPSTORE}/repo.json`)).json()).packages.map(pkg => [pkg.name, pkg]));
+	const store = software.some(component => component.sources.appstore) ? await appStore() : {};
 	const releases = new Map();
+	// A rolling release such as `latest` keeps its tag: its version is in the notes, its date is the last upload
 	const release = async (repo) => {
 		if (!releases.has(repo)) {
 			const latest = await github(`repos/${repo}/releases/latest`);
-			releases.set(repo, { version: latest.tag_name, date: latest.published_at.slice(0, 10), assets: latest.assets });
+			releases.set(repo, {
+				version: /\d/.test(latest.tag_name) ? latest.tag_name : latest.body?.match(/\d+\.\d+(?:\.\d+)*/)?.[0] ?? latest.tag_name,
+				date: [latest.published_at, ...latest.assets.map(asset => asset.updated_at)].sort().at(-1).slice(0, 10),
+				assets: latest.assets
+			});
 		}
 		return releases.get(repo);
 	};
@@ -217,18 +250,18 @@ async function syncSoftware() {
 			component.source = component.sources.bundled ? 'bundled' : 'manual';
 		}
 
-		if (refreshLogos || !(await existingLogo(component))) {
+		if (refreshLogos || !(await existingLogo(component, LOGOS))) {
 			const logo = await findLogo(component, items.length ? await release(items[0].repo) : null, packages, tuning);
 			if (logo) {
 				component.logo = `${component.id}.${logo.extension}`;
 				await writeFile(new URL(component.logo, LOGOS), logo.data);
-			} else if (!(await existingLogo(component))) {
+			} else if (!(await existingLogo(component, LOGOS))) {
 				delete component.logo;
 			}
 		}
 
 		const { id, source, version, released } = component;
-		console.log(`${id.padEnd(24)} ${String(source).padEnd(9)} ${String(version).padEnd(14)} ${released ?? ''}${component.logo ? '' : '  (no logo)'}`);
+		console.log(`${platform.padEnd(7)} ${id.padEnd(24)} ${String(source).padEnd(9)} ${String(version).padEnd(14)} ${released ?? ''}${component.logo ? '' : '  (no logo)'}`);
 	}
 
 	// Placeholders nobody refers to any more
@@ -301,7 +334,10 @@ async function syncFirmware() {
 	await writeFile(FIRMWARE, format(firmware) + '\n');
 }
 
-const problems = await syncSoftware();
+const problems = [];
+for (const catalog of CATALOGS) {
+	problems.push(...await syncSoftware(catalog));
+}
 await syncFirmware();
 
 if (problems.length) {

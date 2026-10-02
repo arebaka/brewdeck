@@ -1,0 +1,31 @@
+always, usbcharge, {{usbcharge}}
+{{#clock}}
+{{.}}
+{{/clock}}
+always, wpa2, {{wpa2}}
+always, launcher, {{launcher}}
+{{highmem}}
+{{mscache}}
+{{infernocache}}
+always, disablepause, {{disablepause}}
+always, oldplugin, {{oldplugin}}
+always, hibblock, {{hibblock}}
+{{skiplogos}}
+{{hidepics}}
+always, hidemac, {{hidemac}}
+always, hidedlc, {{hidedlc}}
+always, noled, {{noled}}
+always, noumd, {{noumd}}
+always, deadef, {{deadef}}
+always, noanalog, {{noanalog}}
+always, vitamute, {{vitamute}}
+always, qaflags, {{qaflags}}
+{{#region}}
+vsh, region_{{region}}, on
+{{/region}}
+
+# The following games don't like Inferno Cache
+# Luxor - The Wrath of Set (the other Luxor game works fine)
+ULUS10201, infernocache, off
+# Flat-Out Head On (both US and EU)
+ULUS10328 ULES00968, infernocache, off

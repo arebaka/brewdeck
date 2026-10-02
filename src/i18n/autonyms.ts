@@ -1,4 +1,3 @@
-// Languages of the DBI translations, each named in itself, so every locale shows the same names
 export const DBI_LANGUAGES: {[code in string]: string} = {
 	be: 'Беларуская',
 	de: 'Deutsch',

@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { AppState, defaultState } from '@/state';
 import { resolveSelection } from '@/data';
+import { CATALOG, SWITCH } from '@/platforms/switch';
 import { translations } from '@/i18n';
-import { validate } from '@/validation';
-import { customState, issueCodes } from './fixtures';
+import { SwitchState } from '@/types';
+import { customBuild, issueCodes } from './fixtures';
 
-const scenario = (patch: Partial<AppState>) => issueCodes({ ...defaultState(), ...patch });
-const selecting = (ids: string[], dependencies = true) => ({ selectedComponentIDs: resolveSelection(ids, dependencies) });
-const fixes = (patch: Partial<AppState>, code: string) => validate({ ...defaultState(), ...patch }, translations.en).find(issue => issue.code == code)?.fixes;
+const scenario = (patch: Partial<SwitchState>) => issueCodes({ ...SWITCH.defaults(), ...patch });
+const selecting = (ids: string[], dependencies = true) => ({ selectedComponentIDs: resolveSelection(CATALOG, ids, dependencies) });
+const fixes = (patch: Partial<SwitchState>, code: string) => SWITCH.validate({ ...SWITCH.defaults(), ...patch }, translations.en).find(issue => issue.code == code)?.fixes;
 
 describe('validation', () => {
 	it('asks for a missing dependency', () => {
@@ -28,8 +28,22 @@ describe('validation', () => {
 		expect(fixes(selecting(['status_monitor'], false), 'requires')).toEqual([{ add: ['ovlmenu'] }, { add: ['ultrahand'] }]);
 	});
 
+	it('reports components covering each other once', () => {
+		const codes = scenario(selecting(['jksv', 'checkpoint', 'neumann']));
+		expect(codes.filter(code => code.startsWith('info:replaces:'))).toEqual([
+			'info:replaces:JKSV|Checkpoint',
+			'info:replaces:JKSV|Neumann',
+			'info:replaces:Checkpoint|Neumann'
+		]);
+	});
+
+	it('keeps what the covered component runs on', () => {
+		expect(fixes(selecting(['flycast']), 'replaces')).toEqual([{ remove: ['flycast'] }]);
+		expect(fixes(selecting(['retroarch', 'mgba']), 'replaces')).toEqual([{ remove: ['mgba'] }, { remove: ['retroarch'] }]);
+	});
+
 	it('needs an entry in the Launch menu', () => {
-		const launch = { ...defaultState().launch, modes: [] };
+		const launch = { ...SWITCH.defaults().launch, modes: [] };
 		expect(scenario({ launch, ...selecting(['atmosphere']) })).toContainEqual('error:noEntries:');
 		expect(scenario({ launch: { ...launch, emummcs: ['SD01'] }, ...selecting(['atmosphere']) })).not.toContainEqual('error:noEntries:');
 		expect(scenario({ launch, ...selecting(['atmosphere', 'lockpick_rcm']) })).not.toContainEqual('error:noEntries:');
@@ -40,23 +54,23 @@ describe('validation', () => {
 	});
 
 	it('warns about patches older than the support of the HOS version', () => {
-		expect(scenario({ hosVersion: '23.0.0' })).toContainEqual('warning:hosTracks:sys-patch|23.0.0');
-		expect(scenario({ hosVersion: '22.1.0' }).some(code => code.startsWith('warning:hosTracks:'))).toBe(false);
+		expect(scenario({ firmware: '23.0.0' })).toContainEqual('warning:hosTracks:sys-patch|23.0.0');
+		expect(scenario({ firmware: '22.1.0' }).some(code => code.startsWith('warning:hosTracks:'))).toBe(false);
 	});
 
 	it('asks for FTP credentials', () => {
-		expect(scenario(selecting([...defaultState().selectedComponentIDs, 'sys_ftpd_light']))).toContainEqual('warning:ftpCredentials:');
+		expect(scenario(selecting([...SWITCH.defaults().selectedComponentIDs, 'sys_ftpd_light']))).toContainEqual('warning:ftpCredentials:');
 	});
 
 	it('explains the GPU cap of sys-clk', () => {
-		expect(issueCodes(customState()).some(code => code.startsWith('info:gpuCap:0123456789ABCDEF|460|'))).toBe(true);
+		expect(issueCodes(customBuild()).some(code => code.startsWith('info:gpuCap:0123456789ABCDEF|460|'))).toBe(true);
 	});
 
 	it('warns about risky components with their notes', () => {
-		expect(scenario(selecting([...defaultState().selectedComponentIDs, 'dbi_patcher'])).some(code => code.startsWith('warning:risky:DBIPatcher|Автор DBI'))).toBe(true);
+		expect(scenario(selecting([...SWITCH.defaults().selectedComponentIDs, 'dbi_patcher'])).some(code => code.startsWith('warning:risky:DBIPatcher|Автор DBI'))).toBe(true);
 	});
 
 	it('points at components to download by hand', () => {
-		expect(issueCodes(customState())).toContainEqual('info:manual:Tinfoil');
+		expect(issueCodes(customBuild())).toContainEqual('info:manual:Tinfoil');
 	});
 });
