@@ -1,32 +1,20 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-import { STEP_IDS, Fix, GameProfile, IssueLevel, LaunchConfig, StepId, TuningStep, TuningValue, Uploads } from './types';
+import { BuildState, Fix, GameProfile, HardwareRevision, Issue, IssueLevel, LaunchConfig, PspState, StepId, SwitchState, TuningGroup, TuningStep, TuningValue, Uploads } from './types';
 import { format, translations } from './i18n';
-import { COMPONENTS, PRESETS, TUNING, getTuningDefaults, isRequirementMet, isTuningOptionChanged, launchEntries, presetSelection, resolveSelection } from './data';
-import { AppState } from './state';
-import { decodeState, encodeState } from './url';
-import { validate } from './validation';
+import { HARDWARE, getTuningDefaults, isTuningOptionChanged, presetSelection, resolveSelection, tuningGroups } from './data';
+import { PLATFORMS } from './platforms';
+import { launchEntries } from './platforms/switch';
+import { PSP } from './platforms/psp';
+import { AppState, decodeState, encodeState, withBuild } from './state';
+import { issueKey } from './validation';
 
-import { Topbar, Sidebar, SidebarItem, Hardware, Firmware, Software, Launch, Tuning, Overclock, Appearance, Build } from './components';
-
-// Modules and overclock only appear when a selected component has something to set
-function visibleSteps(selectedComponentIDs: string[]): StepId[] {
-	return STEP_IDS.filter(step => {
-		if (step == 'modules') {
-			return TUNING.some(group => group.step == 'modules' && group.requires && isRequirementMet(group.requires, selectedComponentIDs));
-		}
-		if (step == 'overclock') {
-			return selectedComponentIDs.includes('sys_clk');
-		}
-		return true;
-	});
-}
+import { Topbar, Sidebar, SidebarItem, Toast, Toasts, Glyph, Hardware, Firmware, Software, Launch, Tuning, Plugins, Overclock, Appearance, Build } from './components';
 
 // Options changed on a step, counting only groups whose components are selected
-function countChanges(state: AppState, step: TuningStep): number {
-	return TUNING
-		.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, state.selectedComponentIDs)))
-		.reduce((count, group) => count + group.options.filter(option => isTuningOptionChanged(group, option, state.tuning)).length, 0);
+function countChanges(groups: TuningGroup[], build: BuildState, step: TuningStep): number {
+	return tuningGroups(groups, step, build.selectedComponentIDs)
+		.reduce((count, group) => count + group.options.filter(option => isTuningOptionChanged(group, option, build.tuning)).length, 0);
 }
 
 const LEVELS: IssueLevel[] = ['error', 'warning', 'info'];
@@ -35,28 +23,66 @@ export default function App() {
 	const [state, setState] = useState<AppState>(() => decodeState(location.search));
 	const [uploads, setUploads] = useState<Uploads>({});
 	const update = (patch: Partial<AppState>) => setState(prev => ({ ...prev, ...patch }));
+	// Changes the build of the current platform, a function gets the build as it is by then
+	const updateBuild = (patch: Partial<SwitchState | PspState> | ((build: BuildState) => Partial<BuildState>)) => setState(prev => {
+		const build = prev.builds[prev.platform];
+		return { ...prev, builds: withBuild(prev.builds, prev.platform, { ...build, ...(typeof patch == 'function' ? patch(build) : patch) }) };
+	});
 
-	const { lang, hardware, hosVersion, selectedComponentIDs, launch, tuning, overclock, appearance } = state;
+	const { lang } = state;
 	const t = translations[lang];
+	const platform = PLATFORMS[state.platform];
+	const build = state.builds[state.platform];
+	const { hardware, firmware, selectedComponentIDs, tuning } = build;
+	const { components, presets, tuning: groups } = platform.catalog;
+	const texts = t.platforms[platform.id];
+	// Steps only a Switch or a PSP goes through
+	const { hardware: revision, launch, overclock, appearance } = state.builds.switch;
+	const psp = state.builds.psp;
 
-	const steps = visibleSteps(selectedComponentIDs);
+	const steps = platform.steps(build);
 	const step = steps.includes(state.step) ? state.step : steps[0];
 	const index = steps.indexOf(step);
 	const setStep = (step: StepId) => update({ step });
 
-	const issues = useMemo(() => validate(state, t), [state, t]);
+	const issues = useMemo(() => platform.validate(build, t), [platform, build, t]);
 	const contentRef = useRef<HTMLElement>(null);
+
+	const [toasts, setToasts] = useState<Toast[]>([]);
+	const lastToast = useRef(0);
+	// A toast lasts as long as its issue and offers the fixes the issue has by now
+	const liveToasts = toasts.flatMap(toast => {
+		const issue = issues.find(issue => issueKey(issue) == issueKey(toast.issue));
+		return issue ? [{ ...toast, issue }] : [];
+	});
+	// The three newest at most, so a phone keeps some of the page in sight
+	const notify = (fresh: Issue[]) => setToasts(prev => [
+		...prev.filter(toast => !fresh.some(issue => issueKey(issue) == issueKey(toast.issue))),
+		...fresh.map(issue => ({ id: ++lastToast.current, issue }))
+	].slice(-3));
+	const dismiss = (id: number) => setToasts(prev => prev.filter(toast => toast.id != id));
+
+	// Toasts of solved issues go away, so they never come back with the issue
+	useEffect(() => {
+		setToasts(prev => prev.filter(toast => issues.some(issue => issueKey(issue) == issueKey(toast.issue))));
+	}, [issues]);
 
 	// Every option lands in the address, so a link reproduces the build
 	useEffect(() => {
-		const query = encodeState({ ...state, step });
+		const query = encodeState(state);
 		history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}`);
-	}, [state, step]);
+	}, [state]);
 
 	// Hyphenation, quotes and the choice of fonts follow the language of the page
 	useEffect(() => {
 		document.documentElement.lang = lang;
 	}, [lang]);
+
+	// The page takes the look of the console, the PSP also takes the color of the month as its XMB does
+	useEffect(() => {
+		document.documentElement.dataset.platform = platform.id;
+		document.documentElement.dataset.month = String(new Date().getMonth() + 1);
+	}, [platform.id]);
 
 	// Every step starts from the top
 	useEffect(() => {
@@ -81,30 +107,39 @@ export default function App() {
 	}, [steps.join(), index]);
 
 	// Size calculator
-	const totalSize = COMPONENTS
+	const totalSize = components
 		.filter(comp => selectedComponentIDs.includes(comp.id))
 		.reduce((sum, current) => sum + current.size, 0);
 
-	// Adding a component brings its dependencies, removing it leaves them for the user to decide
+	// A console of another platform switches to the build of that platform
+	const setHardware = (id: HardwareRevision) => {
+		const platform = HARDWARE.find(hw => hw.id == id)!.platform;
+		setState(prev => ({ ...prev, platform, builds: withBuild(prev.builds, platform, { ...prev.builds[platform], hardware: id }) }));
+	};
+
+	// Adding a component brings its dependencies, removing it leaves them for the user to decide.
+	// Issues the click brings pop up as toasts
 	const toggleComponent = (id: string) => {
-		const comp = COMPONENTS.find(c => c.id === id);
+		const comp = components.find(c => c.id === id);
 		if (!comp || comp.is_required || comp.sources.bundled) return; // Ignore mandatory and bundled entries
 
-		update({
-			selectedComponentIDs: selectedComponentIDs.includes(id)
-				? resolveSelection(selectedComponentIDs.filter(item => item !== id), false)
-				: resolveSelection([...selectedComponentIDs, id])
-		});
+		const selection = selectedComponentIDs.includes(id)
+			? resolveSelection(platform.catalog, selectedComponentIDs.filter(item => item !== id), false)
+			: resolveSelection(platform.catalog, [...selectedComponentIDs, id]);
+		const known = new Set(issues.map(issueKey));
+		notify(platform.validate({ ...build, selectedComponentIDs: selection }, t).filter(issue => !known.has(issueKey(issue))));
+		updateBuild({ selectedComponentIDs: selection });
 	};
 
 	const applyPreset = (id: string) => {
-		update({ selectedComponentIDs: presetSelection(PRESETS.find(preset => preset.id == id)!) });
+		updateBuild({ selectedComponentIDs: presetSelection(platform.catalog, presets.find(preset => preset.id == id)!) });
 	};
 
 	// A fix adds or removes components, only an added one brings its dependencies
 	const applyFix = (fix: Fix) => {
-		update({
+		updateBuild({
 			selectedComponentIDs: resolveSelection(
+				platform.catalog,
 				[...selectedComponentIDs.filter(id => !fix.remove?.includes(id)), ...(fix.add ?? [])],
 				!!fix.add
 			)
@@ -112,17 +147,24 @@ export default function App() {
 	};
 
 	const setTuningOption = (group: string, option: string, value: TuningValue) => {
-		setState(prev => ({ ...prev, tuning: { ...prev.tuning, [group]: { ...prev.tuning[group], [option]: value } } }));
+		updateBuild(({ tuning }) => ({ tuning: { ...tuning, [group]: { ...tuning[group], [option]: value } } }));
 	};
 
 	// Every option of the step returns to its default
 	const resetTuning = (step: TuningStep) => {
-		const defaults = getTuningDefaults();
-		update({ tuning: { ...tuning, ...Object.fromEntries(TUNING.filter(group => group.step == step).map(group => [group.id, defaults[group.id]])) } });
+		const defaults = getTuningDefaults(groups);
+		updateBuild({ tuning: { ...tuning, ...Object.fromEntries(groups.filter(group => group.step == step).map(group => [group.id, defaults[group.id]])) } });
 	};
 
-	const setLaunch = (launch: LaunchConfig) => update({ launch });
-	const setOverclock = (overclock: GameProfile[]) => update({ overclock });
+	const setLaunch = (launch: LaunchConfig) => updateBuild({ launch });
+	const setOverclock = (overclock: GameProfile[]) => updateBuild({ overclock });
+
+	// Runlevels of a plugin, the ones of the catalog leave the build
+	const setPlugin = (id: string, scope: string[]) => {
+		const { [id]: changed, ...plugins } = psp.plugins;
+		const defaults = PSP.catalog.components.find(comp => comp.id == id)!.plugin!.scope;
+		updateBuild({ plugins: scope.join() == defaults.join() ? plugins : { ...plugins, [id]: scope } });
+	};
 
 	// `key` is bootlogo, background, logo.<entry> or icon.<entry>, `image` is a gallery id, `upload` or nothing for the default
 	const setImage = (key: string, image?: string, blob?: Blob) => {
@@ -137,41 +179,40 @@ export default function App() {
 			const images = { ...appearance[`${target}s`] };
 			if (image) images[entry!] = image;
 			else delete images[entry!];
-			update({ appearance: { ...appearance, [`${target}s`]: images } });
+			updateBuild({ appearance: { ...appearance, [`${target}s`]: images } });
 		} else {
-			update({ appearance: { ...appearance, [target]: image } });
+			updateBuild({ appearance: { ...appearance, [target]: image } });
 		}
 	};
 
 	const stepIssues = (step: StepId) => issues.filter(issue => issue.step == step);
 	// The most serious issue of a step marks it in the sidebar
 	const worst = (step: StepId) => LEVELS.find(level => stepIssues(step).some(issue => issue.level == level));
-	const images = [appearance.bootlogo, appearance.background, ...Object.values(appearance.logos), ...Object.values(appearance.icons)].filter(Boolean).length;
 
-	const values: Record<StepId, string | number> = {
+	const values: Partial<Record<StepId, string | number>> = {
 		hardware: t.hardware[hardware].name,
-		firmware: hosVersion,
+		firmware,
 		software: selectedComponentIDs.length,
-		launch: launchEntries(launch, selectedComponentIDs).length,
-		system: countChanges(state, 'system') || '',
-		security: countChanges(state, 'security') || '',
-		modules: countChanges(state, 'modules') || '',
-		overclock: overclock.length || '',
-		appearance: images || '',
-		build: ''
+		system: countChanges(groups, build, 'system') || '',
+		security: countChanges(groups, build, 'security') || '',
+		modules: countChanges(groups, build, 'modules') || '',
+		...platform.values(build)
 	};
-	const sidebar: SidebarItem[] = steps.map(step => ({ step, value: values[step], alert: worst(step) }));
+	const sidebar: SidebarItem[] = steps.map(step => ({ step, value: values[step] ?? '', alert: worst(step) }));
 
-	const page = t.pages[step];
+	// Pages tell about the platform its own way where they have to
+	const page = { ...t.pages[step], ...texts.pages?.[step] };
 
 	return (<>
 		<Topbar
 			lang={lang}
 			setLang={lang => update({ lang })}
+			subtitle={texts.subtitle}
 			t={t} />
 
 		<Sidebar
 			items={sidebar}
+			platform={platform.id}
 			activeStep={step}
 			setActiveStep={setStep}
 			totalSize={totalSize}
@@ -191,15 +232,16 @@ export default function App() {
 				<Hardware
 					lang={lang}
 					hardware={hardware}
-					setHardware={hardware => update({ hardware })}
+					setHardware={setHardware}
 					t={t} />
 			)}
 
 			{step == 'firmware' && (
 				<Firmware
 					lang={lang}
-					version={hosVersion}
-					setVersion={hosVersion => update({ hosVersion })}
+					platform={platform}
+					version={firmware}
+					setVersion={firmware => updateBuild({ firmware })}
 					issues={stepIssues('firmware')}
 					applyFix={applyFix}
 					t={t} />
@@ -208,6 +250,7 @@ export default function App() {
 			{step == 'software' && (
 				<Software
 					lang={lang}
+					platform={platform}
 					selectedComponentIDs={selectedComponentIDs}
 					toggleComponent={toggleComponent}
 					applyPreset={applyPreset}
@@ -234,6 +277,7 @@ export default function App() {
 				<Tuning
 					key={step}
 					lang={lang}
+					platform={platform}
 					step={step}
 					tuning={tuning}
 					selectedComponentIDs={selectedComponentIDs}
@@ -244,10 +288,21 @@ export default function App() {
 					t={t} />
 			)}
 
+			{step == 'plugins' && (
+				<Plugins
+					lang={lang}
+					build={psp}
+					setPlugin={setPlugin}
+					setTuningOption={setTuningOption}
+					issues={stepIssues('plugins')}
+					applyFix={applyFix}
+					t={t} />
+			)}
+
 			{step == 'overclock' && (
 				<Overclock
 					lang={lang}
-					hardware={hardware}
+					hardware={revision}
 					overclock={overclock}
 					setOverclock={setOverclock}
 					tuning={tuning}
@@ -274,10 +329,11 @@ export default function App() {
 			{step == 'build' && (
 				<Build
 					lang={lang}
-					state={state}
+					platform={platform}
+					build={build}
 					uploads={uploads}
 					totalSize={totalSize}
-					tuningChanges={(['launch', 'system', 'security', 'modules'] as TuningStep[]).reduce((sum, step) => sum + countChanges(state, step), 0)}
+					tuningChanges={(['launch', 'system', 'security', 'modules', 'plugins'] as TuningStep[]).reduce((sum, step) => sum + countChanges(groups, build, step), 0)}
 					issues={issues}
 					applyFix={applyFix}
 					setStep={setStep}
@@ -291,7 +347,7 @@ export default function App() {
 					type="button"
 					className="hint"
 					onClick={() => setStep(steps[index - 1])}>
-					<span className="glyph">B</span>
+					<Glyph name={platform.glyphs.back} role="back" />
 					{t.wizard.back}
 				</button>
 			)}
@@ -300,7 +356,7 @@ export default function App() {
 					type="button"
 					className="hint"
 					onClick={() => setStep(steps[index + 1])}>
-					<span className="glyph">A</span>
+					<Glyph name={platform.glyphs.next} role="next" />
 					{t.wizard.next}
 				</button>
 			) : (
@@ -308,10 +364,17 @@ export default function App() {
 					type="button"
 					className="hint"
 					onClick={() => setStep(steps[0])}>
-					<span className="glyph">X</span>
+					<Glyph name={platform.glyphs.rebuild} role="rebuild" />
 					{t.wizard.rebuild}
 				</button>
 			)}
 		</footer>
+
+		<Toasts
+			toasts={liveToasts}
+			platform={platform}
+			applyFix={applyFix}
+			dismiss={dismiss}
+			t={t} />
 	</>);
 }

@@ -14,6 +14,9 @@ importers:
       '@fontsource/biz-udpgothic':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/m-plus-1p':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/montserrat':
         specifier: ^5.3.0
         version: 5.3.0
@@ -74,6 +77,9 @@ packages:
 
   '@fontsource/biz-udpgothic@5.3.0':
     resolution: {integrity: sha512-uBcdaC2/Bg7GEhzWSb2REs8azL1ys+KpI8TmPnJa2xtaD8DVMgsRbtIcEss8xjN5KRtp8E0+LFbG43FhkWZdPw==}
+
+  '@fontsource/m-plus-1p@5.3.0':
+    resolution: {integrity: sha512-CunM07SjKhNp0nhIlp8x4QqeBqQx9bsR7Xrmm7A9riVt5TxFuKmFwDPT6Co9nnirguvsD9Ng+4pHM2uE7WbXmQ==}
 
   '@fontsource/montserrat@5.3.0':
     resolution: {integrity: sha512-iQPDtZOnmM5ih4JBGaMSXisRap0ixb9bAUw2hDtY7EjVfaqiiNlKtVuJl9XclxUwtwMMHNcWXfQR6zI9x05+Tg==}
@@ -825,6 +831,8 @@ snapshots:
   '@bufbuild/protobuf@2.16.0': {}
 
   '@fontsource/biz-udpgothic@5.3.0': {}
+
+  '@fontsource/m-plus-1p@5.3.0': {}
 
   '@fontsource/montserrat@5.3.0': {}
 

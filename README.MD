@@ -10,7 +10,7 @@ BrewDeck is a static web app. It goes through the console, the software and ever
 
 **Revision.** Erista, Mariko, OLED or Lite. The revision decides how Hekate starts: from RCM or from a modchip that boots `payload.bin` in the root of the card. It also decides which tools make sense and how far overclocking goes. The console is drawn at its real size, as far as the browser can tell the density of the screen.
 
-**HOS version.** Every system version, with the Atmosphère release that supports it. A version Atmosphère does not support yet is an error, patches released before the support of the version are warned about.
+**Firmware.** Every system version, with the Atmosphère release that supports it. A version Atmosphère does not support yet is an error, patches released before the support of the version are warned about.
 
 **Software.** Components by purpose:
 

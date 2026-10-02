@@ -46,7 +46,7 @@ const en: Translation = {
 	},
 	steps: {
 		hardware: 'Hardware',
-		firmware: 'HOS Version',
+		firmware: 'Firmware',
 		software: 'Software',
 		launch: 'Launch',
 		system: 'CFW',
