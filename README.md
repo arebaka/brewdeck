@@ -8,7 +8,7 @@ BrewDeck is a static web app. It goes through the console, the software and ever
 
 ## Nintendo Switch
 
-**Revision.** Erista, Mariko, OLED or Lite. The revision decides how Hekate starts: from RCM or from a modchip that boots `payload.bin` in the root of the card. It also decides which tools make sense and how far overclocking goes. The console is drawn at its real size, as far as the browser can tell the density of the screen.
+**Revision.** Erista, Mariko, OLED or Lite. The revision decides how Hekate starts: from RCM or from a modchip that boots `payload.bin` in the root of the card. It also decides which tools make sense and how far overclocking goes. The console is drawn at its real size, as far as the browser can tell the density of the screen. On a screen narrower than the console the picture shrinks to fit.
 
 **Firmware.** Every system version, with the Atmosphère release that supports it. A version Atmosphère does not support yet is an error, patches released before the support of the version are warned about.
 
@@ -83,13 +83,17 @@ Files with the same names are overwritten, the rest of the card stays. The insta
 ## Development
 
 ```sh
-npm install
-npm run dev       # development server
-npm run build     # static site in dist/
-npm test          # unit tests, installers run where bash, pwsh and shellcheck are installed
-npm run test:ui   # every step in headless Chrome
-npm run sync      # versions, sizes, sources and logos of the catalogs
+bun install
+bun run dev       # development server
+bun run build     # static site in dist/
+bun run start     # builds the site and serves it the way it is published
+bun run test      # unit tests, installers run where bash, pwsh and shellcheck are installed
+bun run test:ui   # every step in headless Chrome
+bun run check     # types, unit tests, build and UI tests in a row
+bun run sync      # versions, sizes, sources and logos of the catalogs
 ```
+
+The project runs on [Bun](https://bun.sh). Unit tests are started with `bun run test`: `bun test` would start the test runner of Bun itself instead of Vitest.
 
 Catalogs live in `data/` and templates of the generated files in `templates/`, with a directory per platform in both, such as `data/switch/`. Logos, photos and the gallery live in `public/`. SVG sources of the gallery icons, the set of BrewDeck and the icons of Nichole Mattera fitted into the icon of Nyx, live in `art/icons/` and are rendered into the gallery with `rsvg-convert -w 192 -h 192 art/icons/<id>.svg -o public/appearance/icon/<id>.png`.
 

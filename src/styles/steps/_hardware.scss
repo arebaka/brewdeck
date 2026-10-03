@@ -12,15 +12,13 @@
 	}
 }
 
-// A console wider than the window keeps its physical size and shows its middle, the screen
+// The console keeps its physical size while the page is wide enough for it and shrinks to the page otherwise
 .preview {
 	display: flex;
 	justify-content: center;
 
 	.photo {
-		flex: none;
 		display: block;
-		max-width: none;
-		height: auto;
+		max-width: 100%;
 	}
 }

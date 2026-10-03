@@ -10,13 +10,15 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"test": "vitest run",
-		"test:ui": "node tests/ui.ts",
+		"test:watch": "vitest",
+		"test:ui": "bun tests/ui.ts",
 		"lint": "tsc --noEmit",
+		"check": "bun run lint && bun run test && bun run build && bun run test:ui",
 		"build": "vite build",
-		"prepare": "npm run --silent build",
 		"dev": "vite --host=0.0.0.0 --port=3000",
 		"preview": "vite preview",
-		"sync": "node scripts/sync.mjs",
+		"start": "bun run build && bun run preview",
+		"sync": "bun scripts/sync.mjs",
 		"clean": "rm -rf dist"
 	},
 	"bugs": {

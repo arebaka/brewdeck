@@ -58,7 +58,7 @@ export function Hardware({
 			</section>
 		))}
 
-		{/* The console in its physical size, a console wider than the window scrolls */}
+		{/* The console in its physical size, a console wider than the page shrinks to fit it */}
 		<footer className="preview">
 			<img
 				src={`images/${info.image}`}

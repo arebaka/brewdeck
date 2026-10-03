@@ -68,7 +68,7 @@ export interface ComponentInfo {
 	size: number; // bytes to download
 	released?: string;
 	logo?: string;
-	source: ComponentSource; // the fresher of the available sources, picked by npm run sync
+	source: ComponentSource; // the fresher of the available sources, picked by bun run sync
 	prefer?: 'appstore' | 'github';
 	sources: ComponentSources;
 	requires?: Requirement[]; // all have to be met, a nested list is met by any of its components

@@ -1,8 +1,8 @@
 // Refreshes the catalogs of every platform from the Homebrew App Store and GitHub: versions, sizes, release dates,
 // the fresher source of every component and logos. Maps HOS versions to the Atmosphere releases supporting them.
 //
-// Usage: npm run sync                  GITHUB_TOKEN or a logged in gh CLI lifts the GitHub API limit
-//        npm run sync -- --logos       downloads logos again, even the existing ones
+// Usage: bun run sync                  GITHUB_TOKEN or a logged in gh CLI lifts the GitHub API limit
+//        bun run sync --logos          downloads logos again, even the existing ones
 
 import { readFile, writeFile, readdir, stat, unlink } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';

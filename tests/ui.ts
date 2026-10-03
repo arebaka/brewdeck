@@ -1,5 +1,5 @@
 // Clicks through every step of BrewDeck in headless Chrome and checks what the user sees.
-// Usage: npm run test:ui, set CHROME when the browser is not on the PATH
+// Usage: bun run test:ui, set CHROME when the browser is not on the PATH
 
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
@@ -146,10 +146,24 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 
 	// Hardware
 	// The photo is titled with the size of the console, drawn at the 96 pixels per inch browsers assume on Linux
+	await page.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false });
+	await sleep(250);
 	await check('the console is as wide as the real one', `(() => {
 		const photo = document.querySelector('.preview .photo');
 		return Math.abs(photo.getBoundingClientRect().width - parseFloat(photo.title) / 25.4 * 96) < 1;
 	})()`);
+	// A phone is narrower than the console
+	await page.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
+	await sleep(250);
+	await check('on a phone the console shrinks to the page and keeps its proportions', `(() => {
+		const photo = document.querySelector('.preview .photo');
+		const { width, height } = photo.getBoundingClientRect();
+		return width < parseFloat(photo.title) / 25.4 * 96
+			&& Math.abs(width - photo.parentElement.clientWidth) < 1
+			&& Math.abs(width / height - photo.naturalWidth / photo.naturalHeight) < .01;
+	})()`);
+	await page.send('Emulation.clearDeviceMetricsOverride');
+	await sleep(250);
 
 	// Software
 	await page.act(`step('Software')`);
