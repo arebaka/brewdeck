@@ -1,4 +1,3 @@
-// Consoles BrewDeck builds for, each with a catalog, steps and templates of its own
 export type PlatformId = 'switch' | 'psp';
 export const PLATFORM_IDS: PlatformId[] = ['switch', 'psp'];
 
@@ -13,13 +12,13 @@ export interface HardwareInfo {
 	codename: string;
 	is_modchip_required: boolean;
 	image: string;
-	dimensions: [number, number]; // width and height in millimeters, Joy-Con attached
+	width: number; // in millimeters
+	height: number; //in millimeters
 	screen: number; // diagonal of the 16:9 display in inches
 }
 
 export type FirmwareStatus = 'stable' | 'legacy' | 'dead';
 
-// Version of the system software of a console
 export interface FirmwareVersion {
 	version: string;
 	date: Date;
@@ -28,8 +27,7 @@ export interface FirmwareVersion {
 	supported?: Date;
 }
 
-export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'plugins' | 'tools' | 'installers' | 'saves' | 'mods' | 'amiibo' | 'themes' | 'media' | 'streaming' | 'emulators' | 'developer';
-
+export type ComponentCategory = 'base' | 'payloads' | 'sysmodules' | 'overlays' | 'plugins' | 'tools' | 'installers' | 'saves' | 'mods' | 'amiibo' | 'themes' | 'media' | 'streaming' | 'emulators' | 'development';
 export type ComponentSource = 'appstore' | 'github' | 'url' | 'manual' | 'bundled';
 
 // Asset of the latest GitHub release: an archive merged into the SD card or a single file
@@ -69,21 +67,19 @@ export interface ComponentInfo {
 	released?: string;
 	logo?: string;
 	source: ComponentSource; // the fresher of the available sources, picked by bun run sync
-	prefer?: 'appstore' | 'github';
 	sources: ComponentSources;
-	requires?: Requirement[]; // all have to be met, a nested list is met by any of its components
-	conflicts_with?: string[];
-	replaces?: string[];
-	hardware?: HardwareRevision[]; // revisions the component is useful on
-	tracks?: ('hos' | 'atmosphere')[]; // has to be updated for every new HOS or Atmosphere release
-	deprecated?: boolean;
-	risky?: boolean; // its note tells what may go wrong, the build warns about it too
 	payload?: string; // SD path of the payload, it gets an entry in the Launch menu of hekate
-	plugin?: CfwPlugin; // a CFW plugin the build lists in the plugins file of its platform
+	requires?: Requirement[]; // all have to be met, a nested list is met by any of its components
+	replaces?: string[];
+	conflicts_with?: string[];
+	tracks?: ('hos' | 'atmosphere')[]; // has to be updated for every new HOS or Atmosphere release
+	hardware?: HardwareRevision[]; // revisions the component is useful on
+	deprecated?: boolean;
 	is_required: boolean;
+	risky?: boolean; // its note tells what may go wrong, the build warns about it too
+	plugin?: CfwPlugin; // a CFW plugin the build lists in the plugins file of its platform
 }
 
-// Plugin of a custom firmware and where it loads by default
 export interface CfwPlugin {
 	path: string; // relative to the folder of the plugins file
 	scope: string[]; // runlevels, such as `vsh` or `game`, empty to leave the plugin off
@@ -91,17 +87,16 @@ export interface CfwPlugin {
 
 export interface Preset {
 	id: string;
-	components: string[] | 'all';
+	components: string[];
 }
 
 export type TuningValue = boolean | number | string | string[];
-
 export type TuningStep = 'launch' | 'system' | 'security' | 'modules' | 'plugins' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
 	secret?: boolean; // never written into links
-	when?: Record<string, TuningValue[]>; // active only while sibling options hold one of the listed values
+	when?: { [option: string]: TuningValue | TuningValue[] }; // active only while sibling options hold one of the listed value
 }
 
 export type TuningOption = TuningOptionBase & (
@@ -123,7 +118,8 @@ export interface TuningGroup {
 	options: TuningOption[];
 }
 
-export type TuningConfig = Record<string, Record<string, TuningValue>>;
+// Values of the options a build holds, by group and option
+export type TuningConfig = { [group: string]: { [option: string]: TuningValue } };
 
 // Software of a platform: its components, presets of them and options of their configs
 export interface Catalog {
@@ -176,12 +172,14 @@ export interface GalleryImage {
 
 export type BootMode = 'emummc' | 'sysmmc' | 'stock';
 
+export type LaunchKey = Record<string, string | number>;
+
 // Section of hekate_ipl.ini, an entry of the Launch menu
 export interface LaunchEntry {
 	id: string; // boot mode, `emummc-<folder>` of another emuMMC or a payload component
 	name: string; // name of the section, shown in the Launch menu
 	caption: string; // caption of the group the section belongs to
-	keys: Record<string, string | number>;
+	keys: LaunchKey;
 }
 
 // Entry booting the console in one of the modes

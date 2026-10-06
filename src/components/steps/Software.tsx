@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 
-import { Fix, Issue } from '../../types';
-import { Language, Translation } from '../../i18n';
-import { matchingPreset } from '../../data';
-import { Platform } from '../../platforms';
-import { activate } from '../../utils';
+import { Fix, Issue } from '@/types';
+import { Language, Translation } from '@i18n';
+import { matchingPreset } from '@/data';
+import { Platform } from '@/platforms';
+import { activate } from '@/utils';
 import { Issues } from '../Issues';
 import { ComponentTile } from '../ComponentTile';
 

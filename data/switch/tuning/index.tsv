@@ -1,0 +1,16 @@
+id	step	file	requires
+logo	launch	bootloader/hekate_ipl.ini
+hekate	system	bootloader/hekate_ipl.ini
+nyx	system	bootloader/nyx.ini
+dns	security	atmosphere/hosts
+exosphere	security	exosphere.ini
+atmosphere	system	atmosphere/config/system_settings.ini
+stratosphere	system	atmosphere/config/stratosphere.ini
+hbl	system	atmosphere/config/override_config.ini
+tesla	modules	config/tesla/config.ini	ovlmenu|ultrahand
+sys_patch	modules	config/sys-patch/config.ini	sys_patch
+missioncontrol	modules	config/MissionControl/missioncontrol.ini	missioncontrol
+status_monitor	modules	config/status-monitor/config.ini	status_monitor
+sys_ftpd_light	modules	config/sys-ftpd/config.ini	sys_ftpd_light
+dbi_patcher	modules	switch/DBI/translation.bin	dbi_patcher
+sys_clk	overclock	config/sys-clk/config.ini	sys_clk

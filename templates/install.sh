@@ -60,7 +60,6 @@ if [ ! -w "$SD_ROOT" ]; then
 	exit 1
 fi
 
-# The script and what archives leave in the root of the card go away, wherever the script was started from
 cleanup() {
 	rm -rf "$WORK_DIR"
 	rm -f "$SD_ROOT/install.sh"

@@ -1,0 +1,4 @@
+id	type	default	values
+highmem	select	off	off,on,auto,force16,forcemax
+mscache	select	4k	off,4k,8k,16k
+infernocache	select	lru	off,lru,rr

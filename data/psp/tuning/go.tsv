@@ -1,0 +1,5 @@
+id	type	default
+oldplugin	toggle	on
+hibblock	toggle	on
+disablepause	toggle	off
+deadef	toggle	off

@@ -1,28 +1,25 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"jsx": "react-jsx",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 		"strict": true,
-		"strictPropertyInitialization": true,
-		"declaration": true,
-		"sourceMap": false,
-		"skipLibCheck": true,
-		"allowImportingTsExtensions": true,
 		"noEmit": true,
-		"baseUrl": ".",
-		"declarationDir": "dist",
+		"isolatedModules": true,
+		"skipLibCheck": true,
 		"paths": {
-			"@/*": ["src/*"],
-			"@components/*": ["src/components/*"],
-			"@data": ["data"],
-			"@data/*": ["data/*"],
-			"@templates": ["templates"],
-			"@templates/*": ["templates/*"],
-			"@sd": ["templates/switch/sd"],
-			"@sd/*": ["templates/switch/sd/*"]
-		}
+			"@/*": ["./src/*"],
+			"@components/*": ["./src/components/*"],
+			"@styles/*": ["./styles/*"],
+			"@data": ["./data"],
+			"@data/*": ["./data/*"],
+			"@templates": ["./templates"],
+			"@templates/*": ["./templates/*"],
+			"@i18n": ["./i18n"],
+			// "@sd/*": ["./templates/switch/sd/*"],
+		},
 	},
-	"include": ["src", "tests", "vite.config.ts"]
+	"include": ["vite.config.ts", "src", "styles", "data", "templates", "i18n", "tests", "vite-env.d.ts"],
 }

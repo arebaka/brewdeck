@@ -1,29 +1,22 @@
-import { BootEntry, BootMode, Catalog, Clocks, ComponentInfo, EntryOverride, FirmwareVersion, GalleryImage, LaunchConfig, LaunchEntry, OverclockData, Preset, SwitchState, TuningGroup } from '@/types';
+import { BootEntry, BootMode, Catalog, Clocks, ComponentInfo, EntryOverride, FirmwareVersion, GalleryImage, LaunchConfig, LaunchEntry, SwitchState } from '@/types';
 import { compareVersions, getTuningDefaults, presetSelection } from '@/data';
 
-import { appearance, firmware, launch, overclock, presets, software, tuning } from '@data/switch';
+import { APPEARANCE, FIRMWARE, LAUNCH, OVERCLOCK, PRESETS, SOFTWARE, TUNING } from '@data/switch';
 
-export const HOS_VERSIONS: FirmwareVersion[] = firmware.map(v => ({
-	version: v.version,
-	date: new Date(v.date),
-	status: v.status,
-	atmosphere: v.atmosphere,
-	supported: v.supported ? new Date(v.supported) : undefined
-})) as FirmwareVersion[];
-export const COMPONENTS: ComponentInfo[] = software as ComponentInfo[];
+export { OVERCLOCK };
+export const HOS_VERSIONS: FirmwareVersion[] = FIRMWARE;
+export const COMPONENTS: ComponentInfo[] = SOFTWARE;
 // Payloads are picked on the Launch step, the other categories on the Software one
 export const CATALOG: Catalog = {
 	platform: 'switch',
 	components: COMPONENTS,
-	categories: ['base', 'sysmodules', 'overlays', 'tools', 'installers', 'saves', 'mods', 'amiibo', 'themes', 'media', 'streaming', 'emulators', 'developer'],
-	presets: presets as Preset[],
-	tuning: tuning as TuningGroup[]
+	categories: ['base', 'sysmodules', 'overlays', 'tools', 'installers', 'saves', 'mods', 'amiibo', 'themes', 'media', 'streaming', 'emulators', 'development'],
+	presets: PRESETS,
+	tuning: TUNING
 };
-export const BOOT_ENTRIES: BootEntry[] = launch as unknown as BootEntry[];
-export const OVERCLOCK: OverclockData = overclock as OverclockData;
+export const BOOT_ENTRIES: BootEntry[] = LAUNCH;
 // Pictures lie in the folder of their target under their ID: appearance/icon/hekate-switch.png
-export const GALLERY: GalleryImage[] = (appearance as Omit<GalleryImage, 'file'>[])
-	.map(image => ({ ...image, file: `appearance/${image.target}/${image.id}.png` }));
+export const GALLERY: GalleryImage[] = APPEARANCE.map(image => ({ ...image, file: `appearance/${image.target}/${image.id}.png` }));
 
 // Versions newer than the last one some Atmosphere release added support for cannot boot CFW yet
 const NEWEST_SUPPORTED_HOS = HOS_VERSIONS

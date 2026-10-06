@@ -358,7 +358,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 
 	await page.act(`byText('.lang-switch button', 'ru').click()`);
 	await check('the language changes in place', `byText('.sidebar .step.active .label', 'Сборка') != null && document.documentElement.lang == 'ru'`);
-	await page.act(`byText('.lang-switch button', 'ua').click()`);
+	await page.act(`byText('.lang-switch button', 'uk').click()`);
 	await check('Ukrainian is there too', `byText('.sidebar .step.active .label', 'Збірка') != null && document.documentElement.lang == 'uk'`);
 
 	// PSP
@@ -427,9 +427,12 @@ async function main() {
 			browser.kill();
 			await exited;
 		}
-		await server.close();
+		// Under Bun the server of Vite now and then never tells it has closed, so it gets a moment and no more
+		await Promise.race([server.close(), sleep(1000)]);
 		rmSync(temporary, { recursive: true, force: true });
 	}
 }
 
 await main();
+// A server that stayed open would keep the process running
+process.exit();

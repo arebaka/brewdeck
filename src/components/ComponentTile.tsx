@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { ComponentInfo } from '../types';
-import { Translation, format } from '../i18n';
-import { Platform } from '../platforms';
-import { activate, formatSize } from '../utils';
+import { ComponentInfo } from '@/types';
+import { Translation, format } from '@i18n';
+import { Platform } from '@/platforms';
+import { activate, formatSize } from '@/utils';
 
 interface ComponentTileProps {
 	component: ComponentInfo;

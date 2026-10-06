@@ -1,8 +1,8 @@
-import { HARDWARE } from '@/data';
+import { HARDWARE } from '@data';
 import { PLATFORMS } from '@/platforms';
 import { SWITCH } from '@/platforms/switch';
 import { PSP } from '@/platforms/psp';
-import { Language } from './i18n';
+import { Language } from '@i18n';
 import { BuildState, PlatformId, PspState, StepId, SwitchState } from './types';
 
 // A build of every platform, so a console picked by mistake does not cost the build of another one

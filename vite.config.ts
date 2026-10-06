@@ -1,10 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import dsv from '@rollup/plugin-dsv';
+import yaml from '@modyfi/vite-plugin-yaml';
 
 export default defineConfig({
-	plugins: [react()],
+	plugins: [react(), dsv(), yaml()],
 	resolve: {
 		tsconfigPaths: true,
+	},
+	build: {
+		sourcemap: true,
+		manifest: true,
+		minify: 'oxc',
 	},
 	server: {
 		host: '127.0.0.1',
@@ -12,17 +19,5 @@ export default defineConfig({
 		open: true,
 		cors: true,
 		hmr: true,
-	},
-	build: {
-		sourcemap: true,
-		manifest: true,
-		minify: 'oxc',
-		rolldownOptions: {
-			output: {
-				codeSplitting: {
-					groups: [{ name: 'vendor', test: /node_modules/ }],
-				},
-			},
-		},
 	},
 });

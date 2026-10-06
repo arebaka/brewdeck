@@ -1,8 +1,8 @@
 import Mustache from 'mustache';
 
 import { BuildState, ComponentInfo, HardwareInfo, ImageTarget, TuningValue } from '@/types';
-import { Language, Translation } from '@/i18n';
-import { installSh, installPs1 } from '@templates';
+import { Language, Translation } from '@i18n';
+import { INSTALL_SH, INSTALL_PS1 } from '@templates';
 
 // A build with what turns it into files: the language of the readme, its texts and the encoded images
 export type BuildRequest<S extends BuildState = BuildState> = S & {
@@ -99,6 +99,6 @@ export function installerView(request: BuildRequest, hardware: HardwareInfo, sel
 
 // The installer for Linux and macOS and the one for Windows
 export const installers = (view: object): GeneratedFile[] => [
-	{ path: 'install.sh', content: render(installSh, view) },
-	{ path: 'install.ps1', content: render(installPs1, view) }
+	{ path: 'install.sh', content: render(INSTALL_SH, view) },
+	{ path: 'install.ps1', content: render(INSTALL_PS1, view) }
 ];

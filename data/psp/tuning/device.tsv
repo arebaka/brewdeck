@@ -1,0 +1,7 @@
+id	type	default
+wpa2	toggle	on
+hidemac	toggle	on
+noled	toggle	off
+noumd	toggle	off
+noanalog	toggle	off
+vitamute	toggle	on

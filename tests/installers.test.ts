@@ -8,46 +8,46 @@ import { BuildResult, GeneratedFile } from '@/build';
 import { presetSelection } from '@/data';
 import { CATALOG, SWITCH } from '@/platforms/switch';
 import { CATALOG as PSP_CATALOG, PSP } from '@/platforms/psp';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 import { BITMAPS, encodeBitmaps } from './fixtures';
 
 // The installers are run for real where their tools are installed
 const has = (command: string) => spawnSync('sh', ['-c', `command -v ${command}`]).status == 0;
-const canRunBash = has('bash') && has('curl') && (has('unzip') || has('bsdtar') || has('python3'));
+const CAN_RUN_BASH = has('bash') && has('curl') && (has('unzip') || has('bsdtar') || has('python3'));
 
 // Without components nothing is downloaded: the installers only write the configuration and the embedded images
-const offline = {
+const OFFLINE = {
 	switch: SWITCH.build({
 		...SWITCH.defaults(),
 		selectedComponentIDs: [],
 		appearance: { bootlogo: 'hekate-a', background: 'atmosphere-splash', logos: {}, icons: { emummc: 'hekate-switch' } },
 		images: encodeBitmaps(BITMAPS),
 		lang: 'en',
-		t: translations.en
+		t: I18N.en
 	}),
-	psp: PSP.build({ ...PSP.defaults(), selectedComponentIDs: [], lang: 'en', t: translations.en })
+	psp: PSP.build({ ...PSP.defaults(), selectedComponentIDs: [], lang: 'en', t: I18N.en })
 };
 
 // Every kind of download at once: App Store packages, GitHub archives and files, direct links, manual components
-const everything = {
+const EVERYTHING = {
 	switch: SWITCH.build({
 		...SWITCH.defaults(),
 		hardware: 'mariko',
 		selectedComponentIDs: presetSelection(CATALOG, CATALOG.presets.find(preset => preset.id == 'all')!),
 		lang: 'en',
-		t: translations.en
+		t: I18N.en
 	}),
 	psp: PSP.build({
 		...PSP.defaults(),
 		firmware: '5.00',
 		selectedComponentIDs: presetSelection(PSP_CATALOG, PSP_CATALOG.presets.find(preset => preset.id == 'all')!),
 		lang: 'en',
-		t: translations.en
+		t: I18N.en
 	})
 };
 
-const runs = Object.entries(offline);
-const builds = Object.entries(everything).flatMap(([platform, result]) => [[`${platform} offline`, offline[platform as keyof typeof offline].files], [`${platform} everything`, result.files]] as const);
+const RUNS = Object.entries(OFFLINE);
+const BUILDS = Object.entries(EVERYTHING).flatMap(([platform, result]) => [[`${platform} offline`, OFFLINE[platform as keyof typeof OFFLINE].files], [`${platform} everything`, result.files]] as const);
 const script = (files: GeneratedFile[], path: string) => files.find(file => file.path == path)!.content;
 
 // Every installer gets an empty directory standing for the card and runs there, as from the root of the card
@@ -84,15 +84,15 @@ function expectInstalled(root: string, result: BuildResult) {
 	}
 }
 
-describe.skipIf(!canRunBash)('install.sh', () => {
-	it.each(runs)('writes the configuration and the images of %s next to itself', (platform, result) => {
+describe.skipIf(!CAN_RUN_BASH)('install.sh', () => {
+	it.each(RUNS)('writes the configuration and the images of %s next to itself', (platform, result) => {
 		const root = card('install.sh', script(result.files, 'install.sh'));
 		execFileSync('bash', [join(root, 'install.sh')], { cwd: root, stdio: 'pipe' });
 		expectInstalled(root, result);
 	});
 
 	it('cleans up the card, wherever it is started from', () => {
-		const root = card('install.sh', script(offline.psp.files, 'install.sh'));
+		const root = card('install.sh', script(OFFLINE.psp.files, 'install.sh'));
 		LEFTOVERS.forEach(file => writeFileSync(join(root, file), 'junk'));
 		const home = elsewhere();
 		execFileSync('bash', [join(root, 'install.sh')], { cwd: home, stdio: 'pipe' });
@@ -102,7 +102,7 @@ describe.skipIf(!canRunBash)('install.sh', () => {
 
 describe.skipIf(!has('shellcheck'))('install.sh under shellcheck', () => {
 	// Findings come out as the difference, one per line
-	it.each(builds)('has no findings for the %s build', (name, files) => {
+	it.each(BUILDS)('has no findings for the %s build', (name, files) => {
 		const { stdout } = spawnSync('shellcheck', ['-S', 'style', '-f', 'gcc', '-'], { input: script(files, 'install.sh'), encoding: 'utf8' });
 		expect(stdout.trim().split('\n').filter(Boolean)).toEqual([]);
 	});
@@ -110,21 +110,21 @@ describe.skipIf(!has('shellcheck'))('install.sh under shellcheck', () => {
 
 describe.skipIf(!has('pwsh'))('install.ps1', () => {
 	// The page adds the byte order mark for Windows PowerShell
-	it.each(runs)('writes the configuration and the images of %s next to itself', (platform, result) => {
+	it.each(RUNS)('writes the configuration and the images of %s next to itself', (platform, result) => {
 		const root = card('install.ps1', `﻿${script(result.files, 'install.ps1')}`);
 		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1')], { cwd: root, stdio: 'pipe' });
 		expectInstalled(root, result);
 	}, 60_000);
 
 	it('cleans up the card, wherever it is started from', () => {
-		const root = card('install.ps1', `﻿${script(offline.psp.files, 'install.ps1')}`);
+		const root = card('install.ps1', `﻿${script(OFFLINE.psp.files, 'install.ps1')}`);
 		LEFTOVERS.forEach(file => writeFileSync(join(root, file), 'junk'));
 		const home = elsewhere();
 		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1')], { cwd: home, stdio: 'pipe' });
 		expectCleaned(root, home, 'install.ps1');
 	}, 60_000);
 
-	it.each(builds)('parses the %s build', (name, files) => {
+	it.each(BUILDS)('parses the %s build', (name, files) => {
 		const path = join(card('install.ps1', script(files, 'install.ps1')), 'install.ps1');
 		const errors = execFileSync('pwsh', ['-NoProfile', '-Command', [
 			'$errors = $null',

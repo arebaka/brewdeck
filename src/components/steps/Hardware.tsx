@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { HardwareRevision, PLATFORM_IDS } from '../../types';
-import { Language, Translation, format } from '../../i18n';
-import { HARDWARE } from '../../data';
-import { activate, pixelsPerInch } from '../../utils';
+import { HardwareRevision, PLATFORM_IDS } from '@/types';
+import { Language, Translation, format } from '@i18n';
+import { HARDWARE } from '@data';
+import { activate, pixelsPerInch } from '@/utils';
 
 interface HardwareProps {
 	lang: Language;
@@ -20,8 +20,6 @@ export function Hardware({
 	t
 }: HardwareProps) {
 	const info = HARDWARE.find(hw => hardware == hw.id)!;
-	const [width, height] = info.dimensions;
-
 	const consoles = (platform: string) => HARDWARE.filter(hw => hw.platform == platform);
 
 	return (<>
@@ -63,9 +61,9 @@ export function Hardware({
 			<img
 				src={`images/${info.image}`}
 				alt={info.name}
-				title={format(t.pages.hardware.size, { width: width.toLocaleString(lang), height: height.toLocaleString(lang) })}
+				title={format(t.pages.hardware.size, { width: info.width.toLocaleString(lang), height: info.height.toLocaleString(lang) })}
 				className="photo"
-				style={{ width: `${width / 25.4 * pixelsPerInch()}px` }} />
+				style={{ width: `${info.width / 25.4 * pixelsPerInch()}px` }} />
 		</footer>
 	</>);
 }

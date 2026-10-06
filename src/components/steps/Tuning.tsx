@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
-import { Fix, Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '../../types';
-import { Language, Translation } from '../../i18n';
-import { isTuningOptionActive, tuningGroups } from '../../data';
-import { Platform } from '../../platforms';
-import { activate } from '../../utils';
+import { Fix, Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '@/types';
+import { Language, Translation } from '@i18n';
+import { isTuningOptionActive, tuningGroups } from '@/data';
+import { Platform } from '@/platforms';
+import { activate } from '@/utils';
 import { Issues } from '../Issues';
 import { Buttons, isButtons } from '../Buttons';
 

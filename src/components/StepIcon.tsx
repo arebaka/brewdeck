@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StepId } from '../types';
+import { StepId } from '@/types';
 
 // Line icons of the steps, as the XMB draws its categories: the console, the update, a gamepad, the toolbox and so on
 const ICONS: {[step in StepId]: React.ReactNode} = {

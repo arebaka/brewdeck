@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveSelection } from '@/data';
 import { CATALOG, SWITCH } from '@/platforms/switch';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 import { SwitchState } from '@/types';
 import { customBuild, issueCodes } from './fixtures';
 
 const scenario = (patch: Partial<SwitchState>) => issueCodes({ ...SWITCH.defaults(), ...patch });
 const selecting = (ids: string[], dependencies = true) => ({ selectedComponentIDs: resolveSelection(CATALOG, ids, dependencies) });
-const fixes = (patch: Partial<SwitchState>, code: string) => SWITCH.validate({ ...SWITCH.defaults(), ...patch }, translations.en).find(issue => issue.code == code)?.fixes;
+const fixes = (patch: Partial<SwitchState>, code: string) => SWITCH.validate({ ...SWITCH.defaults(), ...patch }, I18N.en).find(issue => issue.code == code)?.fixes;
 
 describe('validation', () => {
 	it('asks for a missing dependency', () => {

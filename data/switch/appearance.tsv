@@ -1,0 +1,41 @@
+id	target	author	license	url	hue
+hekate-a	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-a-custom	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-b	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-b-custom	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-c	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-c-ctc	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-d	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+hekate-d-ctc	bootlogo	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/res/bootlogo
+atmosphere-logo	bootlogo	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+atmosphere-banner	bootlogo	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+atmosphere-splash	bootlogo	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+atmosphere-splash	background	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+mattera-atmosphere-hue	icon	Nichole Mattera, Atmosphère-NX	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/atmosphere	on
+hekate-switch	icon	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/nyx/resources	on
+hekate-lakka-hue	icon	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/nyx/resources	on
+mattera-lockpick-hue	icon	Nichole Mattera	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/lockpick	on
+hekate-payload	icon	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/nyx/resources	on
+brewdeck-emummc-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-sysmmc-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-stock-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-fusee-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-tegraexplorer-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-resolver-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-hwfly-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+brewdeck-picofly-hue	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons	on
+atmosphere-logo	icon	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+atmosphere-logo-light	icon	Atmosphère-NX	GPL-2.0	https://github.com/Atmosphere-NX/Atmosphere/tree/master/img
+mattera-atmosphere	icon	Nichole Mattera, Atmosphère-NX	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/atmosphere
+mattera-switch	icon	Nichole Mattera, CTCaer	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/switch
+hekate-lakka	icon	CTCaer	GPL-2.0	https://github.com/CTCaer/hekate/tree/master/nyx/resources
+mattera-lockpick	icon	Nichole Mattera	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/lockpick
+mattera-payload	icon	Nichole Mattera, CTCaer	GPL-2.0	https://github.com/NicholeMattera/Hekate-Icons/tree/main/payload
+brewdeck-emummc	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-sysmmc	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-stock	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-fusee	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-tegraexplorer	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-resolver	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-hwfly	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons
+brewdeck-picofly	icon	BrewDeck	MIT	https://github.com/arebaka/brewdeck/tree/master/art/icons

@@ -15,18 +15,19 @@ const SWITCHBREW_VERSIONS = 'https://switchbrew.org/wiki/System_Versions';
 // Every platform keeps its catalog in data/<platform> and the logos of its components in public/logos/<platform>
 const CATALOGS = ['switch', 'psp'].map(platform => ({
 	platform,
-	software: new URL(`../data/${platform}/software.json`, import.meta.url),
-	tuning: new URL(`../data/${platform}/tuning.json`, import.meta.url),
+	software: new URL(`../data/${platform}/software/index.tsv`, import.meta.url),
+	sources: new URL(`../data/${platform}/software/sources.yaml`, import.meta.url),
+	tuning: new URL(`../data/${platform}/tuning/`, import.meta.url),
 	logos: new URL(`../public/logos/${platform}/`, import.meta.url)
 }));
-const FIRMWARE = new URL('../data/switch/firmware.json', import.meta.url);
+const FIRMWARE = new URL('../data/switch/firmware.tsv', import.meta.url);
 
 const MAX_ICON_SOURCE = 40 * 1024 * 1024; // archives bigger than this are not downloaded for an icon
 const STUB_LOGO = 1024; // logos smaller than this are placeholders
 const DEFAULT_ICON = 'a9f3fdc1312063579bee0fdf91cb79ed75804457'; // SHA-1 of the gray console with a question mark libnx gives homebrew without an icon
 
-const refreshLogos = process.argv.includes('--logos');
-const token = process.env.GITHUB_TOKEN || ghToken();
+const REFRESH_LOGOS = process.argv.includes('--logos');
+const TOKEN = process.env.GITHUB_TOKEN || ghToken();
 
 function ghToken() {
 	try {
@@ -46,19 +47,22 @@ async function request(url, headers = {}) {
 
 const github = async (path) => (await request(`https://api.github.com/${path}`, {
 	Accept: 'application/vnd.github+json',
-	...(token && { Authorization: `Bearer ${token}` })
+	...(TOKEN && { Authorization: `Bearer ${TOKEN}` })
 })).json();
 
 const download = async (url) => Buffer.from(await (await request(url)).arrayBuffer());
 
-// Size of a download in bytes, 0 when the server does not tell. Some servers, such as the one of Sony, only tell it for a part
+// Size of a download in bytes, 0 when the server does not tell. Some servers, such as the one of Sony, only tell it for a part.
+// Compression is declined: asked for it, a server answers with the length of a packed empty body
 async function contentLength(url) {
+	const headers = { 'Accept-Encoding': 'identity' };
 	try {
-		const length = Number((await fetch(url, { method: 'HEAD' })).headers.get('content-length'));
+		const head = await fetch(url, { method: 'HEAD', headers });
+		const length = head.ok ? Number(head.headers.get('content-length')) : 0;
 		if (length) return length;
-		const part = await fetch(url, { headers: { Range: 'bytes=0-0' } });
+		const part = await fetch(url, { headers: { ...headers, Range: 'bytes=0-0' } });
 		await part.body?.cancel();
-		return Number(part.headers.get('content-range')?.split('/')[1]) || 0;
+		return part.ok ? Number(part.headers.get('content-range')?.split('/')[1]) || 0 : 0;
 	} catch {
 		return 0;
 	}
@@ -85,7 +89,6 @@ const storeDate = (date) => date.split('/').reverse().join('-');
 
 // Equal or unknown versions are decided by the release date, the App Store wins a tie
 function pickSource(component, store, release) {
-	if (component.prefer) return component.prefer;
 	if (!release) return 'appstore';
 	if (!store) return 'github';
 	return (compareVersions(store.version, release.version) || (store.date >= release.date ? 1 : -1)) > 0 ? 'appstore' : 'github';
@@ -127,12 +130,11 @@ async function archiveIcon(buffer) {
 }
 
 // Assets named after an option of the component, such as a language, are looked up with its default
-function assetPattern(component, item, tuning) {
-	const options = tuning.find(group => group.id == component.id)?.options ?? [];
+function assetPattern(item, options) {
 	return new RegExp(item.asset.replace(/\{\{(\w+)\}\}/g, (match, id) => options.find(option => option.id == id)?.default ?? match));
 }
 
-async function findLogo(component, release, packages, tuning) {
+async function findLogo(component, release, packages, options) {
 	for (const name of component.sources.appstore ?? []) {
 		try {
 			return { data: await download(`${APPSTORE}/packages/${name}/icon.png`), extension: 'png' };
@@ -140,7 +142,7 @@ async function findLogo(component, release, packages, tuning) {
 	}
 
 	const assets = (component.sources.github ?? [])
-		.map(item => release?.assets.find(asset => assetPattern(component, item, tuning).test(asset.name)))
+		.map(item => release?.assets.find(asset => assetPattern(item, options).test(asset.name)))
 		.filter(asset => asset && asset.size < MAX_ICON_SOURCE && /\.(nro|ovl|pbp|zip)$/i.test(asset.name));
 	const archives = packages
 		.filter(pkg => pkg.filesize * 1024 < MAX_ICON_SOURCE)
@@ -165,23 +167,36 @@ async function existingLogo(component, logos) {
 	}
 }
 
-// Arrays of plain values and objects nested in arrays stay on one line, like the hand written data
-function format(value, depth = 0, inline = false) {
-	const indent = '\t'.repeat(depth);
-	if (Array.isArray(value)) {
-		if (value.every(item => typeof item != 'object' || Array.isArray(item))) {
-			return `[${value.map(item => format(item)).join(', ')}]`;
-		}
-		return `[\n${value.map(item => `${indent}\t${format(item, depth + 1, depth > 0)}`).join(',\n')}\n${indent}]`;
+// A table is the names of its columns, then a row per line, cells separated by tabs
+async function readTable(url) {
+	const [header, ...lines] = (await readFile(url, 'utf8')).trimEnd().split('\n');
+	const columns = header.split('\t');
+	const rows = lines.map(line => {
+		const cells = line.split('\t');
+		return Object.fromEntries(columns.map((column, index) => [column, cells[index] ?? '']));
+	});
+	return { columns, rows };
+}
+
+// Cells left empty at the end of a row are not written, like in the hand written data
+const writeTable = (url, columns, rows) => writeFile(url, [columns, ...rows.map(row => columns.map(column => String(row[column] ?? '').replace(/[\t\r\n]+/g, ' ')))]
+	.map(cells => cells.join('\t').trimEnd())
+	.join('\n') + '\n');
+
+// Sources of the components by id, a single App Store package, asset or download may go without a list
+async function readSources(file) {
+	const many = (value) => value === undefined ? undefined : [].concat(value);
+	return Object.fromEntries(Object.entries(Bun.YAML.parse(await readFile(file, 'utf8')) ?? {})
+		.map(([id, { appstore, github, url, ...rest }]) => [id, { appstore: many(appstore), github: many(github), url: many(url), ...rest }]));
+}
+
+// Options of the config of a component, when it has a table of them
+async function readOptions(directory, id) {
+	try {
+		return (await readTable(new URL(`${id}.tsv`, directory))).rows;
+	} catch {
+		return [];
 	}
-	if (value && typeof value == 'object') {
-		const entries = Object.entries(value).filter(([, item]) => item !== undefined);
-		if (inline) {
-			return `{ ${entries.map(([key, item]) => `${JSON.stringify(key)}: ${JSON.stringify(item)}`).join(', ')} }`;
-		}
-		return `{\n${entries.map(([key, item]) => `${indent}\t${JSON.stringify(key)}: ${format(item, depth + 1)}`).join(',\n')}\n${indent}}`;
-	}
-	return JSON.stringify(value);
 }
 
 // Packages of the Homebrew App Store by name, fetched once for every catalog that uses the store
@@ -191,9 +206,12 @@ async function appStore() {
 	return storePackages;
 }
 
-async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logos: LOGOS }) {
-	const software = JSON.parse(await readFile(SOFTWARE, 'utf8'));
-	const tuning = JSON.parse(await readFile(TUNING, 'utf8'));
+async function syncSoftware({ platform, software: SOFTWARE, sources: SOURCES, tuning: TUNING, logos: LOGOS }) {
+	const { columns, rows: software } = await readTable(SOFTWARE);
+	const sources = await readSources(SOURCES);
+	for (const component of software) {
+		component.sources = sources[component.id] ?? {};
+	}
 	const store = software.some(component => component.sources.appstore) ? await appStore() : {};
 	const releases = new Map();
 	// A rolling release such as `latest` keeps its tag: its version is in the notes, its date is the last upload
@@ -212,6 +230,7 @@ async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logo
 	const problems = [];
 	for (const component of software) {
 		const { appstore = [], github: items = [], url = [] } = component.sources;
+		const options = await readOptions(TUNING, component.id);
 		const packages = appstore.map(name => store[name]).filter(Boolean);
 		if (packages.length < appstore.length) {
 			problems.push(`${component.id}: no App Store package ${appstore.filter(name => !store[name]).join(', ')}`);
@@ -231,7 +250,7 @@ async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logo
 			const matched = [];
 			for (const item of items) {
 				const info = await release(item.repo);
-				const asset = info.assets.find(asset => assetPattern(component, item, tuning).test(asset.name));
+				const asset = info.assets.find(asset => assetPattern(item, options).test(asset.name));
 				if (!asset) problems.push(`${component.id}: no asset ${item.asset} in ${item.repo} ${info.version}`);
 				else matched.push(asset);
 			}
@@ -244,19 +263,20 @@ async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logo
 			const chosen = source == 'appstore' ? storeInfo : releaseInfo;
 			Object.assign(component, { source, version: chosen.version.replace(/^v(?=\d)/, ''), size: chosen.size, released: chosen.date });
 		} else if (url.length) {
+			// A server that does not tell the size leaves the known one
 			const sizes = await Promise.all(url.map(item => contentLength(item.url)));
-			Object.assign(component, { source: 'url', size: sizes.reduce((a, b) => a + b, 0) });
+			Object.assign(component, { source: 'url', size: sizes.reduce((a, b) => a + b, 0) || component.size });
 		} else {
 			component.source = component.sources.bundled ? 'bundled' : 'manual';
 		}
 
-		if (refreshLogos || !(await existingLogo(component, LOGOS))) {
-			const logo = await findLogo(component, items.length ? await release(items[0].repo) : null, packages, tuning);
+		if (REFRESH_LOGOS || !(await existingLogo(component, LOGOS))) {
+			const logo = await findLogo(component, items.length ? await release(items[0].repo) : null, packages, options);
 			if (logo) {
 				component.logo = `${component.id}.${logo.extension}`;
 				await writeFile(new URL(component.logo, LOGOS), logo.data);
 			} else if (!(await existingLogo(component, LOGOS))) {
-				delete component.logo;
+				component.logo = '';
 			}
 		}
 
@@ -271,14 +291,13 @@ async function syncSoftware({ platform, software: SOFTWARE, tuning: TUNING, logo
 		if (!logos.has(file) && (await stat(path)).size < STUB_LOGO) await unlink(path);
 	}
 
-	await writeFile(SOFTWARE, format(software.map(({ id, name, author, category, version, size, released, logo, source, prefer, sources, ...rest }) =>
-		({ id, name, author, category, version, size, released, logo, source, prefer, sources, ...rest }))) + '\n');
+	await writeTable(SOFTWARE, columns, software);
 	return problems;
 }
 
 // Every HOS version maps to the first Atmosphere release that supports it or an older version of the same line
 async function syncFirmware() {
-	const firmware = JSON.parse(await readFile(FIRMWARE, 'utf8'));
+	const { columns, rows: firmware } = await readTable(FIRMWARE);
 
 	const support = [];
 	for (let page = 1; ; page++) {
@@ -331,7 +350,7 @@ async function syncFirmware() {
 		console.log(`firmware: ${entry.version} is not supported by Atmosphere yet`);
 	}
 
-	await writeFile(FIRMWARE, format(firmware) + '\n');
+	await writeTable(FIRMWARE, columns, firmware);
 }
 
 const problems = [];

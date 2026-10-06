@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { decodeState, defaultState, encodeState } from '@/state';
 import { resolveSelection } from '@/data';
 import { CATALOG, PSP } from '@/platforms/psp';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 import { PspState } from '@/types';
 
 // A PSP Go on an old firmware with every plugin, changed settings and plugins loading elsewhere
@@ -21,7 +21,7 @@ function customPsp(): PspState {
 	return build;
 }
 
-const codes = (build: PspState) => PSP.validate(build, translations.en).map(issue => `${issue.level}:${issue.code}`);
+const codes = (build: PspState) => PSP.validate(build, I18N.en).map(issue => `${issue.level}:${issue.code}`);
 
 describe('PSP links', () => {
 	const state = defaultState();
@@ -50,7 +50,7 @@ describe('PSP validation', () => {
 	it('updates an old firmware first', () => {
 		const old = { ...PSP.defaults(), firmware: '6.35' };
 		expect(codes(old)).toContain('error:firmwareUpdate');
-		expect(PSP.validate(old, translations.en).find(issue => issue.code == 'firmwareUpdate')?.fixes).toEqual([{ add: ['update661'] }]);
+		expect(PSP.validate(old, I18N.en).find(issue => issue.code == 'firmwareUpdate')?.fixes).toEqual([{ add: ['update661'] }]);
 		expect(codes(customPsp())).not.toContain('error:firmwareUpdate');
 	});
 
@@ -66,15 +66,15 @@ describe('PSP validation', () => {
 	});
 
 	it('points at the overclock tester above 333 MHz', () => {
-		expect(PSP.validate(customPsp(), translations.en).find(issue => issue.code == 'overclock')?.params).toEqual({ mhz: '403' });
+		expect(PSP.validate(customPsp(), I18N.en).find(issue => issue.code == 'overclock')?.params).toEqual({ mhz: '403' });
 		expect(codes(PSP.defaults())).not.toContain('info:overclock');
 	});
 });
 
 describe('PSP build', () => {
-	const result = PSP.build({ ...customPsp(), lang: 'en', t: translations.en });
+	const result = PSP.build({ ...customPsp(), lang: 'en', t: I18N.en });
 	const config = (path: string) => result.configs.find(config => config.path == path)?.content;
-	const defaults = PSP.build({ ...PSP.defaults(), lang: 'en', t: translations.en });
+	const defaults = PSP.build({ ...PSP.defaults(), lang: 'en', t: I18N.en });
 
 	it('writes the settings of ARK as its own menu does', () => {
 		const settings = defaults.configs.find(config => config.path == 'PSP/SAVEDATA/ARK_01234/SETTINGS.TXT')!.content;

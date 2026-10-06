@@ -93,9 +93,9 @@ bun run check     # types, unit tests, build and UI tests in a row
 bun run sync      # versions, sizes, sources and logos of the catalogs
 ```
 
-The project runs on [Bun](https://bun.sh). Unit tests are started with `bun run test`: `bun test` would start the test runner of Bun itself instead of Vitest.
+The project runs on [Bun](https://bun.sh). Unit tests are started with `bun run test`: `bun test` would start the test runner of Bun itself instead of Vitest, and that one cannot read the catalogs, which Vite loads.
 
-Catalogs live in `data/` and templates of the generated files in `templates/`, with a directory per platform in both, such as `data/switch/`. Logos, photos and the gallery live in `public/`. SVG sources of the gallery icons, the set of BrewDeck and the icons of Nichole Mattera fitted into the icon of Nyx, live in `art/icons/` and are rendered into the gallery with `rsvg-convert -w 192 -h 192 art/icons/<id>.svg -o public/appearance/icon/<id>.png`.
+Catalogs live in `data/` and templates of the generated files in `templates/`, with a directory per platform in both, such as `data/switch/`. A catalog is a set of TSV tables with a row per console, system version, component or option. Several values in a cell are separated by commas, alternatives by `|`, and a flag is set with `on`. What does not fit a table lies in YAML next to it: the sources of the components, the conditions of the options, the keys of the Launch entries, the clocks and the templates of the overclock. Texts of the page live in `i18n/`, a folder of YAML files per language: `index.yaml` holds the page itself, the folders of the platforms hold the texts of their components and options. Styles live in `styles/`. Logos, photos and the gallery live in `public/`. SVG sources of the gallery icons, the set of BrewDeck and the icons of Nichole Mattera fitted into the icon of Nyx, live in `art/icons/` and are rendered into the gallery with `rsvg-convert -w 192 -h 192 art/icons/<id>.svg -o public/appearance/icon/<id>.png`.
 
 ## License
 

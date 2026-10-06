@@ -1,17 +1,10 @@
 import { PspState, TuningValue } from '@/types';
-import { Language } from '@/i18n';
-import { HARDWARE } from '@/data';
+import { HARDWARE } from '@data';
 import { BuildRequest, BuildResult, ConfigSpec, installerView, installers, render, renderConfigs } from '@/build';
-import { readmeEn, readmeRu, readmeUk, settingsTxt, pluginsTxt, hotspotTxt } from '@templates/psp';
+import TEMPLATES, { README } from '@templates/psp';
 import { COMPONENTS, isFirmwareSupported, pluginScope, selectedPlugins } from './data';
 
 type Request = BuildRequest<PspState>;
-
-const READMES: {[lang in Language]: string} = {
-	en: readmeEn,
-	ru: readmeRu,
-	uk: readmeUk
-};
 
 const onOff = (value: TuningValue) => value ? 'on' : 'off';
 
@@ -29,7 +22,7 @@ const pluginLines = (request: Request) => selectedPlugins(request.selectedCompon
 const CONFIGS: ConfigSpec<Request>[] = [
 	{
 		path: 'PSP/SAVEDATA/ARK_01234/SETTINGS.TXT',
-		template: settingsTxt,
+		template: TEMPLATES.settingsTxt,
 		view: ({ tuning: { clock, memory, xmb, device, go } }) => ({
 			usbcharge: onOff(clock.usbcharge),
 			// The same clock in games and the XMB takes one line, 0 leaves the clock alone
@@ -63,13 +56,13 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	{
 		// ARK also reads the plugins file of its own folder, which FasterARK overwrites on every install
 		path: 'SEPLUGINS/PLUGINS.TXT',
-		template: pluginsTxt,
+		template: TEMPLATES.pluginsTxt,
 		view: request => ({ plugins: pluginLines(request) }),
 		when: request => selectedPlugins(request.selectedComponentIDs).length > 0
 	},
 	{
 		path: 'SEPLUGINS/hotspot.txt',
-		template: hotspotTxt,
+		template: TEMPLATES.hotspotTxt,
 		view: ({ tuning: { aemu } }) => ({ hotspot: aemu.hotspot }),
 		when: ({ selectedComponentIDs, tuning: { aemu } }) => selectedComponentIDs.includes('aemu') && aemu.hotspot != ''
 	}
@@ -112,7 +105,7 @@ export function build(request: Request): BuildResult {
 
 	return {
 		configs,
-		files: [...installers(view), { path: 'README.md', content: render(READMES[request.lang], readmeView) }],
+		files: [...installers(view), { path: 'README.md', content: render(README[request.lang], readmeView) }],
 		assets: [],
 		manual
 	};

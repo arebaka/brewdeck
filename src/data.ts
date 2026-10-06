@@ -1,9 +1,4 @@
-import { Catalog, HardwareInfo, Preset, Requirement, TuningConfig, TuningGroup, TuningOption, TuningStep } from '@/types';
-
-import { hardware } from '@data';
-
-// Consoles of every platform, the revision of a build tells its platform
-export const HARDWARE: HardwareInfo[] = hardware as HardwareInfo[];
+import { Catalog, Preset, Requirement, TuningConfig, TuningGroup, TuningOption, TuningStep } from '@/types';
 
 // Compares dotted versions part by part: -1, 0 or 1
 export function compareVersions(a: string, b: string): number {
@@ -22,9 +17,9 @@ export function getTuningDefaults(groups: TuningGroup[]): TuningConfig {
 	]));
 }
 
-// Options with `when` conditions only apply while their sibling options hold one of the listed values
+// Options with `when` conditions only apply while their sibling options hold the value or one of the listed values
 export function isTuningOptionActive(group: TuningGroup, option: TuningOption, tuning: TuningConfig): boolean {
-	return Object.entries(option.when ?? {}).every(([id, values]) => values.includes(tuning[group.id][id]));
+	return Object.entries(option.when ?? {}).every(([id, values]) => [values].flat().some(value => value === tuning[group.id][id]));
 }
 
 export function isTuningOptionChanged(group: TuningGroup, option: TuningOption, tuning: TuningConfig): boolean {
@@ -76,8 +71,7 @@ function allComponents(catalog: Catalog): string[] {
 export function presetSelection(catalog: Catalog, preset: Preset): string[] {
 	return resolveSelection(
 		catalog,
-		preset.components == 'all' ? allComponents(catalog)
-			: preset.components
+		preset.id == 'all' ? allComponents(catalog) : preset.components
 	);
 }
 

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Fix, Issue, StepId } from '../types';
-import { Translation, format, stepName } from '../i18n';
-import { Platform } from '../platforms';
+import { Fix, Issue, StepId } from '@/types';
+import { Translation, format, stepName } from '@i18n';
+import { Platform } from '@/platforms';
 
 interface IssuesProps {
 	issues: Issue[];

@@ -32,7 +32,7 @@ export function highlight(content: string, path: string): string {
 }
 
 // The readme carries versions and names from release metadata, so raw HTML stays text and links only lead to the web
-const markdown = new Marked({
+const MARKDOWN = new Marked({
 	gfm: true,
 	renderer: {
 		html: ({ text }) => escape(text),
@@ -48,5 +48,5 @@ const markdown = new Marked({
 
 // HTML of the readme
 export function renderMarkdown(content: string): string {
-	return markdown.parse(content, { async: false });
+	return MARKDOWN.parse(content, { async: false });
 }

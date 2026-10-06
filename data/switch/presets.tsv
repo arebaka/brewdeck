@@ -1,0 +1,4 @@
+id	components
+minimal
+base	sys_patch,fusee,lockpick_rcm,tegraexplorer,sys_clk,saltynx,ultrahand,status_monitor,daybreak,appstore,dbi,aio_updater,jksv
+all

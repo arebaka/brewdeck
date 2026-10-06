@@ -1,0 +1,2 @@
+id	type	default	values
+nogc	select	auto	auto,on,off

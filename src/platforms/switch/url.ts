@@ -1,5 +1,5 @@
 import { ClockKey, Clocks, EntryOverride, ImageTarget, LaunchConfig, SwitchRevision, SwitchState } from '@/types';
-import { HARDWARE } from '@/data';
+import { HARDWARE } from '@data';
 import { Params, decodeSelection, decodeTuning, encodeSelection, encodeTuning, query } from '@/url';
 import { BOOT_ENTRIES, CATALOG, COMPONENTS, ENTRY_OVERRIDES, GALLERY, HOS_VERSIONS, OVERCLOCK, defaultBuild, gameName, isEmuMMCFolder, templateClocks } from './data';
 

@@ -1,6 +1,7 @@
-import { BuildState, Catalog, ComponentInfo, Issue, StepId } from './types';
-import { Translation } from './i18n';
-import { HARDWARE, isRequirementMet } from './data';
+import type { BuildState, Catalog, ComponentInfo, Issue, StepId } from './types';
+import type { Translation } from '@i18n';
+import { HARDWARE } from '@data';
+import { isRequirementMet } from './data';
 
 const LEVELS = { error: 0, warning: 1, info: 2 };
 

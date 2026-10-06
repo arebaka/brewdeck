@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 import { BuildState, Fix, GameProfile, HardwareRevision, Issue, IssueLevel, LaunchConfig, PspState, StepId, SwitchState, TuningGroup, TuningStep, TuningValue, Uploads } from './types';
-import { format, translations } from './i18n';
-import { HARDWARE, getTuningDefaults, isTuningOptionChanged, presetSelection, resolveSelection, tuningGroups } from './data';
+import { format, I18N } from '@i18n';
+import { HARDWARE } from '@data';
+import { getTuningDefaults, isTuningOptionChanged, presetSelection, resolveSelection, tuningGroups } from './data';
 import { PLATFORMS } from './platforms';
 import { launchEntries } from './platforms/switch';
 import { PSP } from './platforms/psp';
@@ -30,7 +31,7 @@ export default function App() {
 	});
 
 	const { lang } = state;
-	const t = translations[lang];
+	const t = I18N[lang];
 	const platform = PLATFORMS[state.platform];
 	const build = state.builds[state.platform];
 	const { hardware, firmware, selectedComponentIDs, tuning } = build;

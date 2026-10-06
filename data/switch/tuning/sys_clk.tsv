@@ -1,0 +1,6 @@
+id	type	default	min	max
+poll_interval_ms	number	300	50	5000
+temp_log_interval_ms	number	0	0	600000
+freq_log_interval_ms	number	0	0	600000
+power_log_interval_ms	number	0	0	600000
+csv_write_interval_ms	number	0	0	600000

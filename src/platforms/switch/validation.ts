@@ -1,5 +1,5 @@
 import { ClockKey, ClockMode, Issue, SwitchState } from '@/types';
-import { Translation } from '@/i18n';
+import { Translation } from '@i18n';
 import { componentIssues, sortIssues } from '@/validation';
 import { CATALOG, COMPONENTS, HOS_VERSIONS, OVERCLOCK, isHOSSupported, launchEntries } from './data';
 

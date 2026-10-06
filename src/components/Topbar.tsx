@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Language, Translation, translations } from '../i18n';
+import { LANGUAGES, Language, I18N, Translation } from '@i18n';
 
 interface TopbarProps {
 	lang: Language;
@@ -29,12 +29,12 @@ export function Topbar({
 			</p>
 			<Clock lang={lang} />
 			<nav className="lang-switch">
-				{(Object.keys(translations) as Language[]).map(option => (
+				{LANGUAGES.map(option => (
 					<button
 						key={option}
 						className={`lang-option ${lang == option ? 'active' : ''}`}
 						onClick={() => setLang(option)}>
-						{translations[option].language}
+						{I18N[option].language}
 					</button>
 				))}
 			</nav>

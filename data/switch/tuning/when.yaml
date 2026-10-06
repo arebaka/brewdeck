@@ -1,0 +1,22 @@
+dns:
+  targets:
+    mode:
+      - block
+  add_defaults:
+    mode:
+      - block
+      - default
+  debug_log:
+    mode:
+      - block
+      - default
+
+atmosphere:
+  enable_sd_card_logging:
+    enable_log_manager: true
+  sd_card_log_output_directory:
+    enable_log_manager: true
+
+sys_ftpd_light:
+  keycombo:
+    pause: true

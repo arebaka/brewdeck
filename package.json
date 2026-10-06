@@ -58,6 +58,8 @@
 		"react-dom": "^19.2.7"
 	},
 	"devDependencies": {
+		"@modyfi/vite-plugin-yaml": "^1.1.1",
+		"@rollup/plugin-dsv": "^4.0.0",
 		"@types/mustache": "^4.2.6",
 		"@types/node": "^26.1.0",
 		"@types/react": "^19.2.17",

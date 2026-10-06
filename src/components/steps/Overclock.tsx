@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-import { ClockKey, ClockMode, ClockModule, GameProfile, SwitchRevision, Fix, Issue, TuningConfig, TuningStep, TuningValue } from '../../types';
-import { Language, Translation } from '../../i18n';
-import { tuningGroups } from '../../data';
-import { CATALOG, OVERCLOCK, SWITCH, gameName, templateClocks } from '../../platforms/switch';
-import { activate } from '../../utils';
+import { ClockKey, ClockMode, ClockModule, GameProfile, SwitchRevision, Fix, Issue, TuningConfig, TuningStep, TuningValue } from '@/types';
+import { Language, Translation } from '@i18n';
+import { tuningGroups } from '@/data';
+import { CATALOG, OVERCLOCK, SWITCH, gameName, templateClocks } from '@/platforms/switch';
+import { activate } from '@/utils';
 import { Issues } from '../Issues';
 import { TuningSection } from './Tuning';
 

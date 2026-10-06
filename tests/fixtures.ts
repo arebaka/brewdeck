@@ -4,7 +4,7 @@ import { AppState, defaultState } from '@/state';
 import { CATALOG, SWITCH, templateClocks } from '@/platforms/switch';
 import { resolveSelection } from '@/data';
 import { Issue, SwitchState } from '@/types';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 
 // A build touching every kind of option, a secret, overclock profiles of every kind, launch extras and uploads
 export function customBuild(): SwitchState {
@@ -52,7 +52,7 @@ export function customState(): AppState {
 
 // Issues as `level:code:params` in Russian, the language with the most room for mistakes
 export function issueCodes(build: SwitchState): string[] {
-	return SWITCH.validate(build, translations.ru).map((issue: Issue) => `${issue.level}:${issue.code}:${Object.values(issue.params).join('|')}`);
+	return SWITCH.validate(build, I18N.ru).map((issue: Issue) => `${issue.level}:${issue.code}:${Object.values(issue.params).join('|')}`);
 }
 
 // Arbitrary bytes stand for the bitmaps: the installers only decode what the page encoded

@@ -1,5 +1,0 @@
-[
-	{ "id": "minimal", "components": [] },
-	{ "id": "base", "components": ["gclite", "cmfilemanager"] },
-	{ "id": "all", "components": "all" }
-]

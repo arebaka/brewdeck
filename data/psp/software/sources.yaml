@@ -1,0 +1,57 @@
+ark:
+  github:
+    repo: PSP-Arkfive/FasterARK
+    asset: ^FasterARK_psp_{{variant}}\.zip$
+
+update661:
+  url:
+    url: http://du01.psp.update.playstation.org/update/psp/image/us/2014_1212_6be8878f475ac5b1a499b95ab2f7d301/EBOOT.PBP
+    path: PSP/GAME/UPDATE/EBOOT.PBP
+
+gclite:
+  github:
+    repo: codestation/gclite
+    asset: ^categories_lite-[0-9.]+\.zip$
+    root: categories_lite-1.6
+    into: SEPLUGINS/gclite
+
+missyhud:
+  github:
+    repo: pebeto/missyhud.prx
+    asset: ^missyhud\.prx$
+    path: SEPLUGINS/missyhud.prx
+
+aemu:
+  github:
+    repo: Kethen/aemu
+    asset: ^aemu_[0-9a-f]+\.zip$
+    root: dist_660_release
+
+remotejoylite:
+  github:
+    repo: Kethen/RemoteJoyLite
+    asset: ^RemoteJoyLite_[0-9a-f]+\.zip$
+    root: psp
+    into: SEPLUGINS/RemoteJoyLite
+
+cmfilemanager:
+  github:
+    repo: joel16/CMFileManager-PSP
+    asset: ^CMFileManager-PSP\.zip$
+
+daedalusx64:
+  github:
+    repo: DaedalusX64/daedalus
+    asset: ^DaedalusX64_[0-9_]+\.zip$
+    into: PSP/GAME
+
+tempgba:
+  github:
+    repo: andymcca/TempGBA4PSP-mod
+    asset: ^TempGBA4PSP-Mod_[0-9]+\.zip$
+    into: PSP/GAME/TempGBA4PSP
+
+gba_bios:
+  url:
+    url: https://raw.githubusercontent.com/Cult-of-GBA/BIOS/master/bios.bin
+    path: PSP/GAME/TempGBA4PSP/gba_bios.bin

@@ -1,0 +1,380 @@
+atmosphere:
+  github:
+    repo: Atmosphere-NX/Atmosphere
+    asset: ^atmosphere-.*\.zip$
+
+hekate:
+  # Only GitHub: taken from the App Store, the installer would skip the payloads below
+  github:
+    - repo: CTCaer/hekate
+      asset: ^hekate_ctcaer_[0-9.]+_Nyx_[0-9.]+\.zip$
+    - repo: CTCaer/hekate
+      asset: ^hekate_ctcaer_[0-9.]+\.bin$
+      path: atmosphere/reboot_payload.bin
+    - repo: CTCaer/hekate
+      asset: ^hekate_ctcaer_[0-9.]+\.bin$
+      path: payload.bin
+      modchip: true
+
+sys_patch:
+  github:
+    repo: impeeza/sys-patch
+    asset: ^sys-patch-.*\.zip$
+
+fusee:
+  github:
+    repo: Atmosphere-NX/Atmosphere
+    asset: ^fusee\.bin$
+    path: bootloader/payloads/fusee.bin
+
+lockpick_rcm:
+  github:
+    repo: impeeza/Lockpick_RCMDecScots
+    asset: ^Lockpick_RCM-[0-9.]+_Hekate\.zip$
+
+tegraexplorer:
+  # Only GitHub, so the payload lands where its Launch entry points
+  github:
+    repo: suchmememanyskill/TegraExplorer
+    asset: ^TegraExplorer\.bin$
+    path: bootloader/payloads/TegraExplorer.bin
+
+common_problem_resolver:
+  github:
+    repo: Team-Neptune/CommonProblemResolver
+    asset: ^CommonProblemResolver\.bin$
+    path: bootloader/payloads/CommonProblemResolver.bin
+
+hwfly_toolbox:
+  github:
+    repo: hwfly-nx/hwfly-toolbox
+    asset: ^hwfly_toolbox\.bin$
+    path: bootloader/payloads/hwfly_toolbox.bin
+
+picofly_toolbox:
+  url:
+    url: https://raw.githubusercontent.com/Ansem-SoD/Picofly/main/Firmwares/picofly_toolbox_0.2.bin
+    path: bootloader/payloads/picofly_toolbox.bin
+
+missioncontrol:
+  appstore: MissionControl
+  github:
+    repo: ndeadly/MissionControl
+    asset: ^MissionControl-.*\.zip$
+
+sys_clk:
+  appstore: sys-clk
+  github:
+    repo: retronx-team/sys-clk
+    asset: ^sys-clk-.*\.zip$
+
+nx_fan_control:
+  github:
+    repo: dominatorul/NX-FanControl
+    asset: ^NXFanControl\.zip$
+
+saltynx:
+  appstore: SaltyNX
+  github:
+    repo: masagrator/SaltyNX
+    asset: ^SaltyNX\.zip$
+
+ldn_mitm:
+  appstore: ldn_mitm
+  github:
+    repo: spacemeowx2/ldn_mitm
+    asset: ^ldn_mitm_.*\.zip$
+
+sys_con:
+  appstore: syscon1x2024
+  github:
+    repo: o0Zz/sys-con
+    asset: ^sys-con-.*\.zip$
+
+sysdvr:
+  appstore: SysDVR
+  github:
+    repo: exelix11/SysDVR
+    asset: ^SysDVR\.zip$
+
+sys_ftpd_light:
+  appstore: sys-ftpd-light
+
+sys_tune:
+  appstore: sys-tune
+
+fizeau:
+  github:
+    repo: averne/Fizeau
+    asset: ^Fizeau-.*\.zip$
+
+sys_hidplus:
+  appstore: sys-hidplus
+
+ovlmenu:
+  appstore:
+    - nx-ovlloader
+    - Tesla-menu
+  github:
+    - repo: WerWolv/nx-ovlloader
+      asset: ^nx-ovlloader\.zip$
+    - repo: WerWolv/Tesla-Menu
+      asset: ^ovlmenu\.zip$
+
+ultrahand:
+  appstore: UltrahandOverlay
+
+status_monitor:
+  appstore: Status-Monitor-Overlay
+  github:
+    repo: masagrator/Status-Monitor-Overlay
+    asset: ^Status-Monitor-Overlay\.zip$
+
+fps_locker:
+  appstore: FPSLocker
+  github:
+    repo: masagrator/FPSLocker
+    asset: ^FPSLocker\.ovl$
+    path: switch/.overlays/FPSLocker.ovl
+
+reversenx_rt:
+  github:
+    repo: masagrator/ReverseNX-RT
+    asset: ^ReverseNX-RT-ovl\.ovl$
+    path: switch/.overlays/ReverseNX-RT-ovl.ovl
+
+sysdvr_overlay:
+  appstore: sysdvr-overlay
+
+edizon_overlay:
+  appstore: EdiZonOverlay
+
+noled:
+  github:
+    repo: kemalsanli/noled
+    asset: ^noled\.ovl$
+    path: switch/.overlays/noled.ovl
+
+master_volume:
+  github:
+    repo: averne/MasterVolume
+    asset: ^MasterVolume-[0-9.]+\.zip$
+
+bt_audio:
+  github:
+    repo: masagrator/BT_Audio-ovl
+    asset: ^BT_Audio-ovl\.ovl$
+    path: switch/.overlays/BT_Audio-ovl.ovl
+
+daybreak:
+  bundled: atmosphere
+
+appstore:
+  appstore: appstore
+
+sphaira:
+  appstore: sphaira
+
+dbi:
+  github:
+    - repo: rashevskyv/dbi
+      asset: ^DBI\.nro$
+      path: switch/DBI/DBI.nro
+    - repo: rashevskyv/dbi
+      asset: ^dbi\.config$
+      path: switch/DBI/dbi.config
+
+dbi_patcher:
+  github:
+    - repo: rashevskyv/DBIPatcher
+      asset: ^DBI\.nro$
+      path: switch/DBI/DBI.nro
+    - repo: rashevskyv/DBIPatcher
+      asset: ^translation_{{language}}\.bin$
+      path: switch/DBI/translation.bin
+
+tinfoil:
+  manual: https://tinfoil.io/Download
+
+goldleaf:
+  appstore: Goldleaf
+  github:
+    repo: XorTroll/Goldleaf
+    asset: ^Goldleaf\.nro$
+    path: switch/Goldleaf/Goldleaf.nro
+
+nxdumptool:
+  appstore: gcdumptool
+
+aio_updater:
+  github:
+    repo: HamletDuFromage/aio-switch-updater
+    asset: ^aio-switch-updater\.zip$
+
+jksv:
+  appstore: jksv
+  github:
+    repo: J-D-K/JKSV
+    asset: ^JKSV\.nro$
+    path: switch/JKSV/JKSV.nro
+
+checkpoint:
+  appstore: Checkpoint
+
+neumann:
+  appstore: Neumann
+
+edizon:
+  appstore: Edizon
+  github:
+    repo: tomvita/EdiZon-SE
+    asset: ^edizon\.zip$
+
+breeze:
+  github:
+    repo: tomvita/Breeze-Beta
+    asset: ^Breeze\.zip$
+
+simple_mod_manager:
+  appstore: SimpleModManager
+
+simple_mod_downloader:
+  appstore: SimpleModDownloader
+
+switch_cheats_updater:
+  appstore: switch-cheats-updater
+
+emuiibo:
+  appstore: emuiibo
+  github:
+    repo: XorTroll/emuiibo
+    asset: ^emuiibo\.zip$
+    root: SdOut
+
+amiigo:
+  appstore: Amiigo
+
+amiibo_generator:
+  appstore: AmiiboGenerator
+
+linkalho:
+  github:
+    repo: impeeza/linkalho
+    asset: ^linkalho-.*\.zip$
+
+nx_shell:
+  appstore: NX-shell
+  github:
+    repo: Joel16/NX-Shell
+    asset: ^NX-Shell\.nro$
+    path: switch/NX-Shell/NX-Shell.nro
+
+nx_activity_log:
+  github:
+    repo: zdm65477730/NX-Activity-Log
+    asset: ^NX-Activity-Log\.nro$
+    path: switch/NX-Activity-Log/NX-Activity-Log.nro
+
+jc_color_swapper:
+  appstore: JC-color-swapper
+
+nxmp:
+  appstore: NXMP
+
+switchfin:
+  appstore: Switchfin
+
+pplay:
+  appstore: pplay
+
+browsenx:
+  appstore: browsenx
+
+lennytube:
+  appstore: lennytube
+
+comicnx:
+  appstore: ComicNX
+
+nxthemes_installer:
+  appstore: NXthemes_Installer
+
+themezer:
+  appstore: ThemezerNX
+
+ulaunch:
+  appstore: uLaunch
+  github:
+    repo: XorTroll/uLaunch
+    asset: ^uLaunch\.zip$
+
+moonlight:
+  appstore: Moonlight-Switch
+
+akira:
+  github:
+    repo: xlanor/akira
+    asset: ^akira-[0-9.]+\.zip$
+
+skynx:
+  appstore: SkyNX
+
+switch_remote_play:
+  appstore: switch-remote-play
+
+retroarch:
+  appstore: RetroNX
+
+flycast:
+  url:
+    url: https://buildbot.libretro.com/nightly/nintendo/switch/libnx/latest/flycast_libretro_libnx.nro.zip
+    into: retroarch/cores
+
+ppsspp:
+  appstore: ppsspp
+
+melonds:
+  appstore: melonDS
+
+noods:
+  appstore: NooDS
+  github:
+    repo: Hydr8gon/NooDS
+    asset: ^noods-switch\.zip$
+    into: switch
+
+desmume:
+  appstore: desmume
+
+mgba:
+  appstore: mGBA
+
+psnes:
+  appstore: psnes
+
+pnes:
+  appstore: pNES
+
+pfbneo:
+  appstore: pFBA
+
+scummvm:
+  appstore: scummvm
+
+sys_botbase:
+  github:
+    repo: olliz0r/sys-botbase
+    asset: ^sys-botbase.*\.zip$
+
+usb_botbase:
+  appstore: USBBotbase
+
+sys_gdbstub:
+  github:
+    repo: mossvr/sys-gdbstub
+    asset: ^sys-gdbstub\.zip$
+
+twili:
+  github:
+    repo: misson20000/twili
+    asset: ^twili\.zip$

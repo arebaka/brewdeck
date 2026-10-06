@@ -1,5 +1,0 @@
-[
-	{ "id": "minimal", "components": [] },
-	{ "id": "base", "components": ["sys_patch", "fusee", "lockpick_rcm", "tegraexplorer", "sys_clk", "saltynx", "ultrahand", "status_monitor", "daybreak", "appstore", "dbi", "aio_updater", "jksv"] },
-	{ "id": "all", "components": "all" }
-]

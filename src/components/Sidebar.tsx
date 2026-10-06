@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
-import { IssueLevel, PlatformId, StepId } from '../types';
-import { Translation, stepName } from '../i18n';
-import { formatSize } from '../utils';
+import { IssueLevel, PlatformId, StepId } from '@/types';
+import { Translation, stepName } from '@i18n';
+import { formatSize } from '@/utils';
 import { StepIcon } from './StepIcon';
 
 export interface SidebarItem {

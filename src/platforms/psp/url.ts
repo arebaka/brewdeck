@@ -1,5 +1,5 @@
 import { PspRevision, PspState } from '@/types';
-import { HARDWARE } from '@/data';
+import { HARDWARE } from '@data';
 import { Params, decodeSelection, decodeTuning, encodeSelection, encodeTuning, query } from '@/url';
 import { CATALOG, COMPONENTS, FIRMWARE, RUNLEVELS, defaultBuild } from './data';
 

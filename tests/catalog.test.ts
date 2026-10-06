@@ -1,21 +1,22 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import { HARDWARE, matchingPreset, presetSelection, resolveSelection } from '@/data';
+import { HARDWARE } from '@data';
+import { matchingPreset, presetSelection, resolveSelection } from '@/data';
 import { PLATFORMS } from '@/platforms';
 import { CATALOG, GALLERY } from '@/platforms/switch';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 import { buttonName, isButtons } from '@/components/Buttons';
 
-const platforms = Object.values(PLATFORMS).map(platform => [platform.id, platform] as const);
-const languages = Object.entries(translations);
+const PLATFORM_CASES = Object.values(PLATFORMS).map(platform => [platform.id, platform] as const);
+const LANGUAGE_CASES = Object.entries(I18N);
 
 describe('catalog', () => {
 	it('builds for the platform of every console', () => {
 		expect(HARDWARE.filter(hw => !(hw.platform in PLATFORMS)).map(hw => hw.id)).toEqual([]);
 	});
 
-	it.each(platforms)('refers only to existing components of %s', (id, { catalog }) => {
+	it.each(PLATFORM_CASES)('refers only to existing components of %s', (id, { catalog }) => {
 		const ids = new Set(catalog.components.map(comp => comp.id));
 		for (const comp of catalog.components) {
 			const references = [
@@ -26,9 +27,20 @@ describe('catalog', () => {
 			];
 			expect(references.filter(id => !ids.has(id)), comp.id).toEqual([]);
 		}
-		for (const preset of catalog.presets.filter(preset => Array.isArray(preset.components))) {
-			expect((preset.components as string[]).filter(id => !ids.has(id)), preset.id).toEqual([]);
+		for (const preset of catalog.presets) {
+			expect(preset.components.filter(id => !ids.has(id)), preset.id).toEqual([]);
 		}
+	});
+
+	it.each(PLATFORM_CASES)('takes every component of %s from a source it has', (id, { catalog }) => {
+		expect(catalog.components.filter(comp => !comp.sources[comp.source]?.length).map(comp => comp.id)).toEqual([]);
+	});
+
+	it.each(PLATFORM_CASES)('matches the assets of %s with patterns that read as they are written', (id, { catalog }) => {
+		const patterns = catalog.components.flatMap(comp => (comp.sources.github ?? []).map(item => item.asset));
+		// A backslash doubled in the YAML matches a backslash instead of escaping what follows it
+		expect(patterns.filter(pattern => pattern.includes('\\\\'))).toEqual([]);
+		expect(() => patterns.map(pattern => new RegExp(pattern))).not.toThrow();
 	});
 
 	it('installs payloads where their Launch entries point', () => {
@@ -48,21 +60,31 @@ describe('catalog', () => {
 		expect(files.filter(file => !existsSync(`public/${file}`))).toEqual([]);
 	});
 
-	it.each(platforms)('credits every logo of %s in public/LICENSE', id => {
+	it.each(PLATFORM_CASES)('credits every logo of %s in public/LICENSE', id => {
 		// The section of the platform runs up to the next unindented line
 		const section = readFileSync('public/LICENSE', 'utf8').split(`\nlogos/${id}/\n`)[1].split(/\n(?=\S)/)[0];
 		const credited = [...section.matchAll(/^ {4}([\w.-]+\.(?:png|jpg))\b/gm)].map(match => match[1]).sort();
 		expect(credited).toEqual(readdirSync(`public/logos/${id}`).sort());
 	});
 
-	describe.each(languages)('in %s', (lang, t) => {
-		it.each(platforms)('describes every component, option and preset of %s', (id, { catalog }) => {
+	describe.each(LANGUAGE_CASES)('in %s', (lang, t) => {
+		it.each(PLATFORM_CASES)('describes every component, option and preset of %s', (id, { catalog }) => {
 			expect(catalog.components.filter(comp => !t.software[id][comp.id]?.description).map(comp => comp.id)).toEqual([]);
 			const missing = catalog.tuning.flatMap(group => group.options
 				.filter(option => !t.tuning[id][group.id]?.options[option.id]?.title)
 				.map(option => `${group.id}.${option.id}`));
 			expect(missing).toEqual([]);
 			expect(catalog.presets.filter(preset => !t.pages.software.presets[preset.id]).map(preset => preset.id)).toEqual([]);
+		});
+
+		it.each(PLATFORM_CASES)('keeps no texts of %s for what the catalog no longer has', (id, { catalog }) => {
+			const components = new Set(catalog.components.map(comp => comp.id));
+			const options = new Set(catalog.tuning.flatMap(group => group.options.map(option => `${group.id}.${option.id}`)));
+			const stale = [
+				...Object.keys(t.software[id]).filter(component => !components.has(component)),
+				...Object.entries(t.tuning[id]).flatMap(([group, texts]) => Object.keys(texts.options).map(option => `${group}.${option}`)).filter(option => !options.has(option))
+			];
+			expect(stale).toEqual([]);
 		});
 
 		it('names every button', () => {
@@ -87,12 +109,22 @@ describe('selection', () => {
 		expect(resolveSelection(CATALOG, ['fps_locker', 'ovlmenu'], false)).not.toContain('saltynx');
 	});
 
+	// Alternatives written as plain requirements would bring both sides of a conflict
+	it.each(PLATFORM_CASES)('picks any component of %s without conflicts among what it brings', (id, platform) => {
+		for (const comp of platform.catalog.components) {
+			const selection = resolveSelection(platform.catalog, [comp.id]);
+			const conflicts = platform.validate({ ...platform.defaults(), selectedComponentIDs: selection }, I18N.en)
+				.filter(issue => issue.code == 'conflict');
+			expect(conflicts, comp.id).toEqual([]);
+		}
+	});
+
 	const presets = Object.values(PLATFORMS).flatMap(platform => platform.catalog.presets.map(preset => [`${platform.id} ${preset.id}`, platform, preset] as const));
 	it.each(presets)('turns the %s preset into a consistent selection', (name, platform, preset) => {
 		const selection = presetSelection(platform.catalog, preset);
 		// Everything takes both sides of conflicts too, the user picks one
-		const broken = platform.validate({ ...platform.defaults(), selectedComponentIDs: selection }, translations.en)
-			.filter(issue => issue.code == 'requires' || (preset.components != 'all' && issue.code == 'conflict'));
+		const broken = platform.validate({ ...platform.defaults(), selectedComponentIDs: selection }, I18N.en)
+			.filter(issue => issue.code == 'requires' || (preset.id != 'all' && issue.code == 'conflict'));
 		expect(broken).toEqual([]);
 		expect(matchingPreset(platform.catalog, selection)?.id).toBe(preset.id);
 	});

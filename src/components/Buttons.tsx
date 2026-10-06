@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Translation } from '../i18n';
-import { activate } from '../utils';
+import { Translation } from '@i18n';
+import { activate } from '@/utils';
 
 // Buttons in the order of the Joy-Con they are on
 const LEFT = ['ZL', 'L', 'MINUS', 'LS', 'DLEFT', 'DUP', 'DDOWN', 'DRIGHT'];

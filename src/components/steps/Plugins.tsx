@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { ComponentInfo, Fix, Issue, PspState, TuningValue } from '../../types';
-import { Language, Translation } from '../../i18n';
-import { tuningGroups } from '../../data';
-import { CATALOG, PSP, RUNLEVELS, pluginScope, selectedPlugins } from '../../platforms/psp';
-import { activate } from '../../utils';
+import { ComponentInfo, Fix, Issue, PspState, TuningValue } from '@/types';
+import { Language, Translation } from '@i18n';
+import { tuningGroups } from '@/data';
+import { CATALOG, PSP, RUNLEVELS, pluginScope, selectedPlugins } from '@/platforms/psp';
+import { activate } from '@/utils';
 import { Issues } from '../Issues';
 import { TuningSection } from './Tuning';
 

@@ -1,5 +1,5 @@
 import { BuildState, Catalog, FirmwareVersion, Issue, PlatformId, StepId } from '@/types';
-import { Translation } from '@/i18n';
+import { Translation } from '@i18n';
 import { BuildRequest, BuildResult } from '@/build';
 import { SWITCH } from './switch';
 import { PSP } from './psp';

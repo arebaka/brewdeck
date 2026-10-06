@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { BuildState, Fix, Issue, StepId, Uploads } from '../../types';
-import { Language, Translation, format } from '../../i18n';
-import { HARDWARE } from '../../data';
-import { Platform } from '../../platforms';
-import { encodeImage } from '../../images';
-import { highlight, renderMarkdown } from '../../markup';
-import { activate, downloadFile, formatSize } from '../../utils';
+import { BuildState, Fix, Issue, StepId, Uploads } from '@/types';
+import { Language, Translation, format } from '@i18n';
+import { HARDWARE } from '@data';
+import { Platform } from '@/platforms';
+import { encodeImage } from '@/images';
+import { highlight, renderMarkdown } from '@/markup';
+import { activate, downloadFile, formatSize } from '@/utils';
 import { Issues } from '../Issues';
 
 interface BuildProps {

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveSelection } from '@/data';
 import { CATALOG, COMPONENTS, SWITCH } from '@/platforms/switch';
-import { translations } from '@/i18n';
+import { I18N } from '@i18n';
 import { BITMAPS, customBuild, encodeBitmaps } from './fixtures';
 
 describe('build', () => {
-	const result = SWITCH.build({ ...customBuild(), lang: 'en', t: translations.en });
+	const result = SWITCH.build({ ...customBuild(), lang: 'en', t: I18N.en });
 	const paths = result.configs.map(config => config.path);
 	const config = (path: string) => result.configs.find(config => config.path == path)?.content;
 	const installers = result.files.filter(file => file.path.startsWith('install.'));
@@ -96,7 +96,7 @@ describe('build', () => {
 			appearance: { bootlogo: 'hekate-a', background: 'atmosphere-splash', logos: {}, icons: { emummc: 'hekate-switch' } },
 			images,
 			lang: 'en',
-			t: translations.en
+			t: I18N.en
 		});
 		for (const file of files.filter(file => file.path.startsWith('install.'))) {
 			for (const [path, data] of Object.entries(images)) {
@@ -113,7 +113,7 @@ describe('build', () => {
 			selectedComponentIDs: resolveSelection(CATALOG, [...build.selectedComponentIDs, 'dbi_patcher']),
 			tuning: { ...build.tuning, dbi_patcher: { language: 'ua' } },
 			lang: 'en',
-			t: translations.en
+			t: I18N.en
 		});
 		for (const file of files.filter(file => file.path.startsWith('install.'))) {
 			expect(file.content).toContain("'^translation_ua\\.bin$'");

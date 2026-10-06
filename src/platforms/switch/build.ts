@@ -1,21 +1,11 @@
 import { ImageTarget, SwitchState, TuningValue } from '@/types';
-import { Language } from '@/i18n';
-import { HARDWARE, isRequirementMet, isTuningOptionChanged } from '@/data';
+import { HARDWARE } from '@data';
+import { isRequirementMet, isTuningOptionChanged } from '@/data';
 import { Asset, BuildRequest, BuildResult, ConfigSpec, installerView, installers, render, renderConfigs } from '@/build';
-import {
-	readmeEn, readmeRu, readmeUk, bootIni,
-	hekateIplIni, nyxIni, exosphereIni, systemSettingsIni, stratosphereIni, overrideConfigIni, nintendoHostsTxt, adHostsTxt,
-	teslaConfigIni, sysPatchConfigIni, missionControlIni, statusMonitorConfigIni, sysFtpdConfigIni, sysClkConfigIni
-} from '@templates/switch';
+import TEMPLATES, { README } from '@templates/switch';
 import { CATALOG, COMPONENTS, GALLERY, launchEntries } from './data';
 
 type Request = BuildRequest<SwitchState>;
-
-const READMES: {[lang in Language]: string} = {
-	en: readmeEn,
-	ru: readmeRu,
-	uk: readmeUk
-};
 
 // Values as the configs spell them: hekate flags, Atmosphere u8 and u64 settings
 const flag = (value: TuningValue) => value ? 1 : 0;
@@ -59,12 +49,12 @@ function logoPath(request: Request, entry: string): string | undefined {
 const CONFIGS: ConfigSpec<Request>[] = [
 	{
 		path: 'BOOT.INI',
-		template: bootIni,
+		template: TEMPLATES.bootIni,
 		view: () => ({})
 	},
 	{
 		path: 'bootloader/hekate_ipl.ini',
-		template: hekateIplIni,
+		template: TEMPLATES.hekateIplIni,
 		view: (request) => {
 			const { hekate, logo } = request.tuning;
 			const entries = launchEntries(request.launch, request.selectedComponentIDs);
@@ -91,7 +81,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'bootloader/nyx.ini',
-		template: nyxIni,
+		template: TEMPLATES.nyxIni,
 		view: ({ tuning: { nyx } }) => ({
 			themebg: nyxBackground(nyx.themebg),
 			themecolor: nyx.themecolor,
@@ -107,7 +97,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'exosphere.ini',
-		template: exosphereIni,
+		template: TEMPLATES.exosphereIni,
 		view: ({ tuning: { exosphere } }) => ({
 			debugmode: flag(exosphere.debugmode),
 			debugmode_user: flag(exosphere.debugmode_user),
@@ -124,7 +114,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'atmosphere/config/system_settings.ini',
-		template: systemSettingsIni,
+		template: TEMPLATES.systemSettingsIni,
 		view: ({ tuning: { atmosphere, dns } }) => ({
 			upload_enabled: u8(atmosphere.upload_enabled),
 			usb30_force_enabled: u8(atmosphere.usb30_force_enabled),
@@ -152,7 +142,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'atmosphere/config/stratosphere.ini',
-		template: stratosphereIni,
+		template: TEMPLATES.stratosphereIni,
 		view: ({ tuning: { stratosphere } }) => ({
 			nogc: flag(stratosphere.nogc == 'on')
 		}),
@@ -160,7 +150,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'atmosphere/config/override_config.ini',
-		template: overrideConfigIni,
+		template: TEMPLATES.overrideConfigIni,
 		// `!` inverts a key: the Album opens hbmenu unless the key is held, mods and cheats apply unless their keys are held
 		view: ({ tuning: { hbl } }) => ({
 			album_key: (hbl.album ? '!' : '') + hbl.key,
@@ -174,24 +164,24 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'atmosphere/hosts/emummc.txt',
-		template: nintendoHostsTxt,
+		template: TEMPLATES.nintendoHostsTxt,
 		view: () => ({}),
 		when: request => isDNSBlocked(request, 'emummc')
 	},
 	{
 		path: 'atmosphere/hosts/sysmmc.txt',
-		template: nintendoHostsTxt,
+		template: TEMPLATES.nintendoHostsTxt,
 		view: () => ({}),
 		when: request => isDNSBlocked(request, 'sysmmc')
 	},
 	{
 		path: 'atmosphere/hosts/advertising.txt',
-		template: adHostsTxt,
+		template: TEMPLATES.adHostsTxt,
 		view: () => ({})
 	},
 	{
 		path: 'config/tesla/config.ini',
-		template: teslaConfigIni,
+		template: TEMPLATES.teslaConfigIni,
 		view: ({ tuning: { tesla } }) => ({
 			key_combo: (tesla.key_combo as string[]).join('+')
 		}),
@@ -199,7 +189,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'config/sys-patch/config.ini',
-		template: sysPatchConfigIni,
+		template: TEMPLATES.sysPatchConfigIni,
 		view: ({ tuning: { sys_patch } }) => ({
 			patch_sysmmc: flag(sys_patch.patch_sysmmc),
 			patch_emummc: flag(sys_patch.patch_emummc),
@@ -210,13 +200,13 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'config/MissionControl/missioncontrol.ini',
-		template: missionControlIni,
+		template: TEMPLATES.missionControlIni,
 		view: ({ tuning: { missioncontrol } }) => Object.fromEntries(Object.entries(missioncontrol).map(([key, value]) => [key, String(value)])),
 		when: request => isGroupChanged(request, 'missioncontrol')
 	},
 	{
 		path: 'config/status-monitor/config.ini',
-		template: statusMonitorConfigIni,
+		template: TEMPLATES.statusMonitorConfigIni,
 		view: ({ tuning: { status_monitor } }) => ({
 			...Object.fromEntries(Object.entries(status_monitor).map(([key, value]) => [key, Array.isArray(value) ? value.join('+') : String(value)]))
 		}),
@@ -224,7 +214,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'config/sys-ftpd/config.ini',
-		template: sysFtpdConfigIni,
+		template: TEMPLATES.sysFtpdConfigIni,
 		view: ({ tuning: { sys_ftpd_light } }) => ({
 			user: sys_ftpd_light.user,
 			password: sys_ftpd_light.password,
@@ -238,7 +228,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	},
 	{
 		path: 'config/sys-clk/config.ini',
-		template: sysClkConfigIni,
+		template: TEMPLATES.sysClkConfigIni,
 		view: ({ tuning: { sys_clk }, overclock }) => ({
 			...sys_clk,
 			profiles: overclock
@@ -316,7 +306,7 @@ export function build(request: Request): BuildResult {
 
 	return {
 		configs,
-		files: [...installers(view), { path: 'README.md', content: render(READMES[request.lang], readmeView) }],
+		files: [...installers(view), { path: 'README.md', content: render(README[request.lang], readmeView) }],
 		assets: images,
 		manual
 	};

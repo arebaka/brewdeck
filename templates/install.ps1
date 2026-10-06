@@ -49,16 +49,12 @@ function Write-Notice([string]$Text) {
 	Write-Host " $Text"
 }
 
-# --- Downloads ---
-
-# Saves the file into the work directory and returns its path
 function Get-Download([string]$Url) {
 	$file = Join-Path $WorkDir ([IO.Path]::GetFileName(([Uri]$Url).AbsolutePath))
 	Invoke-WebRequest -Uri $Url -OutFile $file -UseBasicParsing
 	return $file
 }
 
-# URL of the first asset of the latest release of the repository whose name matches the regex
 function Get-AssetUrl([string]$Repo, [string]$Pattern) {
 	if (-not $Releases.ContainsKey($Repo)) {
 		$headers = @{ Accept = 'application/vnd.github+json' }
@@ -74,7 +70,6 @@ function Get-AssetUrl([string]$Repo, [string]$Pattern) {
 	return $asset.browser_download_url
 }
 
-# Unpacks the archive into a fresh folder of the work directory and returns it
 function Expand-Download([string]$File) {
 	$unpacked = Join-Path $WorkDir 'unpacked'
 	if (Test-Path -LiteralPath $unpacked) {
@@ -84,7 +79,6 @@ function Expand-Download([string]$File) {
 	return $unpacked
 }
 
-# Merges the archive, or its Root directory, into the Into directory of the card
 function Install-Archive([string]$File, [string]$Root, [string]$Into) {
 	$unpacked = Expand-Download $File
 	$source = if ($Root) { Join-Path $unpacked $Root } else { $unpacked }
@@ -93,7 +87,6 @@ function Install-Archive([string]$File, [string]$Root, [string]$Into) {
 	Copy-Item -Path (Join-Path $source '*') -Destination $target -Recurse -Force
 }
 
-# Copies the file to Path on the card
 function Install-Download([string]$File, [string]$Path) {
 	$target = Join-Path $SdRoot $Path
 	New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
@@ -101,7 +94,6 @@ function Install-Download([string]$File, [string]$Path) {
 }
 
 {{#hasAppstore}}
-# Unpacks a Homebrew App Store package and registers it, so the store on the console sees it installed
 function Install-AppStore([string]$Package) {
 	$unpacked = Expand-Download (Get-Download "$AppStore/zips/$Package.zip")
 	$registry = Join-Path $SdRoot "switch/appstore/.get/packages/$Package"
@@ -116,14 +108,12 @@ function Install-AppStore([string]$Package) {
 }
 
 {{/hasAppstore}}
-# Writes UTF-8 without BOM and with LF line endings, as the console expects
 function Write-Config([string]$Path, [string]$Content) {
 	$target = Join-Path $SdRoot $Path
 	New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
 	[IO.File]::WriteAllText($target, ($Content -replace "`r`n", "`n") + "`n")
 }
 
-# Decodes a gzip-compressed base64 image to Path on the card
 function Write-Image([string]$Path, [string]$Data) {
 	$target = Join-Path $SdRoot $Path
 	New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
@@ -208,7 +198,6 @@ if ($Failed.Count -gt 0) {
 }
 Write-Host ''
 
-# A window started from Explorer closes as soon as the script ends
 if (-not [Console]::IsInputRedirected) {
 	Read-Host 'Press Enter to exit' | Out-Null
 }

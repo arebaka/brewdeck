@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-import { BootMode, EntryOverride, Fix, Issue, LaunchConfig, TuningConfig, TuningValue } from '../../types';
-import { Language, Translation, format } from '../../i18n';
-import { tuningGroups } from '../../data';
-import { BOOT_ENTRIES, CATALOG, COMPONENTS, ENTRY_OVERRIDES, SWITCH, isEmuMMCFolder, launchEntries } from '../../platforms/switch';
-import { activate } from '../../utils';
+import { BootMode, EntryOverride, Fix, Issue, LaunchConfig, TuningConfig, TuningValue } from '@/types';
+import { Language, Translation, format } from '@i18n';
+import { tuningGroups } from '@/data';
+import { BOOT_ENTRIES, CATALOG, COMPONENTS, ENTRY_OVERRIDES, SWITCH, isEmuMMCFolder, launchEntries } from '@/platforms/switch';
+import { activate } from '@/utils';
 import { Issues } from '../Issues';
 import { ComponentTile } from '../ComponentTile';
 import { TuningSection } from './Tuning';

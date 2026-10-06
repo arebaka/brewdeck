@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { Fix, Issue } from '../types';
-import { Translation } from '../i18n';
-import { Platform } from '../platforms';
+import { Fix, Issue } from '@/types';
+import { Translation } from '@i18n';
+import { Platform } from '@/platforms';
 import { Notice } from './Issues';
 
 export interface Toast {
