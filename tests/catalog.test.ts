@@ -55,7 +55,7 @@ describe('catalog', () => {
 		const files = [
 			...Object.values(PLATFORMS).flatMap(({ id, catalog }) => catalog.components.filter(comp => comp.logo).map(comp => `logos/${id}/${comp.logo}`)),
 			...GALLERY.map(image => image.file),
-			...HARDWARE.map(hw => `images/${hw.image}`)
+			...HARDWARE.map(hw => `assets/${hw.image}`)
 		];
 		expect(files.filter(file => !existsSync(`public/${file}`))).toEqual([]);
 	});

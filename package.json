@@ -1,7 +1,7 @@
 {
 	"name": "brewdeck",
 	"version": "0.1.0",
-	"description": "Custom firmware builder for the Nintendo Switch and the PSP",
+	"description": "custom firmware builder for the Nintendo Switch and the PSP",
 	"license": "MIT",
 	"author": "arelive <me@are.moe> (https://are.moe)",
 	"repository": "github:arebaka/brewdeck",

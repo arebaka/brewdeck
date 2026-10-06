@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Градиент корпуса PSP (Piano Black) -->
+    <linearGradient id="pspBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c303b"/>
+      <stop offset="45%" stop-color="#14161b"/>
+      <stop offset="100%" stop-color="#08090b"/>
+    </linearGradient>
+
+    <!-- Градиент круглой впадинки под кнопками PSP -->
+    <radialGradient id="pspWell" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0e1014"/>
+      <stop offset="85%" stop-color="#181b22"/>
+      <stop offset="100%" stop-color="#2a2e3a"/>
+    </radialGradient>
+
+    <!-- Хромированная окантовка PSP -->
+    <linearGradient id="chromeEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#94a3b8"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+
+    <!-- Градиент кнопки-стика Joy-Con -->
+    <radialGradient id="stickCap" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#424242"/>
+      <stop offset="60%" stop-color="#212121"/>
+      <stop offset="100%" stop-color="#0f0f0f"/>
+    </radialGradient>
+
+    <!-- Тень всего корпуса -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#dropShadow)">
+
+    <!-- ЛЕВАЯ ПОЛОВИНА: Nintendo Switch Joy-Con (#FF3C28) -->
+    <path d="M 256,50
+             L 140,50
+             C 80,50 48,90 48,160
+             L 48,352
+             C 48,422 80,462 140,462
+             L 256,462 Z"
+          fill="#FF3C28" />
+
+    <!-- Элементы Joy-Con -->
+    <!-- Кнопка Минус (-) -->
+    <rect x="175" y="92" width="32" height="10" rx="5" fill="#1e1e1e"/>
+
+    <!-- Аналоговый стик -->
+    <g transform="translate(145, 202)">
+      <circle cx="0" cy="0" r="48" fill="#181818" stroke="#0a0a0a" stroke-width="4"/>
+      <circle cx="0" cy="0" r="36" fill="url(#stickCap)"/>
+      <rect x="-3" y="-30" width="6" height="10" rx="2" fill="#101010"/>
+      <rect x="-3" y="20" width="6" height="10" rx="2" fill="#101010"/>
+      <rect x="-30" y="-3" width="10" height="6" rx="2" fill="#101010"/>
+      <rect x="20" y="-3" width="10" height="6" rx="2" fill="#101010"/>
+      <circle cx="0" cy="0" r="8" fill="#1a1a1a"/>
+    </g>
+
+    <!-- Кнопки направления (D-Pad) -->
+    <g transform="translate(145, 335)">
+      <circle cx="0" cy="-38" r="15" fill="#1e1e1e"/>
+      <polygon points="0,-44 -5,-35 5,-35" fill="#666"/>
+      <circle cx="0" cy="38" r="15" fill="#1e1e1e"/>
+      <polygon points="0,44 -5,35 5,35" fill="#666"/>
+      <circle cx="-38" cy="0" r="15" fill="#1e1e1e"/>
+      <polygon points="-44,0 -35,-5 -35,5" fill="#666"/>
+      <circle cx="38" cy="0" r="15" fill="#1e1e1e"/>
+      <polygon points="44,0 35,-5 35,5" fill="#666"/>
+    </g>
+
+    <!-- Кнопка Скриншота (Квадратная) -->
+    <rect x="175" y="405" width="24" height="24" rx="5" fill="#1e1e1e"/>
+    <circle cx="187" cy="417" r="6" fill="#2d2d2d"/>
+
+
+    <!-- ПРАВАЯ ПОЛОВИНА: Sony PSP (Реалистичная форма) -->
+    <path d="M 256,50
+             L 350,50
+             Q 418,50 445,90
+             C 475,148 480,208 480,256
+             C 480,304 475,364 445,422
+             Q 418,462 350,462
+             L 256,462 Z"
+          fill="url(#pspBody)" />
+
+    <!-- Серебристый хромированный кант по краю PSP -->
+    <path d="M 350,52
+             Q 416,52 442,91
+             C 472,148 477,208 477,256
+             C 477,304 472,364 442,421
+             Q 416,460 350,460"
+          fill="none"
+          stroke="url(#chromeEdge)"
+          stroke-width="5"
+          stroke-linecap="round"/>
+
+    <!-- Перфорация динамика PSP (верхний правый угол) -->
+    <g transform="translate(396, 150)" fill="#050608">
+      <circle cx="0" cy="0" r="3.5"/>
+      <circle cx="-11" cy="0" r="3.5"/>
+      <circle cx="11" cy="0" r="3.5"/>
+      <circle cx="-5.5" cy="-9" r="3.5"/>
+      <circle cx="5.5" cy="-9" r="3.5"/>
+      <circle cx="-5.5" cy="9" r="3.5"/>
+      <circle cx="5.5" cy="9" r="3.5"/>
+    </g>
+
+    <!-- Круглая впадинка на корпусе PSP под блоком кнопок -->
+    <circle cx="365" cy="256" r="68" fill="url(#pspWell)" stroke="#111318" stroke-width="2"/>
+    <circle cx="365" cy="256" r="67" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5"/>
+
+    <!-- Кнопки действия PlayStation (Δ, ○, ×, □) -->
+    <g transform="translate(365, 256)">
+      <!-- Треугольник (Зеленый) -->
+      <g transform="translate(0, -36)">
+        <circle cx="0" cy="0" r="16" fill="#20232a" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <polygon points="0,-7 -7,5 7,5" fill="none" stroke="#00E676" stroke-width="3" stroke-linejoin="round"/>
+      </g>
+
+      <!-- Круг (Красный) -->
+      <g transform="translate(36, 0)">
+        <circle cx="0" cy="0" r="16" fill="#20232a" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <circle cx="0" cy="0" r="6" fill="none" stroke="#FF5252" stroke-width="3"/>
+      </g>
+
+      <!-- Крест (Синий) -->
+      <g transform="translate(0, 36)">
+        <circle cx="0" cy="0" r="16" fill="#20232a" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <path d="M -5,-5 L 5,5 M 5,-5 L -5,5" fill="none" stroke="#448AFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <!-- Квадрат (Розовый) -->
+      <g transform="translate(-36, 0)">
+        <circle cx="0" cy="0" r="16" fill="#20232a" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <rect x="-5.5" y="-5.5" width="11" height="11" fill="none" stroke="#FF4081" stroke-width="3" rx="1"/>
+      </g>
+    </g>
+
+    <!-- Линия стыка двух консолей по центру -->
+    <line x1="256" y1="50" x2="256" y2="462" stroke="#0d0e11" stroke-width="3"/>
+  </g>
+</svg>

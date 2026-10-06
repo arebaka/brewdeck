@@ -59,7 +59,7 @@ export function Hardware({
 		{/* The console in its physical size, a console wider than the page shrinks to fit it */}
 		<footer className="preview">
 			<img
-				src={`images/${info.image}`}
+				src={`assets/${info.image}`}
 				alt={info.name}
 				title={format(t.pages.hardware.size, { width: info.width.toLocaleString(lang), height: info.height.toLocaleString(lang) })}
 				className="photo"
