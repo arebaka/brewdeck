@@ -273,7 +273,7 @@ hbl:
 
 tesla:
   title: Tesla / Ultrahand
-  description: Button combo to open the overlay menu.
+  description: Button combo to open the overlay menu. For Ultrahand it goes into its own config as well.
   options:
     key_combo:
       title: Combo
@@ -318,6 +318,9 @@ missioncontrol:
     dualsense_vibration_intensity:
       title: DualSense vibration
       description: Intensity from 1 (12.5%) to 8 (100%).
+    dualsense_adaptive_trigger_travel:
+      title: DualSense trigger travel, %
+      description: Limits how far the adaptive triggers go, 0 leaves them free. Needs MissionControl 0.16.0 or newer.
     dualshock4_lightbar_brightness:
       title: DualShock 4 lightbar
       description: Brightness from 0 (off) to 9 (full).
@@ -337,56 +340,334 @@ missioncontrol:
     host_name:
       title: Bluetooth name
       description: Name of the console shown to controllers, empty keeps the system one.
+    host_address:
+      title: Bluetooth address
+      description: MAC address of the console shown to controllers, such as 04:20:69:04:20:69, empty keeps the system one.
+
+sys_con:
+  title: sys-con
+  description: How sys-con finds USB controllers and shows them to the console. Its config is written whole, with the profiles of controllers sys-con ships, so the ones it added on the console are not kept.
+  options:
+    mode:
+      title: Mode
+      description: How controllers reach the console.
+      values:
+        hiddbg: Virtual pads, the most compatible
+        mitm: In place of the HID service
+        disabled: Disabled, sys-con does nothing
+    discovery_mode:
+      title: Discovery
+      description: Which USB devices sys-con takes for controllers. Limiting it fixes official controllers connected over USB.
+      values:
+        '0': Any HID device and Xbox controllers
+        '1': Listed devices and Xbox controllers
+        '2': Listed devices only
+    discovery_vidpid:
+      title: Devices to discover
+      description: Vendor and product IDs by commas, such as 054c-* for every Sony controller. Up to two along with Xbox controllers, up to three without them.
+    auto_add_controller:
+      title: Add unknown controllers
+      description: Write a controller sys-con sees for the first time into the config, to be set up there.
+    polling_timeout_ms:
+      title: Polling timeout, ms
+      description: How long sys-con waits for the data of a controller before it asks again. It matters for controllers with several interfaces, such as the wireless Xbox 360 one, low values load the processor.
+    polling_thread_priority:
+      title: Polling thread priority
+      description: Priority of the thread that reads controllers, from 24 to 63. A lower number is a higher priority, applications run at 44.
+    network_controller:
+      title: Network controller
+      description: A virtual controller driven over UDP by the networkpad.py script of sys-con, made for testing. Anyone on the same network can press its buttons. Dangerous.
+    network_controller_port:
+      title: Network controller port
+      description: UDP port sys-con listens on.
+    log_level:
+      title: Log level
+      description: How much sys-con writes to its log.
+      values:
+        '0': Trace
+        '1': Debug
+        '2': Performance
+        '3': Info
+        '4': Warning
+        '5': Error
 
 status_monitor:
   title: Status Monitor
-  description: Layout and shortcut of the on-screen monitor.
+  description: Buttons and readings shared by the modes of the on-screen monitor. The modes themselves are set below.
   options:
     key_combo:
-      title: Shortcut
-      description: Buttons to hold together to open the monitor.
-    mini_show:
-      title: Mini mode
-      description: Values shown in the mini mode.
+      title: Exit combo
+      description: Buttons to hold together to leave a mode of the monitor, from one to four.
+    touch_screen:
+      title: Touch screen
+      description: Drag the Mini, FPS and Game Resolutions modes around the screen with a finger. The new place is not saved.
+    motion_control:
+      title: Motion controls
+      description: Move the same modes with the motion of a wireless Joy-Con or a Pro Controller while its combo is held.
+    left_joycon_motion_key_combo:
+      title: Left Joy-Con combo
+      description: Buttons to hold to move a mode with the left Joy-Con, from one to four.
+    right_joycon_motion_key_combo:
+      title: Right Joy-Con combo
+      description: Buttons to hold to move a mode with the right Joy-Con, from one to four.
+    pro_controller_motion_key_combo:
+      title: Pro Controller combo
+      description: Buttons to hold to move a mode with a Pro Controller, from one to four.
+    average_gpu_load:
+      title: Average GPU load
+      description: Average the last five readings of the GPU load. More accurate, at the cost of a little more load on the processor.
+    battery_avg_iir_filter:
+      title: Battery filter
+      description: Take the voltage and current as the battery gauge averages them itself, over a longer time.
+    battery_time_left_refreshrate:
+      title: Battery estimate refresh, s
+      description: How often the time left on the battery is recalculated.
+    use_old_fps_average:
+      title: Old FPS average
+      description: Do not round the average FPS, the way it was before Status Monitor 1.2.2.
+    font_cache:
+      title: Font cache
+      description: Cache glyphs to draw faster.
+
+status_monitor_full:
+  title: Status Monitor, Full
+  description: The mode with every reading in detail, a panel at a side of the screen.
+  options:
+    refresh_rate:
+      title: Refreshes per second
+      description: How often the mode is redrawn. Higher values load the processor more, 1 is recommended.
+    layer_width_align:
+      title: Side of the screen
+      description: Where the panel is drawn.
+      values:
+        left: Left
+        right: Right
+    show_real_freqs:
+      title: Real frequencies
+      description: Frequencies the CPU, GPU and RAM really run at. Needs sys-clk.
+    show_deltas:
+      title: Frequency differences
+      description: How far the real frequencies are from the target ones. Needs sys-clk, hidden when both kinds of frequencies are off.
+    show_target_freqs:
+      title: Target frequencies
+      description: Frequencies the CPU, GPU and RAM are set to.
+    show_fps:
+      title: FPS
+      description: Frames per second of the game, counted two ways. Needs SaltyNX.
+    show_res:
+      title: Resolution
+      description: Two most likely internal resolutions of the game. Needs SaltyNX, only for games on the NVN graphics API.
+    show_read_speed:
+      title: Read speed
+      description: How much the game reads from storage per second. Needs SaltyNX.
+
+status_monitor_mini:
+  title: Status Monitor, Mini
+  description: The compact mode, a small panel with a reading per line. The slider next to a color sets its opacity.
+  options:
+    show:
+      title: Readings
+      description: What the panel shows. FPS, resolution and read speed need SaltyNX and a running game.
       values:
         TEMP: Temperature
         FAN: Fan
         DRAW: Power
         RES: Resolution
         READ: Read speed
-    micro_show:
-      title: Micro mode
-      description: Values shown in the micro bar.
+    real_freqs:
+      title: Real frequencies
+      description: Show the frequencies the CPU, GPU and RAM really run at instead of the target ones. Needs sys-clk.
+    replace_MB_with_RAM_load:
+      title: RAM load
+      description: Show the load of RAM in percent instead of megabytes used. Needs sys-clk.
+    refresh_rate:
+      title: Refreshes per second
+      description: How often the mode is redrawn. Higher values load the processor more, 1 is recommended.
+    layer_width_align:
+      title: Horizontal position
+      description: Side of the screen the panel is drawn at.
+      values:
+        left: Left
+        center: Center
+        right: Right
+    layer_height_align:
+      title: Vertical position
+      description: Edge of the screen the panel is drawn at.
+      values:
+        top: Top
+        center: Center
+        bottom: Bottom
+    handheld_font_size:
+      title: Font size, handheld
+      description: Size of the text on the screen of the console.
+    docked_font_size:
+      title: Font size, docked
+      description: Size of the text on a TV.
+    background_color:
+      title: Background
+      description: Color of the panel.
+    cat_color:
+      title: Names
+      description: Color of the names of readings on the left.
+    text_color:
+      title: Values
+      description: Color of the readings on the right.
+
+status_monitor_micro:
+  title: Status Monitor, Micro
+  description: The mode of a single line along the top or bottom edge of the screen. The slider next to a color sets its opacity.
+  options:
+    show:
+      title: Readings
+      description: What the line shows. Board stands for temperatures and battery power, FPS needs SaltyNX and a running game.
       values:
         BRD: Board
         FAN: Fan
-    average_gpu_load:
-      title: Average GPU load
-      description: Smooth the GPU load readings.
-    touch_screen:
-      title: Touch screen
-      description: Control the monitor by touch.
-    motion_control:
-      title: Motion shortcut
-      description: Open the monitor with a Joy-Con motion combo.
-    mini_font_size:
-      title: Mini mode font size
-      description: Same size in handheld and docked.
-    micro_font_size:
-      title: Micro mode font size
-      description: Same size in handheld and docked.
-    battery_avg_iir_filter:
-      title: Battery filter
-      description: Smooth the battery readings with an IIR filter.
-    battery_time_left_refreshrate:
-      title: Battery estimate refresh, s
-      description: How often the time left is recalculated.
-    use_old_fps_average:
-      title: Old FPS average
-      description: Use the previous way of averaging FPS.
-    font_cache:
-      title: Font cache
-      description: Cache glyphs to draw faster.
+    real_freqs:
+      title: Real frequencies
+      description: Show the frequencies the CPU, GPU and RAM really run at instead of the target ones. Needs sys-clk.
+    replace_GB_with_RAM_load:
+      title: RAM load
+      description: Show the load of RAM in percent instead of gigabytes used. Needs sys-clk.
+    refresh_rate:
+      title: Refreshes per second
+      description: How often the mode is redrawn. Higher values load the processor more, 1 is recommended.
+    layer_height_align:
+      title: Edge of the screen
+      description: Where the line is drawn.
+      values:
+        top: Top
+        bottom: Bottom
+    text_align:
+      title: Text alignment
+      description: Which side of the line the readings are gathered at.
+      values:
+        left: Left
+        center: Center
+        right: Right
+    handheld_font_size:
+      title: Font size, handheld
+      description: Size of the text on the screen of the console.
+    docked_font_size:
+      title: Font size, docked
+      description: Size of the text on a TV.
+    background_color:
+      title: Background
+      description: Color of the line.
+    cat_color:
+      title: Names
+      description: Color of the names of readings.
+    text_color:
+      title: Values
+      description: Color of the readings themselves.
+
+status_monitor_fps_counter:
+  title: Status Monitor, FPS Counter
+  description: The mode with nothing but the FPS of the game. Needs SaltyNX. The slider next to a color sets its opacity.
+  options:
+    layer_width_align:
+      title: Horizontal position
+      description: Side of the screen the counter is drawn at.
+      values:
+        left: Left
+        center: Center
+        right: Right
+    layer_height_align:
+      title: Vertical position
+      description: Edge of the screen the counter is drawn at.
+      values:
+        top: Top
+        center: Center
+        bottom: Bottom
+    handheld_font_size:
+      title: Font size, handheld
+      description: Size of the number on the screen of the console.
+    docked_font_size:
+      title: Font size, docked
+      description: Size of the number on a TV.
+    background_color:
+      title: Background
+      description: Color behind the number.
+    text_color:
+      title: Text
+      description: Color of the number.
+
+status_monitor_fps_graph:
+  title: Status Monitor, FPS Graph
+  description: The mode with a graph of the FPS of the game. Needs SaltyNX. The slider next to a color sets its opacity.
+  options:
+    layer_width_align:
+      title: Horizontal position
+      description: Side of the screen the graph is drawn at.
+      values:
+        left: Left
+        center: Center
+        right: Right
+    layer_height_align:
+      title: Vertical position
+      description: Edge of the screen the graph is drawn at.
+      values:
+        top: Top
+        center: Center
+        bottom: Bottom
+    background_color:
+      title: Background
+      description: Color behind the graph.
+    border_color:
+      title: Frame
+      description: Color of the frame around the graph.
+    dashed_line_color:
+      title: Center line
+      description: Color of the dashed line in the middle of the graph, and of the graph line while FPS holds at a whole value.
+    main_line_color:
+      title: Graph line
+      description: Color of the line of FPS.
+    rounded_line_color:
+      title: Line at a whole FPS
+      description: Meant for the graph line while FPS holds at a whole value. Status Monitor reads this color, but so far draws that line with the color of the center line.
+    perfect_line_color:
+      title: Line at full and half rate
+      description: Color of the graph line while FPS holds at the refresh rate of the screen or half of it, 60 or 30.
+    fps_counter_color:
+      title: Average FPS
+      description: Color of the average FPS drawn behind the graph.
+    max_fps_text_color:
+      title: Top mark
+      description: Color of the top mark of the scale, 60.
+    min_fps_text_color:
+      title: Bottom mark
+      description: Color of the bottom mark of the scale, 0.
+
+status_monitor_game_resolutions:
+  title: Status Monitor, Game Resolutions
+  description: The mode listing the resolutions a game renders at. Needs SaltyNX. The slider next to a color sets its opacity.
+  options:
+    refresh_rate:
+      title: Refreshes per second
+      description: How often the mode is redrawn. Higher values load the processor more.
+    layer_width_align:
+      title: Horizontal position
+      description: Side of the screen the panel is drawn at.
+      values:
+        left: Left
+        center: Center
+        right: Right
+    layer_height_align:
+      title: Vertical position
+      description: Edge of the screen the panel is drawn at.
+      values:
+        top: Top
+        center: Center
+        bottom: Bottom
+    background_color:
+      title: Background
+      description: Color of the panel.
+    cat_color:
+      title: Headings
+      description: Color of the Depth and Viewport headings.
+    text_color:
+      title: Resolutions
+      description: Color of the lists of resolutions.
 
 sys_ftpd_light:
   title: sys-ftpd-light
@@ -441,3 +722,296 @@ sys_clk:
     csv_write_interval_ms:
       title: CSV log, ms
       description: 0 disables it.
+
+ultrahand:
+  title: Ultrahand
+  description: Language, input, menus, widget, theme, notifications, and features of the overlay menu. A theme and sounds are picked in Ultrahand itself.
+  options:
+    default_lang:
+      title: Language
+      description: Language of the menu.
+    launch_combos:
+      title: Launch combos
+      description: Overlays and packages open by button combos of their own, set in their settings.
+    swipe_to_open:
+      title: Swipe to open
+      description: Open the menu with a swipe from the edge of the touch screen.
+    swipe_offset:
+      title: Swipe offset, px
+      description: Moves the zone a swipe starts in this far from the edge of the screen, for screens that miss touches at the very edge. Ultrahand has no such setting in its menus.
+    haptic_feedback:
+      title: Haptic feedback
+      description: Vibrate on navigation.
+    stick_navigation:
+      title: Stick navigation
+      description: Move through the menu with the stick as well as with the D-pad.
+    hold_duration:
+      title: Hold duration, ms
+      description: How long a button is held for the commands that ask for a hold.
+    sound_effects:
+      title: Sound effects
+      description: Sounds of the menu.
+    opaque_screenshots:
+      title: Opaque screenshots
+      description: Screenshots taken with the menu open show it without transparency.
+    right_alignment:
+      title: Right-side mode
+      description: Draw the menu at the right edge of the screen instead of the left one.
+    auto_ntp_sync:
+      title: NTP sync before downloads
+      description: Set the clock from the network before downloads, a wrong time breaks secure connections.
+    show_packages:
+      title: Packages menu
+      description: Show the page of packages next to the page of overlays.
+    page_swap:
+      title: Page swap
+      description: Open the menu on the page of packages, the overlays move to the second page.
+    show_user_guide:
+      title: User guide
+      description: Show the hints about the buttons in the menus.
+    show_hidden:
+      title: Hidden
+      description: Show the entry that opens the list of hidden overlays and packages.
+    show_delete:
+      title: Delete
+      description: Offer to delete an overlay or a package in its settings.
+    show_unsupported:
+      title: Unsupported overlays
+      description: List the overlays that are not built for Horizon OS 21 and newer, with a warning. It matters on those systems only.
+    show_overlay_versions:
+      title: Overlay versions
+      description: Show versions next to the names of overlays.
+    show_package_versions:
+      title: Package versions
+      description: Show versions next to the names of packages.
+    clean_version_labels:
+      title: Clean versions
+      description: Show versions without the leading v.
+    show_clock:
+      title: Clock
+      description: Show the time in the widget.
+    datetime_format:
+      title: Clock format
+      description: How the time is written, in the format of strftime. %a %T gives the day of the week and the time with seconds, %H:%M only hours and minutes. The result has to fit in 19 characters.
+    show_soc_temp:
+      title: SoC temperature
+      description: Show the temperature of the processor in the widget.
+    show_pcb_temp:
+      title: PCB temperature
+      description: Show the temperature of the board in the widget.
+    show_battery:
+      title: Battery
+      description: Show the charge of the battery in the widget.
+    dynamic_widget_colors:
+      title: Dynamic temperatures
+      description: Color the temperatures by how hot it is.
+    center_widget_alignment:
+      title: Center alignment
+      description: Center the widget in its backdrop instead of pushing it to the right edge.
+    show_widget_backdrop:
+      title: Backdrop
+      description: Draw a backdrop behind the widget.
+    extended_widget_backdrop:
+      title: Short backdrop
+      description: End the backdrop and the border before the edge of the screen. The menu of Ultrahand shows this key the other way round, as Extended Backdrop turned off.
+    show_widget_border:
+      title: Border
+      description: Draw a border around the widget.
+    dynamic_widget_border:
+      title: Dynamic border
+      description: Let colors flow along the border.
+    switch_2_style:
+      title: Switch 2 style
+      description: Draw the selection the way the Switch 2 does, rounded and with colors flowing along its frame. Off brings the look of the first Switch.
+    dynamic_logo:
+      title: Dynamic logo
+      description: Let colors run through the Ultrahand logo.
+    dynamic_tables:
+      title: Dynamic tables
+      description: Let colors flow along the borders of tables.
+    selection_bg:
+      title: Selection background
+      description: Fill the selected item with the selection color of the theme.
+    selection_text:
+      title: Selection text
+      description: Give the text of the selected item its color of the theme.
+    selection_value:
+      title: Selection value
+      description: Give the value of the selected item its color of the theme.
+    libultrahand_titles:
+      title: libultrahand title color
+      description: Give the names of overlays built with libultrahand their own color of the theme.
+    libultrahand_versions:
+      title: libultrahand version color
+      description: Give the versions of overlays built with libultrahand their own color of the theme.
+    package_titles:
+      title: Package title color
+      description: Give the names of packages their own color of the theme.
+    package_versions:
+      title: Package version color
+      description: Give the versions of packages their own color of the theme.
+    in_package_titles:
+      title: In-package titles
+      description: Let a package color its title inside itself. Off gives every package the color of the theme.
+    notifications:
+      title: API notifications
+      description: Show the notifications other homebrew sends through Ultrahand.
+    notifications_hotkey:
+      title: API toggle hotkey
+      description: Holding Minus for a few seconds turns the notifications of other homebrew on and off.
+    startup_notification:
+      title: Startup notification
+      description: Show a notification when Ultrahand starts after the console boots.
+    silence_notifications:
+      title: Silent notifications
+      description: Show notifications without their sound.
+    max_notifications:
+      title: Notification slots
+      description: How many notifications stay on the screen at once.
+
+sys_tune:
+  title: sys-tune
+  description: Playback of the background music player. It plays MP3, FLAC and WAV files of the card, its overlay opens the /music folder.
+  options:
+    load_path:
+      title: Play on start
+      description: A file or a folder of the card that plays once the console boots, such as /music. Empty to start silent.
+    shuffle:
+      title: Shuffle
+      description: Play the tracks in random order.
+    repeat:
+      title: Repeat
+      description: What is repeated.
+      values:
+        '0': Nothing
+        '1': One track
+        '2': All tracks
+    volume:
+      title: Music volume, %
+      description: Volume of the music.
+    global_volume:
+      title: Game volume, %
+      description: Volume of the games that have no volume of their own set in the overlay.
+    title_default:
+      title: Play in games
+      description: The music goes on when a game starts. The overlay also sets it for every game apart.
+
+jksv:
+  title: JKSV
+  description: Settings of the save manager, the same ones its settings menu keeps. Favorites and the blacklist are set in JKSV itself.
+  options:
+    WorkingDirectory:
+      title: Output folder
+      description: Folder of the card the backups go to.
+    IncludeDeviceSaves:
+      title: Device saves with users
+      description: List the saves shared by every user among the saves of each user.
+    AutoBackupOnRestore:
+      title: Backup on restore
+      description: Back the save up before a backup is restored over it.
+    AutoNameBackups:
+      title: Name backups automatically
+      description: Name new backups without asking on the keyboard.
+    AutoUploadToRemote:
+      title: Upload backups
+      description: Upload new backups to the remote storage and delete them from the card. It takes the WebDAV server below or Google Drive set up on the console.
+    KeepLocalBackups:
+      title: Keep local backups
+      description: Leave uploaded backups on the card as well.
+    AlwaysUseTitleID:
+      title: Application IDs as folder names
+      description: Name the folders of backups by application IDs instead of titles.
+    EnglishSafeTitles:
+      title: English titles in paths
+      description: Prefer the American English title of a game for the name of its folder.
+    HoldForDeletion:
+      title: Hold to delete
+      description: Deleting a backup takes holding A for three seconds.
+    HoldForRestoration:
+      title: Hold to restore
+      description: Restoring a backup takes holding A for three seconds.
+    HoldForOverWrite:
+      title: Hold to overwrite
+      description: Overwriting a backup takes holding A for three seconds.
+    OnlyListMountable:
+      title: Only saves that open
+      description: List only the save data JKSV manages to open when it starts.
+    ListAccountSystemSaves:
+      title: Account system saves
+      description: List the system saves tied to an account.
+    AllowSystemSaveWriting:
+      title: Write to system saves
+      description: Allow restoring system saves and writing to the partitions of the NAND. Dangerous.
+    ExportToZip:
+      title: Export to ZIP
+      description: Pack backups into ZIP archives instead of folders.
+    ZipCompressionLevel:
+      title: ZIP compression
+      description: From 0, stored as it is, to 9. Lower levels pack faster and save less space.
+    TitleSortType:
+      title: Order of games
+      description: How the list of games is sorted.
+      values:
+        '0': Alphabetically
+        '1': Most played
+        '2': Last played
+    JKSMTextMode:
+      title: Text menus
+      description: List games as text, like JKSM on the 3DS does, instead of a grid of icons.
+    ForceEnglish:
+      title: English interface
+      description: Use English instead of the language of the system.
+    ShowDevice:
+      title: Device saves
+      description: Load and show the save data shared by every user.
+    ShowBCAT:
+      title: BCAT saves
+      description: Load and show BCAT data, which games use to deliver content and events between updates.
+    ShowCache:
+      title: Cache saves
+      description: Load and show cache data, where games keep DLC and other things.
+    ShowSystem:
+      title: System saves
+      description: Load and show the save data of the system.
+    EnableTrash:
+      title: Trash bin
+      description: Move the backups deleted from the card to the _TRASH_ folder instead of deleting them for good.
+    UIAnimationScaling:
+      title: Animation scaling
+      description: Speed of transitions, lower is faster. 1 makes them instant.
+
+jksv_webdav:
+  title: JKSV, WebDAV
+  description: A WebDAV server JKSV keeps backups on.
+  options:
+    origin:
+      title: Server
+      description: Address of the server with its protocol, such as https://example.com. Empty to leave WebDAV off.
+    basepath:
+      title: Folder
+      description: Path of the folder on the server the backups go to.
+    username:
+      title: Login
+      description: User name to connect with. Empty for a server open to everyone.
+    password:
+      title: Password
+      description: Password to connect with.
+
+amiigo:
+  title: Amiigo
+  description: How Amiigo creates virtual amiibo for emuiibo.
+  options:
+    categoryMode:
+      title: Folder of new amiibo
+      description: Where in emuiibo/amiibo a created amiibo goes.
+      values:
+        '0': The root
+        '1': By game
+        '2': By amiibo series
+        '3': The folder open in Amiigo
+    useRandomisedUUID:
+      title: Random UUID
+      description: Created amiibo change their UUID at every scan, so a game that takes an amiibo once a day takes it again.
+    saveAmiiboImages:
+      title: Amiibo images
+      description: Download the pictures of created amiibo for the emuiibo overlay. Experimental, a big picture may crash the overlay.

@@ -110,8 +110,14 @@ function option(row: Row): TuningOption {
 			const values = scalars(list(row.values) ?? []);
 			return { id, type: 'select', values, default: typeof values[0] == 'number' ? number(row.default) : row.default };
 		}
-		case 'multiselect':
-			return { id, type: 'multiselect', values: list(row.values) ?? [], default: list(row.default) ?? [] };
+		case 'multiselect': {
+			// The bounds are on how many values are picked at once
+			const picked = list(row.default) ?? [];
+			const min = row.min ? number(row.min) : undefined;
+			const max = row.max ? number(row.max) : undefined;
+			if (picked.length < (min ?? 0) || picked.length > (max ?? Infinity)) throw new Error(`Default of the option ${id} is out of its bounds: "${row.default}"`);
+			return { id, type: 'multiselect', values: list(row.values) ?? [], default: picked, min, max };
+		}
 		case 'range':
 			return { id, type: 'range', min: number(row.min), max: number(row.max), step: number(row.step), default: number(row.default) };
 		case 'number':
@@ -122,16 +128,20 @@ function option(row: Row): TuningOption {
 			return { id, type: 'hue', default: number(row.default) };
 		case 'color':
 			return { id, type: 'color', default: row.default };
+		case 'rgba4444':
+			if (!/^#[0-9A-F]{4}$/.test(row.default)) throw new Error(`Not a color of the option ${id}: "${row.default}"`);
+			return { id, type: 'rgba4444', default: row.default };
 		default:
 			throw new Error(`Unknown type of the option ${id}: "${row.type}"`);
 	}
 }
 
-// Groups of options in the order of their index. Every group keeps its options in a table named after it,
-// conditions of the options come from the YAML next to the tables
-export const tuning = (index: Row[], table: (group: string) => Row[] | undefined, conditions: Conditions | null): TuningGroup[] => index.map(row => {
-	const rows = table(row.id);
-	if (!rows) throw new Error(`No table with the options of the group ${row.id}`);
+// Groups of options in the order of their index. Every group keeps its options in the table its row points at,
+// in the one named after the group without that, conditions of the options come from the YAML next to the tables
+export const tuning = (index: Row[], table: (path: string) => Row[] | undefined, conditions: Conditions | null): TuningGroup[] => index.map(row => {
+	const path = row.table || `${row.id}.tsv`;
+	const rows = table(path);
+	if (!rows) throw new Error(`No table ${path} with the options of the group ${row.id}`);
 	return compact<TuningGroup>({
 		id: row.id,
 		step: row.step as TuningStep,

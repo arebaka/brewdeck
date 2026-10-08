@@ -13,8 +13,11 @@ const FILES = import.meta.glob<Record<string, any>>('./*/**/*.yaml', { eager: tr
 function translation(lang: Language): Translation {
 	const catalogs = (file: string) => Object.fromEntries(PLATFORM_IDS.map(platform => [platform, FILES[`./${lang}/${platform}/${file}.yaml`]]));
 	const texts = { ...FILES[`./${lang}/index.yaml`], software: catalogs('software'), tuning: catalogs('tuning') } as Translation;
-	// Languages name themselves, so the names of the DBI translations are kept once for every language
-	texts.tuning.switch.dbi_patcher.options.language.values = AUTONYMS;
+	// Languages name themselves, so the options that list languages take their names from one place
+	for (const [path, names] of Object.entries(AUTONYMS)) {
+		const [group, option] = path.split('.');
+		texts.tuning.switch[group].options[option].values = names;
+	}
 	return texts;
 }
 

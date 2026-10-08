@@ -91,7 +91,7 @@ export interface Preset {
 }
 
 export type TuningValue = boolean | number | string | string[];
-export type TuningStep = 'launch' | 'system' | 'security' | 'modules' | 'plugins' | 'overclock';
+export type TuningStep = 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'apps' | 'plugins' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
@@ -102,12 +102,13 @@ interface TuningOptionBase {
 export type TuningOption = TuningOptionBase & (
 	| { type: 'toggle'; default: boolean }
 	| { type: 'select'; values: (string | number)[]; default: string | number }
-	| { type: 'multiselect'; values: string[]; default: string[] }
+	| { type: 'multiselect'; values: string[]; default: string[]; min?: number; max?: number } // from `min` to `max` values at once, any number of them without the bounds
 	| { type: 'range'; min: number; max: number; step: number; default: number }
 	| { type: 'number'; min: number; max: number; default: number }
 	| { type: 'text'; maxLength: number; default: string }
 	| { type: 'hue'; default: number }
 	| { type: 'color'; default: string }
+	| { type: 'rgba4444'; default: string } // a color with its opacity, a hex digit per channel: #1117
 );
 
 export interface TuningGroup {
@@ -221,7 +222,7 @@ export interface PspState extends BuildState {
 	plugins: Record<string, string[]>;
 }
 
-export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'modules' | 'plugins' | 'overclock' | 'appearance' | 'build';
+export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'apps' | 'plugins' | 'overclock' | 'appearance' | 'build';
 
 export type IssueLevel = 'error' | 'warning' | 'info';
 

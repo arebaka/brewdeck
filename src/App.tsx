@@ -20,6 +20,9 @@ function countChanges(groups: TuningGroup[], build: BuildState, step: TuningStep
 
 const LEVELS: IssueLevel[] = ['error', 'warning', 'info'];
 
+// Steps that are lists of settings and nothing else
+const SETTINGS_STEPS = ['system', 'security', 'sysmodules', 'overlays', 'apps'] as const;
+
 export default function App() {
 	const [state, setState] = useState<AppState>(() => decodeState(location.search));
 	const [uploads, setUploads] = useState<Uploads>({});
@@ -194,11 +197,10 @@ export default function App() {
 		hardware: t.hardware[hardware].name,
 		firmware,
 		software: selectedComponentIDs.length,
-		system: countChanges(groups, build, 'system') || '',
-		security: countChanges(groups, build, 'security') || '',
-		modules: countChanges(groups, build, 'modules') || '',
+		...Object.fromEntries(SETTINGS_STEPS.map(step => [step, countChanges(groups, build, step) || ''])),
 		...platform.values(build)
 	};
+	const settingsStep = SETTINGS_STEPS.find(item => item == step);
 	const sidebar: SidebarItem[] = steps.map(step => ({ step, value: values[step] ?? '', alert: worst(step) }));
 
 	// Pages tell about the platform its own way where they have to
@@ -274,17 +276,17 @@ export default function App() {
 					t={t} />
 			)}
 
-			{(step == 'system' || step == 'security' || step == 'modules') && (
+			{settingsStep && (
 				<Tuning
-					key={step}
+					key={settingsStep}
 					lang={lang}
 					platform={platform}
-					step={step}
+					step={settingsStep}
 					tuning={tuning}
 					selectedComponentIDs={selectedComponentIDs}
 					setTuningOption={setTuningOption}
 					resetTuning={resetTuning}
-					issues={stepIssues(step)}
+					issues={stepIssues(settingsStep)}
 					applyFix={applyFix}
 					t={t} />
 			)}
@@ -334,7 +336,7 @@ export default function App() {
 					build={build}
 					uploads={uploads}
 					totalSize={totalSize}
-					tuningChanges={(['launch', 'system', 'security', 'modules', 'plugins'] as TuningStep[]).reduce((sum, step) => sum + countChanges(groups, build, step), 0)}
+					tuningChanges={(['launch', ...SETTINGS_STEPS, 'plugins'] as TuningStep[]).reduce((sum, step) => sum + countChanges(groups, build, step), 0)}
 					issues={issues}
 					applyFix={applyFix}
 					setStep={setStep}

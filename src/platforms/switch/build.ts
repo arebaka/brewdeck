@@ -1,6 +1,6 @@
 import { ImageTarget, SwitchState, TuningValue } from '@/types';
 import { HARDWARE } from '@data';
-import { isRequirementMet, isTuningOptionChanged } from '@/data';
+import { isRequirementMet } from '@/data';
 import { Asset, BuildRequest, BuildResult, ConfigSpec, installerView, installers, render, renderConfigs } from '@/build';
 import TEMPLATES, { README } from '@templates/switch';
 import { CATALOG, COMPONENTS, GALLERY, launchEntries } from './data';
@@ -13,6 +13,20 @@ const u8 = (value: TuningValue) => value ? '0x1' : '0x0';
 const u64 = (value: number) => `0x${value.toString(16)}`;
 const MIB = 1024 * 1024;
 
+// A path from the root of the card, as sys-tune takes it: /music
+const cardPath = (path: TuningValue) => String(path).trim().replace(/^(sdmc:)?\/*/, '/');
+
+// Groups of settings that make up the config of Status Monitor, by the names its template gives to their sections
+const STATUS_MONITOR = {
+	status_monitor: 'status_monitor',
+	full: 'status_monitor_full',
+	mini: 'status_monitor_mini',
+	micro: 'status_monitor_micro',
+	fps_counter: 'status_monitor_fps_counter',
+	fps_graph: 'status_monitor_fps_graph',
+	game_resolutions: 'status_monitor_game_resolutions'
+};
+
 // Nyx accepts backgrounds from 0x0B0B0B to 0xC7C7C7 only
 function nyxBackground(color: TuningValue): string {
 	const value = Math.min(Math.max(parseInt(String(color).slice(1), 16) || 0, 0x0b0b0b), 0xc7c7c7);
@@ -24,14 +38,14 @@ function isDNSBlocked({ tuning: { dns } }: Request, target: string): boolean {
 	return dns.mode == 'block' && (dns.targets as string[]).includes(target);
 }
 
-const isSelected = (request: Request, id: string) => request.selectedComponentIDs.includes(id);
-
-// Module configs are written only when changed, so updating a card keeps what was set on the console
-function isGroupChanged(request: Request, id: string): boolean {
-	const group = CATALOG.tuning.find(group => group.id == id)!;
-	return (!group.requires || isRequirementMet(group.requires, request.selectedComponentIDs))
-		&& group.options.some(option => isTuningOptionChanged(group, option, request.tuning));
+// Whether the component a group of settings belongs to is selected: its config is then written, changed or not
+function isGroupSelected(request: Request, id: string): boolean {
+	const { requires } = CATALOG.tuning.find(group => group.id == id)!;
+	return !requires || isRequirementMet(requires, request.selectedComponentIDs);
 }
+
+// The combo of the overlay menu as its configs spell it, empty without buttons
+const menuCombo = ({ tuning: { tesla } }: Request) => (tesla.key_combo as string[]).join('+');
 
 // Icons are named after their entry, white layouts get the `_hue` suffix Nyx tints with the theme color
 function iconPath(request: Request, entry: string): string | undefined {
@@ -182,10 +196,22 @@ const CONFIGS: ConfigSpec<Request>[] = [
 	{
 		path: 'config/tesla/config.ini',
 		template: TEMPLATES.teslaConfigIni,
-		view: ({ tuning: { tesla } }) => ({
-			key_combo: (tesla.key_combo as string[]).join('+')
+		view: request => ({
+			key_combo: menuCombo(request)
 		}),
-		when: request => isGroupChanged(request, 'tesla') && (request.tuning.tesla.key_combo as string[]).length > 0
+		when: request => isGroupSelected(request, 'tesla') && menuCombo(request) != ''
+	},
+	{
+		path: 'config/ultrahand/config.ini',
+		template: TEMPLATES.ultrahandConfigIni,
+		// Ultrahand keeps as hidden what its menus show as shown. It reads the combo of its own config before the one of Tesla
+		// and copies it over that one, so the combo goes here too
+		view: request => ({
+			...Object.fromEntries(Object.entries(request.tuning.ultrahand)
+				.map(([key, value]) => key.startsWith('show_') ? [key.replace('show_', 'hide_'), String(!value)] : [key, String(value)])),
+			key_combo: menuCombo(request)
+		}),
+		when: request => isGroupSelected(request, 'ultrahand')
 	},
 	{
 		path: 'config/sys-patch/config.ini',
@@ -196,21 +222,51 @@ const CONFIGS: ConfigSpec<Request>[] = [
 			enable_logging: flag(sys_patch.enable_logging),
 			version_skip: flag(sys_patch.version_skip)
 		}),
-		when: request => isGroupChanged(request, 'sys_patch')
+		when: request => isGroupSelected(request, 'sys_patch')
 	},
 	{
 		path: 'config/MissionControl/missioncontrol.ini',
 		template: TEMPLATES.missionControlIni,
-		view: ({ tuning: { missioncontrol } }) => Object.fromEntries(Object.entries(missioncontrol).map(([key, value]) => [key, String(value)])),
-		when: request => isGroupChanged(request, 'missioncontrol')
+		view: ({ tuning: { missioncontrol } }) => ({
+			...Object.fromEntries(Object.entries(missioncontrol).map(([key, value]) => [key, String(value)])),
+			bluetooth: missioncontrol.host_name != '' || missioncontrol.host_address != ''
+		}),
+		when: request => isGroupSelected(request, 'missioncontrol')
+	},
+	{
+		path: 'config/sys-con/config.ini',
+		template: TEMPLATES.sysConConfigIni,
+		view: ({ tuning: { sys_con } }) => ({
+			...sys_con,
+			discovery_vidpid: String(sys_con.discovery_vidpid).replace(/\s/g, ''),
+			auto_add_controller: flag(sys_con.auto_add_controller),
+			network_controller: flag(sys_con.network_controller)
+		}),
+		when: request => isGroupSelected(request, 'sys_con')
 	},
 	{
 		path: 'config/status-monitor/config.ini',
 		template: TEMPLATES.statusMonitorConfigIni,
-		view: ({ tuning: { status_monitor } }) => ({
-			...Object.fromEntries(Object.entries(status_monitor).map(([key, value]) => [key, Array.isArray(value) ? value.join('+') : String(value)]))
+		// Every section of the file is a group of settings, lists of buttons and of things to show are joined with a plus
+		view: ({ tuning }) => Object.fromEntries(Object.entries(STATUS_MONITOR).map(([section, group]) => [
+			section,
+			Object.fromEntries(Object.entries(tuning[group]).map(([key, value]) => [key, Array.isArray(value) ? value.join('+') : String(value)]))
+		])),
+		when: request => isGroupSelected(request, 'status_monitor')
+	},
+	{
+		path: 'config/sys-tune/config.ini',
+		template: TEMPLATES.sysTuneConfigIni,
+		view: ({ tuning: { sys_tune } }) => ({
+			shuffle: flag(sys_tune.shuffle),
+			repeat: sys_tune.repeat,
+			// Volumes are picked in percent and kept as parts of one
+			volume: (sys_tune.volume as number) / 100,
+			global_volume: (sys_tune.global_volume as number) / 100,
+			load_path: sys_tune.load_path && cardPath(sys_tune.load_path),
+			title_default: flag(sys_tune.title_default)
 		}),
-		when: request => isGroupChanged(request, 'status_monitor')
+		when: request => isGroupSelected(request, 'sys_tune')
 	},
 	{
 		path: 'config/sys-ftpd/config.ini',
@@ -224,7 +280,35 @@ const CONFIGS: ConfigSpec<Request>[] = [
 			keycombo: (sys_ftpd_light.keycombo as string[]).join('+'),
 			led: flag(sys_ftpd_light.led)
 		}),
-		when: request => isGroupChanged(request, 'sys_ftpd_light')
+		when: request => isGroupSelected(request, 'sys_ftpd_light')
+	},
+	{
+		path: 'config/JKSV/JKSV.json',
+		template: TEMPLATES.jksvJson,
+		// JKSV keeps its switches as numbers and fills in what the file leaves out
+		view: ({ tuning: { jksv } }) => ({
+			...Object.fromEntries(Object.entries(jksv).map(([key, value]) => [key, typeof value == 'boolean' ? flag(value) : value])),
+			WorkingDirectory: JSON.stringify(jksv.WorkingDirectory || 'sdmc:/JKSV')
+		}),
+		when: request => isGroupSelected(request, 'jksv')
+	},
+	{
+		path: 'config/JKSV/webdav.json',
+		template: TEMPLATES.jksvWebdavJson,
+		// JKSV puts the folder between slashes itself, a server open to everyone goes without the login
+		view: ({ tuning: { jksv_webdav: { origin, basepath, username, password } } }) => ({
+			origin: JSON.stringify(origin),
+			basepath: basepath && JSON.stringify(String(basepath).replace(/^\/+|\/+$/g, '')),
+			username: username && JSON.stringify(username),
+			password: JSON.stringify(password)
+		}),
+		when: request => isGroupSelected(request, 'jksv_webdav') && request.tuning.jksv_webdav.origin != ''
+	},
+	{
+		path: 'config/amiigo/settings.json',
+		template: TEMPLATES.amiigoSettingsJson,
+		view: ({ tuning: { amiigo } }) => ({ ...amiigo }),
+		when: request => isGroupSelected(request, 'amiigo')
 	},
 	{
 		path: 'config/sys-clk/config.ini',
@@ -238,8 +322,7 @@ const CONFIGS: ConfigSpec<Request>[] = [
 					clocks: Object.entries(profile.clocks).map(([key, value]) => ({ key, value }))
 				}))
 		}),
-		when: request => isSelected(request, 'sys_clk')
-			&& (isGroupChanged(request, 'sys_clk') || request.overclock.some(profile => Object.keys(profile.clocks).length))
+		when: request => isGroupSelected(request, 'sys_clk')
 	}
 ];
 

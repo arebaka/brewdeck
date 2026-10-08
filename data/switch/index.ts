@@ -14,14 +14,16 @@ import CLOCK_CAP_ROWS from './overclock/caps.tsv';
 import CLOCK_TEMPLATES from './overclock/templates.yaml';
 import GAME_ROWS from './overclock/games.tsv';
 
-// Keys of the entries and options of the groups lie in files named after them
+// Keys of the entries lie in files named after them
 const LAUNCH_KEYS = import.meta.glob<LaunchKey>('./launch/*.yaml', { eager: true, import: 'default' });
-const TUNING_TABLES = import.meta.glob<Row[]>('./tuning/*.tsv', { eager: true, import: 'default' });
+// Options of the groups lie in tables, the index of the groups tells which: the tables of one component share its folder
+// and are named there after the sections of its config
+const TUNING_TABLES = import.meta.glob<Row[]>('./tuning/**/*.tsv', { eager: true, import: 'default' });
 
 export const FIRMWARE = firmware(FIRMWARE_ROWS);
 export const SOFTWARE = components(SOFTWARE_ROWS, SOFTWARE_SOURCES);
 export const PRESETS = presets(PRESET_ROWS);
-export const TUNING = tuning(TUNING_ROWS, group => TUNING_TABLES[`./tuning/${group}.tsv`], TUNING_CONDITIONS as Conditions);
+export const TUNING = tuning(TUNING_ROWS, path => TUNING_TABLES[`./tuning/${path}`], TUNING_CONDITIONS as Conditions);
 
 // Entries of the Launch menu that boot the system, with the keys of their sections
 export const LAUNCH: BootEntry[] = LAUNCH_ROWS.map(row => ({

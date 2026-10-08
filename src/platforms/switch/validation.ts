@@ -34,7 +34,7 @@ export function validate(build: SwitchState, t: Translation): Issue[] {
 
 	const ftp = build.tuning.sys_ftpd_light;
 	if (build.selectedComponentIDs.includes('sys_ftpd_light') && !ftp.anonymous && (!ftp.user || !ftp.password)) {
-		issues.push({ level: 'warning', code: 'ftpCredentials', step: 'modules', params: {} });
+		issues.push({ level: 'warning', code: 'ftpCredentials', step: 'sysmodules', params: {} });
 	}
 
 	if (build.selectedComponentIDs.includes('sys_clk')) {

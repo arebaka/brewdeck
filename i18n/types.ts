@@ -105,9 +105,9 @@ export interface Translation {
 			off: string;
 		};
 		security: Page;
-		modules: Page & {
-			empty: string;
-		};
+		sysmodules: Page;
+		overlays: Page;
+		apps: Page;
 		plugins: Page & {
 			list: string; // heading of the plugins file
 			runlevels: {[runlevel in string]: string}; // where a plugin loads

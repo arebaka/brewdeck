@@ -20,3 +20,37 @@ atmosphere:
 sys_ftpd_light:
   keycombo:
     pause: true
+
+sys_con:
+  discovery_vidpid:
+    discovery_mode:
+      - 1
+      - 2
+  network_controller_port:
+    network_controller: true
+
+status_monitor:
+  left_joycon_motion_key_combo:
+    motion_control: true
+  right_joycon_motion_key_combo:
+    motion_control: true
+  pro_controller_motion_key_combo:
+    motion_control: true
+
+ultrahand:
+  swipe_offset:
+    swipe_to_open: true
+  page_swap:
+    show_packages: true
+  show_package_versions:
+    show_packages: true
+  datetime_format:
+    show_clock: true
+  dynamic_widget_border:
+    show_widget_border: true
+
+jksv:
+  KeepLocalBackups:
+    AutoUploadToRemote: true
+  ZipCompressionLevel:
+    ExportToZip: true

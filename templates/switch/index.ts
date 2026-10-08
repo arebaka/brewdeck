@@ -12,10 +12,16 @@ import overrideConfigIni from './sd/atmosphere/config/override_config.ini?raw';
 import nintendoHostsTxt from './sd/atmosphere/hosts/nintendo.txt?raw';
 import adHostsTxt from './sd/atmosphere/hosts/advertising.txt?raw';
 import teslaConfigIni from './sd/config/tesla/config.ini?raw';
+import ultrahandConfigIni from './sd/config/ultrahand/config.ini?raw';
 import sysPatchConfigIni from './sd/config/sys-patch/config.ini?raw';
 import missionControlIni from './sd/config/MissionControl/missioncontrol.ini?raw';
+import sysConConfigIni from './sd/config/sys-con/config.ini?raw';
 import statusMonitorConfigIni from './sd/config/status-monitor/config.ini?raw';
+import sysTuneConfigIni from './sd/config/sys-tune/config.ini?raw';
 import sysFtpdConfigIni from './sd/config/sys-ftpd/config.ini?raw';
+import jksvJson from './sd/config/JKSV/JKSV.json?raw';
+import jksvWebdavJson from './sd/config/JKSV/webdav.json?raw';
+import amiigoSettingsJson from './sd/config/amiigo/settings.json?raw';
 import sysClkConfigIni from './sd/config/sys-clk/config.ini?raw';
 
 export const README: {[code in Language]: string} = { en, ru, uk };
@@ -31,9 +37,15 @@ export default {
 	nintendoHostsTxt,
 	adHostsTxt,
 	teslaConfigIni,
+	ultrahandConfigIni,
 	sysPatchConfigIni,
 	missionControlIni,
+	sysConConfigIni,
 	statusMonitorConfigIni,
+	sysTuneConfigIni,
 	sysFtpdConfigIni,
+	jksvJson,
+	jksvWebdavJson,
+	amiigoSettingsJson,
 	sysClkConfigIni,
 };

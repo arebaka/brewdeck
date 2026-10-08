@@ -26,6 +26,11 @@ export function isTuningOptionChanged(group: TuningGroup, option: TuningOption, 
 	return JSON.stringify(tuning[group.id][option.id]) != JSON.stringify(option.default);
 }
 
+// Whether a multiselect takes that many values at once
+export function isCountAllowed(option: Extract<TuningOption, { type: 'multiselect' }>, count: number): boolean {
+	return count >= (option.min ?? 0) && count <= (option.max ?? Infinity);
+}
+
 // A component is required by its id, alternatives by any of theirs
 export function isRequirementMet(requirement: Requirement, selectedComponentIDs: string[]): boolean {
 	return typeof requirement == 'string'

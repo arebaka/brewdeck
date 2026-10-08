@@ -1,0 +1,7 @@
+id	type	default	values	min	max	step
+layer_width_align	select	left	left,center,right
+layer_height_align	select	top	top,center,bottom
+handheld_font_size	range	40		8	150	1
+docked_font_size	range	40		8	150	1
+background_color	rgba4444	#1117
+text_color	rgba4444	#FFFF

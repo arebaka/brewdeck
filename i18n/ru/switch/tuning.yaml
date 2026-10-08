@@ -273,7 +273,7 @@ hbl:
 
 tesla:
   title: Tesla / Ultrahand
-  description: Сочетание для вызова меню оверлеев.
+  description: Сочетание для вызова меню оверлеев. Для Ultrahand оно попадает и в его собственный конфиг.
   options:
     key_combo:
       title: Сочетание
@@ -318,6 +318,9 @@ missioncontrol:
     dualsense_vibration_intensity:
       title: Вибрация DualSense
       description: Сила от 1 (12,5%) до 8 (100%).
+    dualsense_adaptive_trigger_travel:
+      title: Ход курков DualSense, %
+      description: Ограничивает ход адаптивных курков, 0 оставляет его свободным. Нужен MissionControl 0.16.0 или новее.
     dualshock4_lightbar_brightness:
       title: Подсветка DualShock 4
       description: Яркость от 0 (выкл) до 9 (максимум).
@@ -337,56 +340,334 @@ missioncontrol:
     host_name:
       title: Имя Bluetooth
       description: Имя консоли для геймпадов, пустое оставляет системное.
+    host_address:
+      title: Адрес Bluetooth
+      description: MAC-адрес консоли для геймпадов, например 04:20:69:04:20:69, пустой оставляет системный.
+
+sys_con:
+  title: sys-con
+  description: Как sys-con находит USB-геймпады и показывает их консоли. Его конфиг записывается целиком, с профилями геймпадов из поставки sys-con, так что добавленные им на консоли не сохраняются.
+  options:
+    mode:
+      title: Режим
+      description: Как геймпады попадают в консоль.
+      values:
+        hiddbg: Виртуальные геймпады, самый совместимый
+        mitm: Подмена службы HID
+        disabled: Выключен, sys-con ничего не делает
+    discovery_mode:
+      title: Обнаружение
+      description: Какие USB-устройства sys-con принимает за геймпады. Ограничение чинит официальные геймпады, подключённые по USB.
+      values:
+        '0': Любые HID-устройства и геймпады Xbox
+        '1': Устройства из списка и геймпады Xbox
+        '2': Только устройства из списка
+    discovery_vidpid:
+      title: Список устройств
+      description: ID производителя и устройства через запятую, например 054c-* для всех геймпадов Sony. До двух вместе с геймпадами Xbox, до трёх без них.
+    auto_add_controller:
+      title: Добавлять неизвестные геймпады
+      description: Записывать геймпад, который sys-con видит впервые, в конфиг, чтобы настроить его там.
+    polling_timeout_ms:
+      title: Тайм-аут опроса, мс
+      description: Сколько sys-con ждёт данных от геймпада, прежде чем спросить снова. Важно для геймпадов с несколькими интерфейсами, например беспроводного Xbox 360, малые значения нагружают процессор.
+    polling_thread_priority:
+      title: Приоритет потока опроса
+      description: Приоритет потока, который читает геймпады, от 24 до 63. Чем меньше число, тем выше приоритет, приложения работают на 44.
+    network_controller:
+      title: Сетевой геймпад
+      description: Виртуальный геймпад, которым управляет по UDP скрипт networkpad.py из sys-con, сделан для тестов. Нажимать его кнопки сможет любой в той же сети. Опасно.
+    network_controller_port:
+      title: Порт сетевого геймпада
+      description: UDP-порт, который слушает sys-con.
+    log_level:
+      title: Уровень журнала
+      description: Насколько подробно sys-con пишет журнал.
+      values:
+        '0': Трассировка
+        '1': Отладка
+        '2': Производительность
+        '3': Сведения
+        '4': Предупреждения
+        '5': Ошибки
 
 status_monitor:
   title: Status Monitor
-  description: Раскладка и сочетание экранного монитора.
+  description: Кнопки и показания, общие для режимов экранного монитора. Сами режимы настраиваются ниже.
   options:
     key_combo:
-      title: Сочетание
-      description: Кнопки, которые нужно зажать одновременно, чтобы открыть монитор.
-    mini_show:
-      title: Режим mini
-      description: Значения в режиме mini.
+      title: Сочетание выхода
+      description: Кнопки, которые нужно зажать одновременно, чтобы выйти из режима монитора, от одной до четырёх.
+    touch_screen:
+      title: Сенсорный экран
+      description: Перетаскивать режимы Mini, FPS и Game Resolutions по экрану пальцем. Новое место не сохраняется.
+    motion_control:
+      title: Управление движением
+      description: Двигать те же режимы движением беспроводного Joy-Con или Pro Controller, пока зажато его сочетание.
+    left_joycon_motion_key_combo:
+      title: Сочетание левого Joy-Con
+      description: Кнопки, которые нужно зажать, чтобы двигать режим левым Joy-Con, от одной до четырёх.
+    right_joycon_motion_key_combo:
+      title: Сочетание правого Joy-Con
+      description: Кнопки, которые нужно зажать, чтобы двигать режим правым Joy-Con, от одной до четырёх.
+    pro_controller_motion_key_combo:
+      title: Сочетание Pro Controller
+      description: Кнопки, которые нужно зажать, чтобы двигать режим геймпадом Pro Controller, от одной до четырёх.
+    average_gpu_load:
+      title: Усреднять нагрузку GPU
+      description: Усреднять пять последних показаний нагрузки GPU. Точнее, но чуть сильнее нагружает процессор.
+    battery_avg_iir_filter:
+      title: Фильтр батареи
+      description: Брать напряжение и ток такими, какими их усредняет сам контроллер батареи, за более долгое время.
+    battery_time_left_refreshrate:
+      title: Обновление остатка батареи, с
+      description: Как часто пересчитывается оставшееся время работы от батареи.
+    use_old_fps_average:
+      title: Старое усреднение FPS
+      description: Не округлять средний FPS, как было до Status Monitor 1.2.2.
+    font_cache:
+      title: Кэш шрифта
+      description: Кэшировать глифы, чтобы рисовать быстрее.
+
+status_monitor_full:
+  title: Status Monitor, Full
+  description: Режим со всеми показаниями в подробностях, панель у края экрана.
+  options:
+    refresh_rate:
+      title: Обновлений в секунду
+      description: Как часто режим перерисовывается. Чем больше, тем сильнее нагрузка на процессор, рекомендуется 1.
+    layer_width_align:
+      title: Сторона экрана
+      description: Где рисуется панель.
+      values:
+        left: Слева
+        right: Справа
+    show_real_freqs:
+      title: Реальные частоты
+      description: Частоты, на которых CPU, GPU и RAM работают на самом деле. Нужен sys-clk.
+    show_deltas:
+      title: Разница частот
+      description: Насколько реальные частоты отличаются от целевых. Нужен sys-clk, скрыта, когда оба вида частот выключены.
+    show_target_freqs:
+      title: Целевые частоты
+      description: Частоты, заданные для CPU, GPU и RAM.
+    show_fps:
+      title: FPS
+      description: Кадры в секунду в игре, посчитанные двумя способами. Нужен SaltyNX.
+    show_res:
+      title: Разрешение
+      description: Два самых вероятных внутренних разрешения игры. Нужен SaltyNX, только для игр на графическом API NVN.
+    show_read_speed:
+      title: Скорость чтения
+      description: Сколько игра читает с накопителя в секунду. Нужен SaltyNX.
+
+status_monitor_mini:
+  title: Status Monitor, Mini
+  description: Компактный режим, небольшая панель с показанием в каждой строке. Ползунок рядом с цветом задаёт его непрозрачность.
+  options:
+    show:
+      title: Показания
+      description: Что показывает панель. Для FPS, разрешения и скорости чтения нужны SaltyNX и запущенная игра.
       values:
         TEMP: Температура
         FAN: Кулер
         DRAW: Потребление
         RES: Разрешение
         READ: Скорость чтения
-    micro_show:
-      title: Режим micro
-      description: Значения в полоске micro.
+    real_freqs:
+      title: Реальные частоты
+      description: Показывать частоты, на которых CPU, GPU и RAM работают на самом деле, вместо целевых. Нужен sys-clk.
+    replace_MB_with_RAM_load:
+      title: Нагрузка RAM
+      description: Показывать нагрузку RAM в процентах вместо занятых мегабайт. Нужен sys-clk.
+    refresh_rate:
+      title: Обновлений в секунду
+      description: Как часто режим перерисовывается. Чем больше, тем сильнее нагрузка на процессор, рекомендуется 1.
+    layer_width_align:
+      title: Положение по горизонтали
+      description: У какой стороны экрана рисуется панель.
+      values:
+        left: Слева
+        center: По центру
+        right: Справа
+    layer_height_align:
+      title: Положение по вертикали
+      description: У какого края экрана рисуется панель.
+      values:
+        top: Сверху
+        center: По центру
+        bottom: Снизу
+    handheld_font_size:
+      title: Размер шрифта в портативе
+      description: Размер текста на экране консоли.
+    docked_font_size:
+      title: Размер шрифта в доке
+      description: Размер текста на телевизоре.
+    background_color:
+      title: Фон
+      description: Цвет панели.
+    cat_color:
+      title: Названия
+      description: Цвет названий показаний слева.
+    text_color:
+      title: Значения
+      description: Цвет самих показаний справа.
+
+status_monitor_micro:
+  title: Status Monitor, Micro
+  description: Режим одной строки вдоль верхнего или нижнего края экрана. Ползунок рядом с цветом задаёт его непрозрачность.
+  options:
+    show:
+      title: Показания
+      description: Что показывает строка. Плата означает температуры и мощность батареи, для FPS нужны SaltyNX и запущенная игра.
       values:
         BRD: Плата
         FAN: Кулер
-    average_gpu_load:
-      title: Усреднять нагрузку GPU
-      description: Сглаживать показания нагрузки GPU.
-    touch_screen:
-      title: Сенсорный экран
-      description: Управлять монитором касаниями.
-    motion_control:
-      title: Вызов жестом
-      description: Открывать монитор движением Joy-Con с зажатыми кнопками.
-    mini_font_size:
-      title: Размер шрифта mini
-      description: Одинаковый в портативе и доке.
-    micro_font_size:
-      title: Размер шрифта micro
-      description: Одинаковый в портативе и доке.
-    battery_avg_iir_filter:
-      title: Фильтр батареи
-      description: Сглаживать показания батареи IIR-фильтром.
-    battery_time_left_refreshrate:
-      title: Обновление остатка батареи, с
-      description: Как часто пересчитывается оставшееся время.
-    use_old_fps_average:
-      title: Старое усреднение FPS
-      description: Использовать прежний способ усреднения FPS.
-    font_cache:
-      title: Кэш шрифта
-      description: Кэшировать глифы, чтобы рисовать быстрее.
+    real_freqs:
+      title: Реальные частоты
+      description: Показывать частоты, на которых CPU, GPU и RAM работают на самом деле, вместо целевых. Нужен sys-clk.
+    replace_GB_with_RAM_load:
+      title: Нагрузка RAM
+      description: Показывать нагрузку RAM в процентах вместо занятых гигабайт. Нужен sys-clk.
+    refresh_rate:
+      title: Обновлений в секунду
+      description: Как часто режим перерисовывается. Чем больше, тем сильнее нагрузка на процессор, рекомендуется 1.
+    layer_height_align:
+      title: Край экрана
+      description: Где рисуется строка.
+      values:
+        top: Сверху
+        bottom: Снизу
+    text_align:
+      title: Выравнивание текста
+      description: К какой стороне строки собраны показания.
+      values:
+        left: По левому краю
+        center: По центру
+        right: По правому краю
+    handheld_font_size:
+      title: Размер шрифта в портативе
+      description: Размер текста на экране консоли.
+    docked_font_size:
+      title: Размер шрифта в доке
+      description: Размер текста на телевизоре.
+    background_color:
+      title: Фон
+      description: Цвет строки.
+    cat_color:
+      title: Названия
+      description: Цвет названий показаний.
+    text_color:
+      title: Значения
+      description: Цвет самих показаний.
+
+status_monitor_fps_counter:
+  title: Status Monitor, FPS Counter
+  description: Режим, в котором нет ничего, кроме FPS игры. Нужен SaltyNX. Ползунок рядом с цветом задаёт его непрозрачность.
+  options:
+    layer_width_align:
+      title: Положение по горизонтали
+      description: У какой стороны экрана рисуется счётчик.
+      values:
+        left: Слева
+        center: По центру
+        right: Справа
+    layer_height_align:
+      title: Положение по вертикали
+      description: У какого края экрана рисуется счётчик.
+      values:
+        top: Сверху
+        center: По центру
+        bottom: Снизу
+    handheld_font_size:
+      title: Размер шрифта в портативе
+      description: Размер числа на экране консоли.
+    docked_font_size:
+      title: Размер шрифта в доке
+      description: Размер числа на телевизоре.
+    background_color:
+      title: Фон
+      description: Цвет под числом.
+    text_color:
+      title: Текст
+      description: Цвет числа.
+
+status_monitor_fps_graph:
+  title: Status Monitor, FPS Graph
+  description: Режим с графиком FPS игры. Нужен SaltyNX. Ползунок рядом с цветом задаёт его непрозрачность.
+  options:
+    layer_width_align:
+      title: Положение по горизонтали
+      description: У какой стороны экрана рисуется график.
+      values:
+        left: Слева
+        center: По центру
+        right: Справа
+    layer_height_align:
+      title: Положение по вертикали
+      description: У какого края экрана рисуется график.
+      values:
+        top: Сверху
+        center: По центру
+        bottom: Снизу
+    background_color:
+      title: Фон
+      description: Цвет под графиком.
+    border_color:
+      title: Рамка
+      description: Цвет рамки вокруг графика.
+    dashed_line_color:
+      title: Средняя линия
+      description: Цвет пунктирной линии посередине графика, а также линии графика, пока FPS держится на целом значении.
+    main_line_color:
+      title: Линия графика
+      description: Цвет линии FPS.
+    rounded_line_color:
+      title: Линия на целом FPS
+      description: Задуман для линии графика, пока FPS держится на целом значении. Status Monitor читает этот цвет, но пока рисует такую линию цветом средней линии.
+    perfect_line_color:
+      title: Линия на полной и половинной частоте
+      description: Цвет линии графика, пока FPS держится на частоте обновления экрана или её половине, 60 или 30.
+    fps_counter_color:
+      title: Средний FPS
+      description: Цвет среднего FPS, нарисованного за графиком.
+    max_fps_text_color:
+      title: Верхняя отметка
+      description: Цвет верхней отметки шкалы, 60.
+    min_fps_text_color:
+      title: Нижняя отметка
+      description: Цвет нижней отметки шкалы, 0.
+
+status_monitor_game_resolutions:
+  title: Status Monitor, Game Resolutions
+  description: Режим со списком разрешений, в которых игра рисует картинку. Нужен SaltyNX. Ползунок рядом с цветом задаёт его непрозрачность.
+  options:
+    refresh_rate:
+      title: Обновлений в секунду
+      description: Как часто режим перерисовывается. Чем больше, тем сильнее нагрузка на процессор.
+    layer_width_align:
+      title: Положение по горизонтали
+      description: У какой стороны экрана рисуется панель.
+      values:
+        left: Слева
+        center: По центру
+        right: Справа
+    layer_height_align:
+      title: Положение по вертикали
+      description: У какого края экрана рисуется панель.
+      values:
+        top: Сверху
+        center: По центру
+        bottom: Снизу
+    background_color:
+      title: Фон
+      description: Цвет панели.
+    cat_color:
+      title: Заголовки
+      description: Цвет заголовков Depth и Viewport.
+    text_color:
+      title: Разрешения
+      description: Цвет списков разрешений.
 
 sys_ftpd_light:
   title: sys-ftpd-light
@@ -441,3 +722,296 @@ sys_clk:
     csv_write_interval_ms:
       title: Журнал CSV, мс
       description: 0 отключает его.
+
+ultrahand:
+  title: Ultrahand
+  description: Язык, ввод, меню, виджет, тема, уведомления и функции меню оверлеев. Тема и звуки выбираются в самом Ultrahand.
+  options:
+    default_lang:
+      title: Язык
+      description: Язык меню.
+    launch_combos:
+      title: Сочетания запуска
+      description: Оверлеи и пакеты открываются своими сочетаниями кнопок, заданными в их настройках.
+    swipe_to_open:
+      title: Открытие свайпом
+      description: Открывать меню свайпом от края сенсорного экрана.
+    swipe_offset:
+      title: Отступ свайпа, пикс.
+      description: Сдвигает зону, в которой начинается свайп, на столько от края экрана. Пригодится, если экран пропускает касания у самого края. В меню Ultrahand такой настройки нет.
+    haptic_feedback:
+      title: Виброотклик
+      description: Вибрация при перемещении по меню.
+    stick_navigation:
+      title: Навигация стиком
+      description: Перемещаться по меню не только крестовиной, но и стиком.
+    hold_duration:
+      title: Время удержания, мс
+      description: Сколько нужно держать кнопку в командах, которые просят удержания.
+    sound_effects:
+      title: Звуки
+      description: Звуки меню.
+    opaque_screenshots:
+      title: Непрозрачные скриншоты
+      description: На скриншотах, снятых с открытым меню, оно выглядит непрозрачным.
+    right_alignment:
+      title: Меню справа
+      description: Рисовать меню у правого края экрана, а не у левого.
+    auto_ntp_sync:
+      title: Синхронизация NTP перед загрузками
+      description: Сверять часы по сети перед загрузкой файлов, неверное время ломает защищённые соединения.
+    show_packages:
+      title: Меню пакетов
+      description: Показывать страницу пакетов рядом со страницей оверлеев.
+    page_swap:
+      title: Смена страниц
+      description: Открывать меню на странице пакетов, оверлеи уходят на вторую.
+    show_user_guide:
+      title: Руководство
+      description: Показывать в меню подсказки по кнопкам.
+    show_hidden:
+      title: Скрытые
+      description: Показывать пункт, который открывает список скрытых оверлеев и пакетов.
+    show_delete:
+      title: Удаление
+      description: Предлагать удаление оверлея или пакета в его настройках.
+    show_unsupported:
+      title: Неподдерживаемые оверлеи
+      description: Показывать оверлеи, не собранные под Horizon OS 21 и новее, с предупреждением. Важно только на таких системах.
+    show_overlay_versions:
+      title: Версии оверлеев
+      description: Показывать версии рядом с названиями оверлеев.
+    show_package_versions:
+      title: Версии пакетов
+      description: Показывать версии рядом с названиями пакетов.
+    clean_version_labels:
+      title: Версии без v
+      description: Показывать версии без буквы v в начале.
+    show_clock:
+      title: Часы
+      description: Показывать время в виджете.
+    datetime_format:
+      title: Формат часов
+      description: Как пишется время, в формате strftime. %a %T даёт день недели и время с секундами, %H:%M только часы и минуты. Результат должен уместиться в 19 символов.
+    show_soc_temp:
+      title: Температура SoC
+      description: Показывать в виджете температуру процессора.
+    show_pcb_temp:
+      title: Температура платы
+      description: Показывать в виджете температуру платы.
+    show_battery:
+      title: Батарея
+      description: Показывать в виджете заряд батареи.
+    dynamic_widget_colors:
+      title: Динамические температуры
+      description: Красить температуры по тому, насколько горячо.
+    center_widget_alignment:
+      title: По центру
+      description: Выравнивать виджет по центру его фона, а не по правому краю.
+    show_widget_backdrop:
+      title: Фон
+      description: Рисовать фон под виджетом.
+    extended_widget_backdrop:
+      title: Короткий фон
+      description: Заканчивать фон и границу до края экрана. Меню Ultrahand показывает этот ключ наоборот, как выключенный "Расширенный фон".
+    show_widget_border:
+      title: Граница
+      description: Рисовать границу вокруг виджета.
+    dynamic_widget_border:
+      title: Динамическая граница
+      description: Пускать цвета вдоль границы.
+    switch_2_style:
+      title: Стиль Switch 2
+      description: Рисовать выделение как на Switch 2, скруглённым и с цветами, бегущими по его рамке. Без него выглядит как на первой Switch.
+    dynamic_logo:
+      title: Динамический логотип
+      description: Пускать цвета по логотипу Ultrahand.
+    dynamic_tables:
+      title: Динамические таблицы
+      description: Пускать цвета вдоль границ таблиц.
+    selection_bg:
+      title: Фон выделения
+      description: Заливать выбранный пункт цветом выделения из темы.
+    selection_text:
+      title: Текст выделения
+      description: Красить текст выбранного пункта в его цвет из темы.
+    selection_value:
+      title: Значение выделения
+      description: Красить значение выбранного пункта в его цвет из темы.
+    libultrahand_titles:
+      title: Цвет заголовков libultrahand
+      description: Красить названия оверлеев, собранных на libultrahand, в их собственный цвет из темы.
+    libultrahand_versions:
+      title: Цвет версий libultrahand
+      description: Красить версии оверлеев, собранных на libultrahand, в их собственный цвет из темы.
+    package_titles:
+      title: Цвет заголовков пакетов
+      description: Красить названия пакетов в их собственный цвет из темы.
+    package_versions:
+      title: Цвет версий пакетов
+      description: Красить версии пакетов в их собственный цвет из темы.
+    in_package_titles:
+      title: Заголовки внутри пакетов
+      description: Разрешать пакету красить свой заголовок внутри себя. Без этого у всех пакетов цвет из темы.
+    notifications:
+      title: Уведомления API
+      description: Показывать уведомления, которые другие homebrew-приложения отправляют через Ultrahand.
+    notifications_hotkey:
+      title: Горячая клавиша API
+      description: Удержание минуса несколько секунд включает и выключает уведомления других homebrew-приложений.
+    startup_notification:
+      title: Уведомление при запуске
+      description: Показывать уведомление, когда Ultrahand запускается после загрузки консоли.
+    silence_notifications:
+      title: Уведомления без звука
+      description: Показывать уведомления без их звука.
+    max_notifications:
+      title: Слоты уведомлений
+      description: Сколько уведомлений держится на экране одновременно.
+
+sys_tune:
+  title: sys-tune
+  description: Воспроизведение фонового музыкального плеера. Он играет файлы MP3, FLAC и WAV с карты, его оверлей открывает папку /music.
+  options:
+    load_path:
+      title: Играть при запуске
+      description: Файл или папка на карте, которые начинают играть после загрузки консоли, например /music. Если пусто, плеер запускается молча.
+    shuffle:
+      title: Перемешивание
+      description: Играть треки в случайном порядке.
+    repeat:
+      title: Повтор
+      description: Что повторяется.
+      values:
+        '0': Ничего
+        '1': Один трек
+        '2': Все треки
+    volume:
+      title: Громкость музыки, %
+      description: Громкость музыки.
+    global_volume:
+      title: Громкость игр, %
+      description: Громкость игр, которым в оверлее не задана своя.
+    title_default:
+      title: Играть в играх
+      description: Музыка продолжает играть, когда запускается игра. В оверлее это задаётся и для каждой игры отдельно.
+
+jksv:
+  title: JKSV
+  description: Настройки менеджера сохранений, те же, что хранит его меню настроек. Избранное и чёрный список задаются в самом JKSV.
+  options:
+    WorkingDirectory:
+      title: Папка бэкапов
+      description: Папка на карте, куда складываются бэкапы.
+    IncludeDeviceSaves:
+      title: Сохранения устройства у пользователей
+      description: Показывать сохранения, общие для всех пользователей, среди сохранений каждого из них.
+    AutoBackupOnRestore:
+      title: Бэкап перед восстановлением
+      description: Делать бэкап сохранения перед тем, как восстановить поверх него другой.
+    AutoNameBackups:
+      title: Автоматические имена
+      description: Называть новые бэкапы без вопроса на клавиатуре.
+    AutoUploadToRemote:
+      title: Выгрузка бэкапов
+      description: Выгружать новые бэкапы в удалённое хранилище и удалять их с карты. Нужен сервер WebDAV ниже или Google Drive, настроенный на консоли.
+    KeepLocalBackups:
+      title: Оставлять бэкапы на карте
+      description: Выгруженные бэкапы остаются и на карте.
+    AlwaysUseTitleID:
+      title: ID приложений в именах папок
+      description: Называть папки бэкапов по ID приложений, а не по названиям.
+    EnglishSafeTitles:
+      title: Английские названия в путях
+      description: Брать для имени папки название игры на американском английском.
+    HoldForDeletion:
+      title: Удержание для удаления
+      description: Чтобы удалить бэкап, нужно три секунды держать A.
+    HoldForRestoration:
+      title: Удержание для восстановления
+      description: Чтобы восстановить бэкап, нужно три секунды держать A.
+    HoldForOverWrite:
+      title: Удержание для перезаписи
+      description: Чтобы перезаписать бэкап, нужно три секунды держать A.
+    OnlyListMountable:
+      title: Только открывающиеся сохранения
+      description: Показывать только те сохранения, которые JKSV удаётся открыть при запуске.
+    ListAccountSystemSaves:
+      title: Системные сохранения аккаунтов
+      description: Показывать системные сохранения, привязанные к аккаунту.
+    AllowSystemSaveWriting:
+      title: Запись в системные сохранения
+      description: Разрешить восстановление системных сохранений и запись в разделы NAND. Опасно.
+    ExportToZip:
+      title: Экспорт в ZIP
+      description: Упаковывать бэкапы в архивы ZIP, а не складывать папками.
+    ZipCompressionLevel:
+      title: Сжатие ZIP
+      description: От 0, без сжатия, до 9. Низкие уровни пакуют быстрее, но экономят меньше места.
+    TitleSortType:
+      title: Порядок игр
+      description: Как отсортирован список игр.
+      values:
+        '0': По алфавиту
+        '1': По времени в игре
+        '2': По последнему запуску
+    JKSMTextMode:
+      title: Текстовые меню
+      description: Показывать игры списком, как JKSM на 3DS, а не сеткой иконок.
+    ForceEnglish:
+      title: Английский интерфейс
+      description: Использовать английский, а не язык системы.
+    ShowDevice:
+      title: Сохранения устройства
+      description: Загружать и показывать сохранения, общие для всех пользователей.
+    ShowBCAT:
+      title: Сохранения BCAT
+      description: Загружать и показывать данные BCAT, через которые игры получают контент и события между обновлениями.
+    ShowCache:
+      title: Сохранения кэша
+      description: Загружать и показывать данные кэша, где игры держат DLC и прочее.
+    ShowSystem:
+      title: Системные сохранения
+      description: Загружать и показывать сохранения системы.
+    EnableTrash:
+      title: Корзина
+      description: Перемещать удалённые с карты бэкапы в папку _TRASH_, а не удалять их насовсем.
+    UIAnimationScaling:
+      title: Скорость анимаций
+      description: Длительность переходов, чем меньше, тем быстрее. При 1 они мгновенные.
+
+jksv_webdav:
+  title: JKSV, WebDAV
+  description: Сервер WebDAV, на котором JKSV хранит бэкапы.
+  options:
+    origin:
+      title: Сервер
+      description: Адрес сервера вместе с протоколом, например https://example.com. Если пусто, WebDAV выключен.
+    basepath:
+      title: Папка
+      description: Путь к папке на сервере, куда складываются бэкапы.
+    username:
+      title: Логин
+      description: Имя пользователя для подключения. Оставь пустым для сервера, открытого всем.
+    password:
+      title: Пароль
+      description: Пароль для подключения.
+
+amiigo:
+  title: Amiigo
+  description: Как Amiigo создаёт виртуальные amiibo для emuiibo.
+  options:
+    categoryMode:
+      title: Папка новых amiibo
+      description: Куда в emuiibo/amiibo попадает созданная amiibo.
+      values:
+        '0': В корень
+        '1': По играм
+        '2': По сериям amiibo
+        '3': В папку, открытую в Amiigo
+    useRandomisedUUID:
+      title: Случайный UUID
+      description: Созданные amiibo меняют UUID при каждом сканировании, и игра, которая принимает amiibo раз в день, принимает её снова.
+    saveAmiiboImages:
+      title: Картинки amiibo
+      description: Скачивать картинки созданных amiibo для оверлея emuiibo. Экспериментально, большая картинка может уронить оверлей.

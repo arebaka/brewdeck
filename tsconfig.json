@@ -18,7 +18,6 @@
 			"@templates": ["./templates"],
 			"@templates/*": ["./templates/*"],
 			"@i18n": ["./i18n"],
-			// "@sd/*": ["./templates/switch/sd/*"],
 		},
 	},
 	"include": ["vite.config.ts", "src", "styles", "data", "templates", "i18n", "tests", "vite-env.d.ts"],

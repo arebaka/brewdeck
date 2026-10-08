@@ -63,6 +63,6 @@ describe('texts', () => {
 	});
 
 	it.each(LANGUAGES)('leave no text of %s empty', lang => {
-		expect(texts(I[lang]).filter(([, text]) => text.trim() == '').map(([path]) => path)).toEqual([]);
+		expect(texts(I18N[lang]).filter(([, text]) => text.trim() == '').map(([path]) => path)).toEqual([]);
 	});
 });

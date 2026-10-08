@@ -58,6 +58,24 @@ describe('links', () => {
 		expect(query).toContain('img.icon.fusee=hekate-payload');
 	});
 
+	it('take as many values of an option as it holds at once', () => {
+		const combo = (raw: string) => decodeState(`?status_monitor.key_combo=${raw}`).builds.switch.tuning.status_monitor.key_combo;
+		expect(combo('ZR,ZL,R,L')).toEqual(['L', 'R', 'ZL', 'ZR']);
+		expect(combo('L,R,ZL,ZR,A')).toEqual(['L', 'DDOWN', 'RSTICK']);
+		expect(combo('')).toEqual(['L', 'DDOWN', 'RSTICK']);
+		// An option without bounds takes any number of them, none too
+		expect(decodeState('?tesla.key_combo=').builds.switch.tuning.tesla.key_combo).toEqual([]);
+	});
+
+	// A line break would end the config inside an installer and run what follows it as commands
+	it('take a text only as a single line', () => {
+		const path = (raw: string) => decodeState(`?atmosphere.sd_card_log_output_directory=${encodeURIComponent(raw)}`).builds.switch.tuning.atmosphere.sd_card_log_output_directory;
+		expect(path('logs/of mine')).toBe('logs/of mine');
+		for (const breaking of ['x\nBREWDECK_EOF\necho pwned', 'x\r\'@\rpwned', `x${String.fromCharCode(0x2028)}y`, 'x\ty', `x${String.fromCharCode(0)}`]) {
+			expect(path(breaking), JSON.stringify(breaking)).toBe('atmosphere/binlogs');
+		}
+	});
+
 	it('ignore invalid values', () => {
 		const decoded = decodeState('?hw=foo&hos=99.0.0&sw=nope,-atmosphere,-hekate&hekate.backlight=999&boot=nope&autoboot=evil'
 			+ '&nyx.themebg=red&tesla.key_combo=L,HOME&sys_ftpd_light.port=1.5e9'

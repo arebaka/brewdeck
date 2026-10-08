@@ -1,5 +1,5 @@
 import { Catalog, TuningConfig, TuningGroup, TuningOption, TuningValue } from './types';
-import { resolveSelection } from './data';
+import { isCountAllowed, resolveSelection } from './data';
 
 // Parameters of a link in their order
 export type Params = [string, string][];
@@ -26,7 +26,8 @@ function parse(option: TuningOption, raw: string): TuningValue | undefined {
 			return option.values.find(value => String(value) == raw);
 		case 'multiselect': {
 			const items = raw ? raw.split(',') : [];
-			return items.every(item => option.values.includes(item)) ? option.values.filter(value => items.includes(value)) : undefined;
+			const values = option.values.filter(value => items.includes(value));
+			return items.every(item => option.values.includes(item)) && isCountAllowed(option, values.length) ? values : undefined;
 		}
 		case 'range':
 		case 'number':
@@ -35,8 +36,11 @@ function parse(option: TuningOption, raw: string): TuningValue | undefined {
 			return Number.isInteger(number) && number >= 0 && number <= 359 ? number : undefined;
 		case 'color':
 			return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : undefined;
+		case 'rgba4444':
+			return /^#[0-9a-f]{4}$/i.test(raw) ? raw.toUpperCase() : undefined;
 		case 'text':
-			return raw.length <= option.maxLength ? raw : undefined;
+			// A text is a single line: a line break would get out of its key in the config and out of the config in the installers
+			return raw.length <= option.maxLength && !/[\p{Cc}\p{Zl}\p{Zp}]/u.test(raw) ? raw : undefined;
 	}
 }
 

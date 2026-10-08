@@ -45,6 +45,7 @@ interface ButtonsProps {
 	values: string[];
 	selected: string[];
 	isEnabled: boolean;
+	isLocked?: (value: string) => boolean; // buttons the selection cannot take or lose now
 	toggle: (value: string) => void;
 	t: Translation;
 }
@@ -53,6 +54,7 @@ export function Buttons({
 	values,
 	selected,
 	isEnabled,
+	isLocked,
 	toggle,
 	t
 }: ButtonsProps) {
@@ -66,14 +68,16 @@ export function Buttons({
 				<ul key={index} className="side">
 					{group.map(value => {
 						const name = buttonName(value);
+						const locked = isLocked?.(value) ?? false;
 						return (
 							<li
 								key={value}
-								className={`button ${GLYPHS[name].shape} ${selected.includes(value) ? 'active' : ''}`}
+								className={`button ${GLYPHS[name].shape} ${selected.includes(value) ? 'active' : ''} ${locked ? 'locked' : ''}`}
 								title={t.buttons[name]}
 								aria-label={t.buttons[name]}
-								tabIndex={isEnabled ? 0 : undefined}
-								onClick={() => toggle(value)}
+								aria-disabled={locked || undefined}
+								tabIndex={isEnabled && !locked ? 0 : undefined}
+								onClick={() => !locked && toggle(value)}
 								onKeyDown={activate}>
 								{GLYPHS[name].label}
 							</li>

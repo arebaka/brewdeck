@@ -76,7 +76,7 @@ sys_ftpd_light:
 
 sys_tune:
   description: Фоновий музичний плеєр
-  details: Відтворює MP3 з SD-карти поверх ігор, керування через оверлей.
+  details: Відтворює MP3, FLAC і WAV із SD-карти поверх ігор, керування через оверлей.
 
 fizeau:
   description: Керування кольорами екрана

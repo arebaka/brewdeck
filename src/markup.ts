@@ -2,17 +2,20 @@ import { Marked } from 'marked';
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
 import ini from 'highlight.js/lib/languages/ini';
+import json from 'highlight.js/lib/languages/json';
 import powershell from 'highlight.js/lib/languages/powershell';
 
 hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('ini', ini);
+hljs.registerLanguage('json', json);
 hljs.registerLanguage('powershell', powershell);
 
 // Languages of the generated files by extension, other files stay plain
 const LANGUAGES: Record<string, string> = {
 	sh: 'bash',
 	ps1: 'powershell',
-	ini: 'ini'
+	ini: 'ini',
+	json: 'json'
 };
 
 const escape = (text: string) => text
@@ -28,7 +31,7 @@ const highlightCode = (code: string, language?: string) => language && hljs.getL
 
 // Highlighted HTML of a generated file
 export function highlight(content: string, path: string): string {
-	return highlightCode(content, LANGUAGES[path.split('.').pop() ?? '']);
+	return highlightCode(content, LANGUAGES[path.split('.').pop()?.toLowerCase() ?? '']);
 }
 
 // The readme carries versions and names from release metadata, so raw HTML stays text and links only lead to the web

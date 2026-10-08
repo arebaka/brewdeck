@@ -31,11 +31,20 @@ const ICONS: {[step in StepId]: React.ReactNode} = {
 		<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z" />
 		<path d="m9 12 2 2 4-4" />
 	</>,
-	modules: <>
+	sysmodules: <>
 		<rect x="4" y="4" width="7" height="7" rx="1" />
 		<rect x="13" y="4" width="7" height="7" rx="1" />
 		<rect x="4" y="13" width="7" height="7" rx="1" />
 		<rect x="13" y="13" width="7" height="7" rx="1" />
+	</>,
+	overlays: <>
+		<rect x="3" y="8" width="13" height="12" rx="1.5" />
+		<path d="M8 8V5.5A1.5 1.5 0 0 1 9.5 4h10A1.5 1.5 0 0 1 21 5.5v9a1.5 1.5 0 0 1-1.5 1.5H16" />
+	</>,
+	apps: <>
+		<rect x="3" y="5" width="18" height="14" rx="1.5" />
+		<path d="M3 9h18" />
+		<path d="M6 7h.01M8.5 7h.01" />
 	</>,
 	plugins: <>
 		<path d="M9.5 3.5a2 2 0 0 1 4 0V6H18v4.5h-1.5a2 2 0 0 0 0 4H18V19h-4.5v-1.5a2 2 0 0 0-4 0V19H5v-4.5h1.5a2 2 0 0 0 0-4H5V6h4.5z" />

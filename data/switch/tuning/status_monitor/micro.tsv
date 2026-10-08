@@ -1,0 +1,12 @@
+id	type	default	values	min	max	step
+show	multiselect	CPU,GPU,RAM,BRD,FAN,FPS	CPU,GPU,RAM,BRD,FAN,FPS
+real_freqs	toggle	off
+replace_GB_with_RAM_load	toggle	on
+refresh_rate	range	1		1	60	1
+layer_height_align	select	top	top,bottom
+text_align	select	center	left,center,right
+handheld_font_size	range	18		8	18	1
+docked_font_size	range	18		8	18	1
+background_color	rgba4444	#1117
+cat_color	rgba4444	#FCCF
+text_color	rgba4444	#FFFF

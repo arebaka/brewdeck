@@ -13,4 +13,4 @@ const TUNING_TABLES = import.meta.glob<Row[]>('./tuning/*.tsv', { eager: true, i
 export const FIRMWARE = firmware(FIRMWARE_ROWS);
 export const SOFTWARE = components(SOFTWARE_ROWS, SOFTWARE_SOURCES);
 export const PRESETS = presets(PRESET_ROWS);
-export const TUNING = tuning(TUNING_ROWS, group => TUNING_TABLES[`./tuning/${group}.tsv`], TUNING_CONDITIONS as Conditions);
+export const TUNING = tuning(TUNING_ROWS, path => TUNING_TABLES[`./tuning/${path}`], TUNING_CONDITIONS as Conditions);

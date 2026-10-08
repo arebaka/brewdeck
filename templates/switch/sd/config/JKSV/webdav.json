@@ -1,0 +1,6 @@
+{
+  "origin": {{origin}}{{#basepath}},
+  "basepath": {{basepath}}{{/basepath}}{{#username}},
+  "username": {{username}},
+  "password": {{password}}{{/username}}
+}

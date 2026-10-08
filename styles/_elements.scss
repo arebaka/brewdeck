@@ -189,6 +189,16 @@
 	}
 }
 
+// A value its option cannot take or lose now: it holds as many of them as it may or as few as it has to
+.choice.locked,
+.button.locked {
+	pointer-events: none;
+
+	&:not(.active) {
+		opacity: .45;
+	}
+}
+
 // Notices with a colored bar, like hints of the system settings
 .warnings,
 .advices {
@@ -400,6 +410,17 @@ select.field {
 	&::-moz-color-swatch {
 		border: none;
 		border-radius: $radius;
+	}
+}
+
+// A color with its opacity: the field picks the color, the slider how solid it is
+.rgba {
+	display: flex;
+	align-items: center;
+	gap: space(3);
+
+	.range {
+		flex: 1;
 	}
 }
 

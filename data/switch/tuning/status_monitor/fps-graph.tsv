@@ -1,0 +1,12 @@
+id	type	default	values
+layer_width_align	select	left	left,center,right
+layer_height_align	select	top	top,center,bottom
+background_color	rgba4444	#1117
+border_color	rgba4444	#F77F
+dashed_line_color	rgba4444	#8888
+main_line_color	rgba4444	#FFFF
+rounded_line_color	rgba4444	#F0FF
+perfect_line_color	rgba4444	#0C0F
+fps_counter_color	rgba4444	#4444
+max_fps_text_color	rgba4444	#FFFF
+min_fps_text_color	rgba4444	#FFFF

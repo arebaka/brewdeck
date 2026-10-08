@@ -207,6 +207,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.component .name', 'DBIPatcher').closest('.component').click()`);
 	await check('a risky component is marked and warned about', `byText('.component .name', 'DBIPatcher').closest('.component').querySelector('.badge.warning') != null
 		&& $$('.notice').some(notice => notice.textContent.includes('The author of DBI warns'))`);
+	await page.act(`byText('.component .name', 'sys-con').closest('.component').click()`);
 
 	// Launch
 	await check('payloads moved off the Software step', `byText('.component .name', 'Lockpick RCM') == null`);
@@ -255,11 +256,40 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.batch .control', 'RESET').click()`);
 	await check('reset clears only its step', `!location.search.includes('exosphere.') && location.search.includes('launch.emummc-SD01.usb3force=1')`);
 
-	// Plugins
-	await page.act(`step('Plugins')`);
-	await check('the settings of selected plugins are listed', `$$('.tuning > .header .title').length > 0`);
+	// Settings of the selected components, by what the components are
+	await check('modules, overlays and applications have steps of their own', `['Modules', 'Overlays', 'Apps'].every(name => byText('.sidebar .step .label', name) != null)`);
+	await page.act(`step('Modules')`);
+	await page.act(`byText('.tuning .row .name', 'Add unknown controllers').closest('.row').click()`);
+	await check('a setting of sys-con reaches the link', `location.search.includes('sys_con.auto_add_controller=0')`);
+	await page.act(`step('Overlays')`);
+	await check('the settings of selected overlays are listed, Status Monitor by its modes', `$$('.tuning > .header .title').map(title => title.textContent).join('|')
+		== 'Tesla / Ultrahand|Status Monitor|' + ['Full', 'Mini', 'Micro', 'FPS Counter', 'FPS Graph', 'Game Resolutions'].map(mode => 'Status Monitor, ' + mode).join('|')`);
+	await page.act(`byText('.tuning .row .name', 'Touch screen').closest('.row').click()`);
+	await check('a setting of Status Monitor reaches the link', `location.search.includes('status_monitor.touch_screen=0')`);
+	// A combo of Status Monitor holds from one to four buttons
+	const button = (name: string) => `byText('.tuning .row .name', 'Exit combo').closest('.row').querySelector('.button[aria-label="${name}"]')`;
+	await page.act(`${button('ZL')}.click()`);
+	await check('a full combo locks the buttons it cannot take', `location.search.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')
+		&& ${button('ZR')}.classList.contains('locked') && !${button('ZL')}.classList.contains('locked')`);
+	await page.act(`${button('ZR')}.click()`);
+	await check('and takes no more of them', `location.search.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')`);
+	for (const name of ['ZL', 'L', 'Down', 'Right stick press']) {
+		await page.act(`${button(name)}.click()`);
+	}
+	await check('the last button of a combo stays', `/status_monitor\\.key_combo=RSTICK(&|$)/.test(location.search)
+		&& ${button('Right stick press')}.classList.contains('locked')`);
+	// The field picks a color, the slider next to it how solid the color is
+	const color = `[...byText('.tuning > .header .title', 'Status Monitor, Mini').closest('.tuning').querySelectorAll('.row')]
+		.find(row => row.querySelector('.name').textContent == 'Background').querySelector('.rgba')`;
+	await page.act(`setField(${color}.querySelector('.range'), '15')`);
+	await check('the slider of a color sets its opacity', `location.search.includes('status_monitor_mini.background_color=%23111F')`);
+	await page.act(`setField(${color}.querySelector('.color'), '#ff0000')`);
+	await check('a color is kept with a hex digit per channel', `location.search.includes('status_monitor_mini.background_color=%23F00F')`);
+	await page.act(`step('Apps')`);
 	await page.act(`byText('.row .choice', 'Українська').click()`);
 	await check('the translation of DBI takes a language', `location.search.includes('dbi_patcher.language=ua')`);
+	await page.act(`byText('.tuning .row .name', 'Trash bin').closest('.row').click()`);
+	await check('a setting of JKSV reaches the link', `location.search.includes('jksv.EnableTrash=1')`);
 
 	// Overclock
 	await page.act(`step('Overclock')`);
@@ -340,12 +370,29 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	})()`);
 	await page.act(`byText('.generated .choice', 'config/sys-clk/config.ini').click()`);
 	await check('the sys-clk profile is previewed', `document.querySelector('.generated .code').textContent.includes('[ABCDEF0123456789]')`);
+	await page.act(`byText('.generated .choice', 'config/JKSV/JKSV.json').click()`);
+	await check('the settings of JKSV are previewed as highlighted JSON', `(() => {
+		const code = document.querySelector('.generated .code');
+		return JSON.parse(code.textContent).EnableTrash === 1 && code.querySelector('.hljs-attr') != null;
+	})()`);
+	await page.act(`byText('.generated .choice', 'config/status-monitor/config.ini').click()`);
+	await check('the config of Status Monitor has a section of every mode', `(() => {
+		const code = document.querySelector('.generated .code').textContent;
+		return code.includes('touch_screen=false') && code.includes('background_color=#F00F') && code.includes('[game_resolutions]');
+	})()`);
+	await page.act(`byText('.generated .choice', 'config/sys-con/config.ini').click()`);
+	await check('the config of sys-con has its settings ahead of the profiles of controllers', `(() => {
+		const code = document.querySelector('.generated .code').textContent;
+		return code.startsWith('[global]\\nmode=hiddbg') && code.includes('\\nauto_add_controller=0\\n') && code.includes('\\n[default]\\n');
+	})()`);
 	await page.act(`byText('.files .row .name', 'install.sh').closest('.row').click()`);
 	await page.act(`byText('.files .row .name', 'install.ps1').closest('.row').click()`);
 	await sleep(1000);
 
 	const installer = readFileSync(join(downloads, 'install.sh'), 'utf8');
 	expect('the installer fetches the translation in the chosen language', installer.includes("'^translation_ua\\.bin$'"));
+	expect('the installer writes the config of sys-con whole, like every other one',
+		installer.includes("write_config 'config/sys-con/config.ini'") && installer.includes('\n[default]\n') && !installer.includes('merge_config'));
 	const images = embeddedImages(installer);
 	expect('the installer embeds the boot screen rotated and opaque', images.some(image =>
 		image.path == 'bootloader/bootlogo.bmp' && image.magic == 'BM' && image.bpp == 32 && image.width == 50 && image.height == 204 && image.isOpaque), images);

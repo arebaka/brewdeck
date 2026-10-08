@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { HARDWARE } from '@data';
 import { matchingPreset, presetSelection, resolveSelection } from '@/data';
 import { PLATFORMS } from '@/platforms';
-import { CATALOG, GALLERY } from '@/platforms/switch';
+import { CATALOG, GALLERY, SWITCH } from '@/platforms/switch';
 import { I18N } from '@i18n';
 import { buttonName, isButtons } from '@/components/Buttons';
 
@@ -127,5 +127,22 @@ describe('selection', () => {
 			.filter(issue => issue.code == 'requires' || (preset.id != 'all' && issue.code == 'conflict'));
 		expect(broken).toEqual([]);
 		expect(matchingPreset(platform.catalog, selection)?.id).toBe(preset.id);
+	});
+});
+
+describe('steps', () => {
+	const steps = (ids: string[]) => SWITCH.steps({ ...SWITCH.defaults(), selectedComponentIDs: resolveSelection(CATALOG, ids) });
+
+	it('show the settings of modules, overlays and applications only for the selected ones that have some', () => {
+		expect(steps([]).filter(step => ['sysmodules', 'overlays', 'apps'].includes(step))).toEqual([]);
+		expect(steps(['sys_con'])).toContain('sysmodules');
+		expect(steps(['ultrahand'])).toContain('overlays');
+		expect(steps(['jksv'])).toContain('apps');
+	});
+
+	// A step misspelled in the data would hide its settings without a word
+	it.each(PLATFORM_CASES)('keep every group of settings of %s on a step the platform goes through', (id, platform) => {
+		const everything = platform.steps({ ...platform.defaults(), selectedComponentIDs: platform.catalog.components.map(comp => comp.id) });
+		expect(platform.catalog.tuning.filter(group => !everything.includes(group.step)).map(group => group.id)).toEqual([]);
 	});
 });

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Fix, Issue, TuningConfig, TuningGroup, TuningOption, TuningStep, TuningValue } from '@/types';
 import { Language, Translation } from '@i18n';
-import { isTuningOptionActive, tuningGroups } from '@/data';
+import { isCountAllowed, isTuningOptionActive, tuningGroups } from '@/data';
 import { Platform } from '@/platforms';
 import { activate } from '@/utils';
 import { Issues } from '../Issues';
@@ -13,7 +13,7 @@ type SetTuningOption = (group: string, option: string, value: TuningValue) => vo
 interface TuningProps {
 	lang: Language;
 	platform: Platform;
-	step: 'system' | 'security' | 'modules';
+	step: TuningStep;
 	tuning: TuningConfig;
 	selectedComponentIDs: string[];
 	setTuningOption: SetTuningOption;
@@ -61,12 +61,6 @@ export function Tuning({
 				setTuningOption={setTuningOption}
 				t={t} />
 		))}
-
-		{groups.length == 0 && (
-			<p className="empty">
-				{t.pages.modules.empty}
-			</p>
-		)}
 	</>);
 }
 
@@ -143,6 +137,12 @@ function Option({
 	const value = tuning[group.id][option.id];
 	const label = (value: string | number) => text.values?.[value] ?? String(value);
 	const set = (value: TuningValue) => isEnabled && setValue(value);
+	// Values of a multiselect with one of them switched, in the order of the option
+	const switched = (item: string) => option.type == 'multiselect'
+		? option.values.filter(v => v == item ? !(value as string[]).includes(item) : (value as string[]).includes(v))
+		: [];
+	// A value the multiselect cannot take or lose, as it would then hold too many or too few of them
+	const isLocked = (item: string) => option.type == 'multiselect' && !isCountAllowed(option, switched(item).length);
 
 	if (option.type == 'toggle') {
 		return (
@@ -180,6 +180,12 @@ function Option({
 				)}
 				{(option.type == 'range' || option.type == 'color') && (
 					<p className="value">
+						{String(value)}
+					</p>
+				)}
+				{option.type == 'rgba4444' && (
+					<p className="value">
+						<span className="swatch" style={{ background: value as string }}></span>
 						{String(value)}
 					</p>
 				)}
@@ -221,10 +227,8 @@ function Option({
 					values={option.values}
 					selected={value as string[]}
 					isEnabled={isEnabled}
-					toggle={button => {
-						const selected = value as string[];
-						set(option.values.filter(item => item == button ? !selected.includes(button) : selected.includes(item)));
-					}}
+					isLocked={isLocked}
+					toggle={button => set(switched(button))}
 					t={t} />
 			)}
 
@@ -246,15 +250,15 @@ function Option({
 			{option.type == 'multiselect' && !isButtons(option.values) && (
 				<ul className="choices">
 					{option.values.map(v => {
-						const selected = value as string[];
-						const isSelected = selected.includes(v);
+						const locked = isLocked(v);
 
 						return (
 							<li
 								key={v}
-								className={`choice ${isSelected ? 'active' : ''}`}
-								tabIndex={isEnabled ? 0 : undefined}
-								onClick={() => set(option.values.filter(item => item == v ? !isSelected : selected.includes(item)))}
+								className={`choice ${(value as string[]).includes(v) ? 'active' : ''} ${locked ? 'locked' : ''}`}
+								aria-disabled={locked || undefined}
+								tabIndex={isEnabled && !locked ? 0 : undefined}
+								onClick={() => !locked && set(switched(v))}
 								onKeyDown={activate}>
 								{label(v)}
 							</li>
@@ -295,9 +299,34 @@ function Option({
 					disabled={!isEnabled}
 					onChange={event => set(event.target.value)} />
 			)}
+
+			{/* The field picks the color, the slider next to it how solid the color is */}
+			{option.type == 'rgba4444' && (
+				<div className="rgba">
+					<input
+						type="color"
+						className="color"
+						value={wideColor(value as string)}
+						disabled={!isEnabled}
+						onChange={event => set(narrowColor(event.target.value) + (value as string)[4])} />
+					<input
+						type="range"
+						className="range"
+						style={{ '--fill': `${parseInt((value as string)[4], 16) / 15 * 100}%` } as React.CSSProperties}
+						min={0}
+						max={15}
+						value={parseInt((value as string)[4], 16)}
+						disabled={!isEnabled}
+						onChange={event => set((value as string).slice(0, 4) + Number(event.target.value).toString(16).toUpperCase())} />
+				</div>
+			)}
 		</li>
 	);
 }
+
+// A color with a hex digit per channel as the #rrggbb a color field takes, and back with every channel rounded to a digit
+const wideColor = (color: string) => `#${[1, 2, 3].map(at => color[at].repeat(2)).join('')}`.toLowerCase();
+const narrowColor = (color: string) => `#${[1, 3, 5].map(at => Math.round(parseInt(color.slice(at, at + 2), 16) / 17).toString(16)).join('')}`.toUpperCase();
 
 interface NumberFieldProps {
 	value: number;

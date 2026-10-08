@@ -76,7 +76,7 @@ sys_ftpd_light:
 
 sys_tune:
   description: Background music player
-  details: Plays MP3 files from the SD card over games, controlled from its overlay.
+  details: Plays MP3, FLAC and WAV files from the SD card over games, controlled from its overlay.
 
 fizeau:
   description: Screen color management

@@ -34,7 +34,9 @@ steps:
   launch: Launch
   system: CFW
   security: Security
-  modules: Plugins
+  sysmodules: Modules
+  overlays: Overlays
+  apps: Apps
   plugins: Plugins
   overclock: Overclock
   appearance: Appearance
@@ -195,10 +197,15 @@ pages:
   security:
     title: Security
     description: 'What the console tells Nintendo: blocking of their servers and the identity data of the console the system sees. Exosphere also keeps the debug settings of the secure monitor.'
-  modules:
-    title: Sysmodules and overlays
-    description: Settings of the selected system modules, overlays and applications. Only components with a verified configuration format are listed.
-    empty: None of the selected modules has settings.
+  sysmodules:
+    title: System modules
+    description: Settings of the selected system modules. Only components with a verified configuration format are listed.
+  overlays:
+    title: Overlays
+    description: Settings of the overlay menu and the selected overlays. Only components with a verified configuration format are listed.
+  apps:
+    title: Applications
+    description: Settings of the selected applications. Only components with a verified configuration format are listed.
   plugins:
     title: Plugins
     description: Where every selected plugin loads. ARK reads the list from SEPLUGINS/PLUGINS.TXT, its plugin manager in the XMB turns plugins on and off later.

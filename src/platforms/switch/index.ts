@@ -1,4 +1,4 @@
-import { StepId, SwitchState } from '@/types';
+import { StepId, SwitchState, TuningStep } from '@/types';
 import { tuningGroups } from '@/data';
 import { Platform } from '..';
 import { CATALOG, HOS_VERSIONS, defaultBuild, isHOSSupported, launchEntries } from './data';
@@ -8,7 +8,10 @@ import { build } from './build';
 
 export * from './data';
 
-const STEPS: StepId[] = ['hardware', 'firmware', 'software', 'launch', 'system', 'security', 'modules', 'overclock', 'appearance', 'build'];
+const STEPS: StepId[] = ['hardware', 'firmware', 'software', 'launch', 'system', 'security', 'sysmodules', 'overlays', 'apps', 'overclock', 'appearance', 'build'];
+
+// Steps with the settings of the selected components, by what the components are
+const COMPONENT_STEPS: TuningStep[] = ['sysmodules', 'overlays', 'apps'];
 
 // Hekate and Atmosphere with homebrew from the Homebrew App Store and GitHub
 export const SWITCH: Platform<SwitchState> = {
@@ -18,9 +21,10 @@ export const SWITCH: Platform<SwitchState> = {
 	isFirmwareSupported: isHOSSupported,
 	defaults: defaultBuild,
 	glyphs: { next: 'A', back: 'B', rebuild: 'X' },
-	// Plugins and overclock only appear when a selected component has something to set
+	// Settings of components and overclock only appear when a selected component has something to set
 	steps: ({ selectedComponentIDs }) => STEPS.filter(step => {
-		if (step == 'modules') return tuningGroups(CATALOG.tuning, 'modules', selectedComponentIDs).some(group => group.requires);
+		const settings = COMPONENT_STEPS.find(item => item == step);
+		if (settings) return tuningGroups(CATALOG.tuning, settings, selectedComponentIDs).length > 0;
 		if (step == 'overclock') return selectedComponentIDs.includes('sys_clk');
 		return true;
 	}),

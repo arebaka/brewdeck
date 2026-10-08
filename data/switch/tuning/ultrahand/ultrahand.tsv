@@ -1,0 +1,48 @@
+id	type	default	values	min	max	step	maxLength
+default_lang	select	en	en,de,es,fr,it,ja,ko,nl,pl,pt,ru,uk,zh-cn,zh-tw
+launch_combos	toggle	on
+swipe_to_open	toggle	on
+swipe_offset	number	0		0	640
+haptic_feedback	toggle	off
+stick_navigation	toggle	on
+hold_duration	range	3000		500	5000	500
+sound_effects	toggle	on
+opaque_screenshots	toggle	on
+right_alignment	toggle	off
+auto_ntp_sync	toggle	on
+show_packages	toggle	on
+page_swap	toggle	off
+show_user_guide	toggle	on
+show_hidden	toggle	on
+show_delete	toggle	on
+show_unsupported	toggle	on
+show_overlay_versions	toggle	on
+show_package_versions	toggle	on
+clean_version_labels	toggle	off
+show_clock	toggle	on
+datetime_format	text	%a %T					32
+show_soc_temp	toggle	off
+show_pcb_temp	toggle	off
+show_battery	toggle	off
+dynamic_widget_colors	toggle	on
+center_widget_alignment	toggle	on
+show_widget_backdrop	toggle	on
+extended_widget_backdrop	toggle	off
+show_widget_border	toggle	on
+dynamic_widget_border	toggle	on
+switch_2_style	toggle	on
+dynamic_logo	toggle	off
+dynamic_tables	toggle	on
+selection_bg	toggle	on
+selection_text	toggle	off
+selection_value	toggle	off
+libultrahand_titles	toggle	off
+libultrahand_versions	toggle	on
+package_titles	toggle	off
+package_versions	toggle	on
+in_package_titles	toggle	on
+notifications	toggle	on
+notifications_hotkey	toggle	on
+startup_notification	toggle	on
+silence_notifications	toggle	off
+max_notifications	range	3		1	8	1
