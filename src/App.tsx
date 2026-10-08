@@ -21,7 +21,7 @@ function countChanges(groups: TuningGroup[], build: BuildState, step: TuningStep
 const LEVELS: IssueLevel[] = ['error', 'warning', 'info'];
 
 // Steps that are lists of settings and nothing else
-const SETTINGS_STEPS = ['system', 'security', 'sysmodules', 'overlays', 'apps'] as const;
+const SETTINGS_STEPS = ['system', 'security', 'sysmodules', 'overlays', 'dbi', 'jksv', 'amiibo'] as const;
 
 export default function App() {
 	const [state, setState] = useState<AppState>(() => decodeState(location.search));

@@ -1,0 +1,2 @@
+id	type	default	maxLength
+ApplicationId	text	0100000000001000	16

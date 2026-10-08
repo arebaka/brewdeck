@@ -22,14 +22,26 @@ export function isTuningOptionActive(group: TuningGroup, option: TuningOption, t
 	return Object.entries(option.when ?? {}).every(([id, values]) => [values].flat().some(value => value === tuning[group.id][id]));
 }
 
+// A list is changed by the rows worth writing, not by the ones being filled in
 export function isTuningOptionChanged(group: TuningGroup, option: TuningOption, tuning: TuningConfig): boolean {
-	return JSON.stringify(tuning[group.id][option.id]) != JSON.stringify(option.default);
+	const value = tuning[group.id][option.id];
+	return JSON.stringify(option.type == 'list' ? listRows(value as string[][]) : value) != JSON.stringify(option.default);
 }
 
 // Whether a multiselect takes that many values at once
 export function isCountAllowed(option: Extract<TuningOption, { type: 'multiselect' }>, count: number): boolean {
 	return count >= (option.min ?? 0) && count <= (option.max ?? Infinity);
 }
+
+// A row of a list as tables and links spell it, its fields separated by `=`. The last field takes what is left,
+// so it may hold the sign itself, and a row with fewer fields leaves the rest of them empty
+export function listRow(text: string, fields: number): string[] {
+	const cells = text.split('=');
+	return Array.from({ length: fields }, (_, index) => index < fields - 1 ? cells[index] ?? '' : cells.slice(index).join('='));
+}
+
+// Rows of a list worth writing: the first field names a row, one without it is being filled in yet
+export const listRows = (rows: string[][]): string[][] => rows.filter(row => row[0].trim() != '');
 
 // A component is required by its id, alternatives by any of theirs
 export function isRequirementMet(requirement: Requirement, selectedComponentIDs: string[]): boolean {

@@ -703,6 +703,469 @@ dbi_patcher:
       title: Language
       description: The translation DBI shows instead of Russian.
 
+dbi_general:
+  title: General
+  description: How DBI exits, where it keeps saves, logs and dumps, how it lists and browses and where it takes versions from.
+  options:
+    ExitToHomeScreen:
+      title: Exit to the HOME Menu
+      description: Exit DBI straight to the HOME Menu instead of hbmenu.
+    SavesFolder:
+      title: Save backups folder
+      description: Folder the backups of saves go to.
+    LogEvents:
+      title: Log operations
+      description: Keep logs of installing, checking integrity and cleaning up.
+    LogsFolder:
+      title: Logs folder
+      description: Folder the logs go to.
+    DumpsFolder:
+      title: Dumps folder
+      description: Folder the dumps of games go to.
+    AppSorting:
+      title: Sorting of applications
+      description: What the list of applications can be sorted by.
+      values:
+        LastPlayed: Last played
+        InstallLocation: Install location
+        Size: Size
+        Name: Name
+    SaveSorting:
+      title: Sorting of saves
+      description: What the list of saves can be sorted by.
+      values:
+        AppLastPlayed: Game last played
+        AppName: Game name
+        UserUid: User
+        Size: Size
+        Time: Time
+    HighlightUpdates:
+      title: Highlight updates
+      description: Highlight the files with updates of installed titles in the file browsers.
+    RotateScreen:
+      title: Rotate the screen
+      description: Turn the picture upside down.
+    RotateJoycon:
+      title: Rotate the Joy-Con
+      description: Turn the controls over, to match the rotated screen.
+    VersionsURL:
+      title: Versions list
+      description: Address or path on the card of the list of title versions updates are checked against, such as sdmc:/versions.txt.
+    TitleDB:
+      title: Title database
+      description: Address of the titledb JSON DBI takes the data of titles from.
+    ROSaveFS:
+      title: Read-only saves
+      description: Browse the files of saves without writing to them.
+    ShowUpdateFromHere:
+      title: Update from here
+      description: Show "Update all items from here" in the context menu of the file browsers.
+    ShowCacheWarmingIndicator:
+      title: Cache warming indicator
+      description: Show a spinner while DBI caches the installed applications.
+    MoveDownAfterX:
+      title: Move down after marking
+      description: Move the cursor down once an item is marked.
+    ScreenIdleTimeout:
+      title: Screen idle timeout, s
+      description: How long DBI waits without input before it turns the screen off, 0 to keep it on.
+    Autorepeat:
+      title: Repeat held buttons
+      description: Keep moving through a list while a direction is held.
+    Secondcursor:
+      title: Cursor on both panels
+      description: Show the cursor on the inactive panel of the two-panel browser too.
+    FoolproofSaveDelete:
+      title: Backup before deleting a save
+      description: Back a save up before it is deleted.
+    TimeShow:
+      title: Clock
+      description: Show the time in the status line.
+    TimeShowSeconds:
+      title: Clock with seconds
+      description: Show the time with seconds.
+    BrowseAppsFromFiles:
+      title: Applications by L
+      description: Open the list of applications from the file browser with L.
+    ValidateSSL:
+      title: Validate SSL certificates
+      description: Check the certificates of the servers DBI connects to.
+    DBIUpdateURL:
+      title: DBI update address
+      description: Where DBI downloads its own updates from.
+    DumpForwarders:
+      title: Dump forwarders
+      description: Save the forwarders DBI generates into the dumps folder.
+    HideFolderJpg:
+      title: Hide folder.jpg
+      description: Leave folder.jpg files out of the file browser.
+    ShowFolderImage:
+      title: Folder pictures
+      description: Show the picture of a folder in the file browser.
+    CustomDNS:
+      title: DNS servers
+      description: DNS servers for HTTP connections, separated by commas, such as 8.8.8.8, 1.1.1.1. Empty for the ones of the console.
+    SmartNetworkConfig:
+      title: Optimal socket buffers
+      description: Try to allocate socket buffers of the optimal size.
+    AutoSaveBackupInterval:
+      title: Automatic save backup, days
+      description: How often DBI backs the saves up when it starts, 0 to never do it.
+    ContentsPath:
+      title: Contents folder
+      description: Path of the contents folder of Atmosphere.
+    ExefsPatchesPath:
+      title: ExeFS patches folder
+      description: Path of the exefs_patches folder of Atmosphere.
+
+dbi_album:
+  title: Album
+  description: What DBI files the pictures it puts into the Album under.
+  options:
+    ApplicationId:
+      title: Application
+      description: ID of the application the pictures are filed under, the HOME Menu by default.
+
+dbi_filtering:
+  title: Filtering
+  description: How the filter of the file browser treats folders.
+  options:
+    FilterFolders:
+      title: Filter folders
+      description: Apply the filter of the file browser to folders too.
+    InheritFilter:
+      title: Keep the filter in subfolders
+      description: A subfolder opens with the filter of the folder above it.
+
+dbi_activity_log:
+  title: Activity log
+  description: What the log of play activity lists.
+  options:
+    HideUnknownUsers:
+      title: Hide deleted users
+      description: Leave the play sessions of deleted users out of the list.
+
+dbi_main_menu:
+  title: Main menu
+  description: Items the main menu of DBI shows.
+  options:
+    BrowseSD:
+      title: Browse SD Card
+      description: Browse the SD card and install files from it.
+    BrowseSystem:
+      title: Browse SYSTEM
+      description: Browse the SYSTEM partition and copy files from it.
+    BrowseUser:
+      title: Browse USER
+      description: Browse the USER partition and copy files from it.
+    USBHost:
+      title: Browse USB
+      description: Browse USB flash drives and hard drives and install files from them.
+    BackendInstall:
+      title: Install from DBIbackend
+      description: Browse the files of a PC through dbibackend and install them.
+    GameCard:
+      title: Install from game card
+      description: Install the game from the inserted game card.
+    Network:
+      title: Network sources
+      description: Browse the configured network sources and install files from them.
+    Local:
+      title: SD card shortcuts
+      description: Browse the configured folders of the SD card and install files from them.
+    BrowseApps:
+      title: Installed applications
+      description: Browse the installed applications.
+    Tickets:
+      title: Tickets
+      description: View and delete the installed tickets.
+    Saves:
+      title: Saves
+      description: View and delete the saves of games.
+    MTP:
+      title: MTP responder
+      description: Start the MTP responder.
+    FTP:
+      title: FTP server
+      description: Start the FTP server.
+    HTTP:
+      title: HTTP server
+      description: Start the HTTP server.
+    Tools:
+      title: Tools
+      description: The menu of tools.
+
+dbi_applications:
+  title: Applications
+  description: The list of installed applications.
+  options:
+    CalculateLFSSize:
+      title: Size of LFS mods
+      description: Count the size of the LayeredFS mods of applications. Slows the list down.
+
+dbi_install:
+  title: Install
+  description: What DBI checks and patches while it installs. The patches break the signature of what they change and can make games crash.
+  options:
+    CheckHash:
+      title: Check hashes
+      description: Check the hashes of NCA files while installing.
+    EnableNSZ:
+      title: NSZ and XCZ in applet mode
+      description: Allow installing compressed NSZ and XCZ files when DBI runs as an applet.
+    CreateLFS:
+      title: Create the LFS folder
+      description: Create the folder of the title in /atmosphere/contents once it is installed.
+    PatchUAC:
+      title: Patch account restrictions
+      description: Lift the restrictions on user accounts, such as linking. Breaks the signature, games may crash.
+    PatchScreenshot:
+      title: Patch the screenshot restriction
+      description: Allow screenshots where a game forbids them. Breaks the signature, games may crash.
+    PatchVideoRec:
+      title: Patch the video restriction
+      description: Allow video recording where a game forbids it. Breaks the signature, games may crash.
+    PatchMasterKeyGeneration:
+      title: Patch the master key generation
+      description: Patch the key generation of NCA files that ask for a newer system than the installed one. Breaks the signature, games may crash.
+    Patch21Names:
+      title: Patch names for systems before 21
+      description: Patch the compressed names in the NACP of a title when the system is older than 21. Games may crash.
+    PatchVersionInMeta:
+      title: Patch the required version
+      description: Patch the system version the meta NCA of a title requires. Games may crash.
+
+dbi_mtp:
+  title: MTP
+  description: What the MTP responder shows to the computer and how it transfers.
+  options:
+    ShowCombinedNSP:
+      title: Combined NSP
+      description: Show an NSP with the base game, its latest update and every DLC in one multi-title file.
+    AddBaseUpdate:
+      title: Base and Update suffixes
+      description: Add the suffixes [Base] and [Update] to file names.
+    ShowMAC:
+      title: Mods & cheats folder
+      description: Show the virtual folder "Mods & cheats" that leads to the folder of the title in sdmc:/atmosphere/contents.
+    MACasTID:
+      title: Title ID for Mods & cheats
+      description: Name that folder by the ID of the title.
+    CustomStorages:
+      title: Custom storages
+      description: Show the folders of the SD card set as shortcuts as storages of their own.
+    TurnOffScreen:
+      title: Turn the screen off
+      description: Turn the screen off when the MTP mode starts.
+    ReportAndroidExtension:
+      title: Android extensions
+      description: Report the Android extensions of MTP. Worth switching when a computer transfers slowly or takes the console for something else.
+    SingleURB:
+      title: Single URB transfers
+      description: Transfer in single URBs. A lot slower, but can be more stable.
+    BufferSize:
+      title: Buffer size, KB
+      description: Size of the MTP transmission buffer.
+    NewBufferTimeout:
+      title: Transmission timeout, ms
+      description: How long an MTP transmission waits.
+    AutoremoveInstalled:
+      title: Remove installed files
+      description: Tell the computer that a file copied to an install storage is gone once it is installed.
+    InitiatorStrictClassFiltering:
+      title: Strict device filtering
+      description: Take only the MTP devices of class 6/1/1. Some Xiaomi devices need it off.
+
+dbi_ftp:
+  title: FTP
+  description: The FTP server of DBI.
+  options:
+    TurnOffScreen:
+      title: Turn the screen off
+      description: Turn the screen off when the FTP mode starts.
+    ReadMT:
+      title: File dates
+      description: Read the modification times of files. Can slow large folders down.
+    Port:
+      title: Port
+      description: Port of the server on the IP address of the console.
+    MinPassivePort:
+      title: Passive ports from
+      description: The first port of the passive range, 0 to pick it automatically.
+    MaxPassivePort:
+      title: Passive ports to
+      description: The last port of the passive range, 0 to pick it automatically.
+    CDIR:
+      title: Current folder as cdir
+      description: Send the current folder in listings as type=cdir.
+    ForceUtf8:
+      title: Force UTF-8
+      description: Always use UTF-8 for file names.
+    UseWaitAll:
+      title: Wait for all data
+      description: Receive with the WaitAll option. Can be faster, some clients do not work with it.
+
+dbi_http:
+  title: HTTP
+  description: The port of the HTTP server of DBI and how it reads over HTTP.
+  options:
+    Port:
+      title: Port
+      description: Port of the server on the IP address of the console.
+    Timeout:
+      title: Read timeout, s
+      description: How long DBI waits for data.
+    RetryCount:
+      title: Retries
+      description: How many times a failed read is tried again, 0 for no limit.
+
+dbi_access_point:
+  title: Access point
+  description: A Wi-Fi network the console starts by itself for its FTP and HTTP servers, so clients connect to it directly.
+  options:
+    UseAP:
+      title: Start an access point
+      description: Start the network of the console when a server starts.
+    SSID:
+      title: Network name
+      description: Name of the access point.
+    Password:
+      title: Password
+      description: Password of the access point.
+    Use5GHz:
+      title: 5 GHz
+      description: Run on 5 GHz instead of 2.4 GHz.
+    Hidden:
+      title: Hidden network
+      description: Hide the name of the network, so only those who know it connect.
+
+dbi_mtp_storages:
+  title: MTP storages
+  description: Storages the computer sees over MTP.
+  options:
+    SDCard:
+      title: SD Card
+      description: The SD card.
+    NandUSER:
+      title: Nand USER
+      description: The USER partition of the internal memory.
+    NandSYSTEM:
+      title: Nand SYSTEM
+      description: The SYSTEM partition of the internal memory.
+    InstalledGames:
+      title: Installed games
+      description: Installed games, to copy them from the console.
+    SDCardInstall:
+      title: SD Card install
+      description: Files copied here are installed onto the SD card.
+    NANDInstall:
+      title: NAND install
+      description: Files copied here are installed into the internal memory.
+    Saves:
+      title: Saves
+      description: Saves of games.
+    Album:
+      title: Album
+      description: Screenshots and videos of the Album.
+    Gamecard:
+      title: Gamecard
+      description: The inserted game card.
+
+dbi_fb2:
+  title: FB2
+  description: How DBI shows FB2 books.
+  options:
+    Theme:
+      title: Theme
+      description: Colors of the page.
+      values:
+        Day: Day
+        Night: Night
+        Sepia: Sepia
+        Darkroom: Darkroom
+    Hyphenation:
+      title: Hyphenation
+      description: Break words between lines.
+    Orientation:
+      title: Orientation
+      description: How a page is turned when a book opens.
+      values:
+        '0': 0°
+        '90': 90°
+        '180': 180°
+        '270': 270°
+
+dbi_network_sources:
+  title: Network sources
+  description: Servers DBI installs from over the network, the ones its config lists.
+  options:
+    sources:
+      title: Sources
+      description: A name, the kind of the server and its address, such as http://192.168.1.47/Nintendo/Switch/. A login and a password go into the address, as in ftp://user:password@192.168.1.24:2121/, so links do not keep the sources.
+      fields:
+        Name: Name
+        Type: Type
+        URL: Address
+
+dbi_local_sources:
+  title: Local sources
+  description: Shortcuts of the main menu to folders of the SD card.
+  options:
+    sources:
+      title: Shortcuts
+      description: A name and the folder it opens, such as sdmc:/switch.
+      fields:
+        Name: Name
+        Path: Folder
+
+dbi_mtp_custom_storages:
+  title: MTP custom storages
+  description: Folders of the SD card the computer sees over MTP as storages of their own.
+  options:
+    storages:
+      title: Storages
+      description: A name and the folder it shows, such as sdmc:/switch.
+      fields:
+        Name: Name
+        Path: Folder
+
+dbi_title_name_override:
+  title: Title name override
+  description: Names DBI shows for titles instead of their own.
+  options:
+    names:
+      title: Names
+      description: The ID of a title and the name to show for it.
+      fields:
+        TitleID: Title ID
+        Name: Name
+
+dbi_disabled_titles_to_check_for_updates:
+  title: Update checks
+  description: Titles DBI leaves out when it checks for updates.
+  options:
+    BlockAllTitlesWithLFS:
+      title: Skip titles with LFS mods
+      description: Leave every title with a LayeredFS mod out of the update check.
+    titles:
+      title: Titles
+      description: IDs of the titles to leave out, each with a note of what it is.
+      fields:
+        TitleID: Title ID
+        Name: Note
+
+dbi_locations:
+  title: Locations
+  description: Servers DBI installs from over the network, the ones it keeps in a file of their own. The file is written only when it lists something.
+  options:
+    locations:
+      title: Locations
+      description: A name, the kind of the server and its address, such as http://192.168.1.47/Nintendo/Switch/. A login and a password go into the address, so links do not keep the locations.
+      fields:
+        Name: Name
+        Type: Type
+        URL: Address
+
 sys_clk:
   title: sys-clk
   description: Service intervals of sys-clk.
@@ -897,7 +1360,7 @@ sys_tune:
       description: The music goes on when a game starts. The overlay also sets it for every game apart.
 
 jksv:
-  title: JKSV
+  title: General
   description: Settings of the save manager, the same ones its settings menu keeps. Favorites and the blacklist are set in JKSV itself.
   options:
     WorkingDirectory:
@@ -981,7 +1444,7 @@ jksv:
       description: Speed of transitions, lower is faster. 1 makes them instant.
 
 jksv_webdav:
-  title: JKSV, WebDAV
+  title: WebDAV
   description: A WebDAV server JKSV keeps backups on.
   options:
     origin:

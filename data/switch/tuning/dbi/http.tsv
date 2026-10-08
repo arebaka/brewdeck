@@ -1,0 +1,4 @@
+id	type	default	min	max
+Port	number	1234	1	65535
+Timeout	number	3	1	600
+RetryCount	number	0	0	100

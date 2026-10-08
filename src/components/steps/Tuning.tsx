@@ -320,7 +320,91 @@ function Option({
 						onChange={event => set((value as string).slice(0, 4) + Number(event.target.value).toString(16).toUpperCase())} />
 				</div>
 			)}
+
+			{option.type == 'list' && (
+				<ListRows
+					option={option}
+					rows={value as string[][]}
+					labels={text.fields}
+					isEnabled={isEnabled}
+					setRows={set}
+					t={t} />
+			)}
 		</li>
+	);
+}
+
+interface ListRowsProps {
+	option: Extract<TuningOption, { type: 'list' }>;
+	rows: string[][];
+	labels?: {[field: string]: string};
+	isEnabled: boolean;
+	setRows: (rows: string[][]) => void;
+	t: Translation;
+}
+
+// Rows of a list: a field per value, a choice where the field has its values. A new row starts empty
+function ListRows({
+	option,
+	rows,
+	labels,
+	isEnabled,
+	setRows,
+	t
+}: ListRowsProps) {
+	const label = (field: string) => labels?.[field] ?? field;
+	const setCell = (at: number, field: number, value: string) => setRows(rows.map((row, index) => index == at
+		? row.map((cell, i) => i == field ? value : cell)
+		: row));
+	// Links separate the fields of a row with `=`, so only the last of them may hold it
+	const clean = (field: number, value: string) => field < option.fields.length - 1 ? value.replace(/=/g, '') : value;
+
+	return (
+		<div className="list">
+			{rows.map((row, at) => (
+				<div key={at} className="entry">
+					{option.fields.map((field, index) => field.values ? (
+						<select
+							key={field.id}
+							className="field"
+							aria-label={label(field.id)}
+							value={row[index]}
+							disabled={!isEnabled}
+							onChange={event => setCell(at, index, event.target.value)}>
+							{field.values.map(item => (
+								<option key={item} value={item}>
+									{item}
+								</option>
+							))}
+						</select>
+					) : (
+						<input
+							key={field.id}
+							className="field"
+							placeholder={label(field.id)}
+							aria-label={label(field.id)}
+							maxLength={option.maxLength}
+							value={row[index]}
+							disabled={!isEnabled}
+							autoComplete="off"
+							spellCheck={false}
+							onChange={event => setCell(at, index, clean(index, event.target.value))} />
+					))}
+					<button
+						className="control"
+						disabled={!isEnabled}
+						onClick={() => setRows(rows.filter((_, index) => index != at))}>
+						{t.pages.system.remove}
+					</button>
+				</div>
+			))}
+			<button
+				className="control"
+				disabled={!isEnabled || rows.length >= (option.max ?? Infinity)}
+				onClick={() => setRows([...rows, option.fields.map(field => field.values?.[0] ?? '')])}>
+				{t.pages.system.add}
+			</button>
+		</div>
 	);
 }
 

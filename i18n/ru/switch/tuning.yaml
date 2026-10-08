@@ -703,6 +703,469 @@ dbi_patcher:
       title: Язык
       description: Перевод, который DBI показывает вместо русского.
 
+dbi_general:
+  title: Общие
+  description: Как DBI выходит, где хранит сохранения, журналы и дампы, как показывает списки и файлы и откуда берёт версии.
+  options:
+    ExitToHomeScreen:
+      title: Выход в главное меню
+      description: Выходить из DBI сразу в главное меню консоли, а не в hbmenu.
+    SavesFolder:
+      title: Папка бэкапов сохранений
+      description: Папка, куда складываются бэкапы сохранений.
+    LogEvents:
+      title: Журнал действий
+      description: Вести журналы установки, проверки целостности и очистки.
+    LogsFolder:
+      title: Папка журналов
+      description: Папка, куда складываются журналы.
+    DumpsFolder:
+      title: Папка дампов
+      description: Папка, куда складываются дампы игр.
+    AppSorting:
+      title: Сортировка приложений
+      description: По чему можно сортировать список приложений.
+      values:
+        LastPlayed: Последний запуск
+        InstallLocation: Место установки
+        Size: Размер
+        Name: Название
+    SaveSorting:
+      title: Сортировка сохранений
+      description: По чему можно сортировать список сохранений.
+      values:
+        AppLastPlayed: Последний запуск игры
+        AppName: Название игры
+        UserUid: Пользователь
+        Size: Размер
+        Time: Время
+    HighlightUpdates:
+      title: Подсвечивать обновления
+      description: Подсвечивать в файловых менеджерах файлы с обновлениями установленных игр.
+    RotateScreen:
+      title: Перевернуть экран
+      description: Перевернуть картинку вверх ногами.
+    RotateJoycon:
+      title: Перевернуть Joy-Con
+      description: Перевернуть управление под перевёрнутый экран.
+    VersionsURL:
+      title: Список версий
+      description: Адрес или путь на карте к списку версий игр, по которому проверяются обновления, например sdmc:/versions.txt.
+    TitleDB:
+      title: База игр
+      description: Адрес JSON-файла titledb, из которого DBI берёт данные об играх.
+    ROSaveFS:
+      title: Сохранения только для чтения
+      description: Просматривать файлы сохранений без записи в них.
+    ShowUpdateFromHere:
+      title: Обновить отсюда
+      description: Показывать "Обновить всё отсюда" в контекстном меню файловых менеджеров.
+    ShowCacheWarmingIndicator:
+      title: Индикатор прогрева кэша
+      description: Показывать индикатор, пока DBI кэширует установленные приложения.
+    MoveDownAfterX:
+      title: Смещать курсор после выделения
+      description: Сдвигать курсор вниз, когда элемент отмечен.
+    ScreenIdleTimeout:
+      title: Гашение экрана, с
+      description: Сколько DBI ждёт без нажатий, прежде чем погасить экран, 0 - не гасить.
+    Autorepeat:
+      title: Автоповтор кнопок
+      description: Двигаться по списку, пока зажато направление.
+    Secondcursor:
+      title: Курсор на обеих панелях
+      description: Показывать курсор и на неактивной панели двухпанельного менеджера.
+    FoolproofSaveDelete:
+      title: Бэкап перед удалением сохранения
+      description: Делать бэкап сохранения перед тем, как его удалить.
+    TimeShow:
+      title: Часы
+      description: Показывать время в строке состояния.
+    TimeShowSeconds:
+      title: Часы с секундами
+      description: Показывать время с секундами.
+    BrowseAppsFromFiles:
+      title: Приложения по L
+      description: Открывать список приложений из файлового менеджера кнопкой L.
+    ValidateSSL:
+      title: Проверять сертификаты SSL
+      description: Проверять сертификаты серверов, к которым подключается DBI.
+    DBIUpdateURL:
+      title: Адрес обновлений DBI
+      description: Откуда DBI скачивает собственные обновления.
+    DumpForwarders:
+      title: Дамп форвардеров
+      description: Сохранять форвардеры, которые создаёт DBI, в папку дампов.
+    HideFolderJpg:
+      title: Скрывать folder.jpg
+      description: Не показывать файлы folder.jpg в файловом менеджере.
+    ShowFolderImage:
+      title: Картинки папок
+      description: Показывать картинку папки в файловом менеджере.
+    CustomDNS:
+      title: Серверы DNS
+      description: Серверы DNS для соединений по HTTP через запятую, например 8.8.8.8, 1.1.1.1. Если пусто, берутся серверы консоли.
+    SmartNetworkConfig:
+      title: Оптимальные буферы сокетов
+      description: Пытаться выделить буферы сокетов оптимального размера.
+    AutoSaveBackupInterval:
+      title: Автобэкап сохранений, дни
+      description: Как часто DBI делает бэкап сохранений при запуске, 0 - никогда.
+    ContentsPath:
+      title: Папка contents
+      description: Путь к папке contents Atmosphere.
+    ExefsPatchesPath:
+      title: Папка патчей ExeFS
+      description: Путь к папке exefs_patches Atmosphere.
+
+dbi_album:
+  title: Альбом
+  description: К чему DBI относит картинки, которые кладёт в Альбом.
+  options:
+    ApplicationId:
+      title: Приложение
+      description: ID приложения, к которому относятся картинки, по умолчанию главное меню.
+
+dbi_filtering:
+  title: Фильтр
+  description: Как фильтр файлового менеджера обходится с папками.
+  options:
+    FilterFolders:
+      title: Фильтровать папки
+      description: Применять фильтр файлового менеджера и к папкам.
+    InheritFilter:
+      title: Фильтр во вложенных папках
+      description: Вложенная папка открывается с фильтром папки над ней.
+
+dbi_activity_log:
+  title: Журнал активности
+  description: Что показывает журнал игровой активности.
+  options:
+    HideUnknownUsers:
+      title: Скрывать удалённых пользователей
+      description: Не показывать в списке игровые сессии удалённых пользователей.
+
+dbi_main_menu:
+  title: Главное меню
+  description: Пункты, которые показывает главное меню DBI.
+  options:
+    BrowseSD:
+      title: Просмотр SD-карты
+      description: Просматривать SD-карту и устанавливать с неё файлы.
+    BrowseSystem:
+      title: Просмотр раздела SYSTEM
+      description: Просматривать раздел SYSTEM и копировать с него файлы.
+    BrowseUser:
+      title: Просмотр раздела USER
+      description: Просматривать раздел USER и копировать с него файлы.
+    USBHost:
+      title: Просмотр USB-носителей
+      description: Просматривать флешки и жёсткие диски USB и устанавливать с них файлы.
+    BackendInstall:
+      title: Установка через DBIbackend
+      description: Просматривать файлы ПК через dbibackend и устанавливать их.
+    GameCard:
+      title: Установка с картриджа
+      description: Установить игру со вставленного картриджа.
+    Network:
+      title: Сетевые источники
+      description: Просматривать настроенные сетевые источники и устанавливать с них файлы.
+    Local:
+      title: Закладки на SD-карте
+      description: Просматривать настроенные папки SD-карты и устанавливать из них файлы.
+    BrowseApps:
+      title: Установленные приложения
+      description: Просматривать установленные приложения.
+    Tickets:
+      title: Тикеты
+      description: Просматривать и удалять установленные тикеты.
+    Saves:
+      title: Сохранения
+      description: Просматривать и удалять сохранения игр.
+    MTP:
+      title: MTP-соединение
+      description: Запускать MTP-соединение.
+    FTP:
+      title: FTP-сервер
+      description: Запускать FTP-сервер.
+    HTTP:
+      title: HTTP-сервер
+      description: Запускать HTTP-сервер.
+    Tools:
+      title: Инструменты
+      description: Меню инструментов.
+
+dbi_applications:
+  title: Установленные игры
+  description: Список установленных приложений.
+  options:
+    CalculateLFSSize:
+      title: Размер модов LFS
+      description: Считать размер модов LayeredFS у приложений. Замедляет список.
+
+dbi_install:
+  title: Установка
+  description: Что DBI проверяет и патчит при установке. Патчи ломают подпись того, что меняют, и игры могут вылетать.
+  options:
+    CheckHash:
+      title: Проверять хеши
+      description: Проверять хеши файлов NCA при установке.
+    EnableNSZ:
+      title: NSZ и XCZ в режиме апплета
+      description: Разрешить установку сжатых файлов NSZ и XCZ, когда DBI запущен как апплет.
+    CreateLFS:
+      title: Создавать папку LFS
+      description: Создавать папку игры в /atmosphere/contents после установки.
+    PatchUAC:
+      title: Патчить ограничения аккаунтов
+      description: Снимать ограничения для аккаунтов пользователей, например привязку. Ломает подпись, игры могут вылетать.
+    PatchScreenshot:
+      title: Патчить запрет скриншотов
+      description: Разрешать скриншоты там, где игра их запрещает. Ломает подпись, игры могут вылетать.
+    PatchVideoRec:
+      title: Патчить запрет видео
+      description: Разрешать запись видео там, где игра её запрещает. Ломает подпись, игры могут вылетать.
+    PatchMasterKeyGeneration:
+      title: Патчить поколение мастер-ключа
+      description: Патчить поколение ключа у файлов NCA, которым нужна система новее установленной. Ломает подпись, игры могут вылетать.
+    Patch21Names:
+      title: Патчить названия для систем до 21
+      description: Патчить сжатые названия в NACP игры, когда версия системы ниже 21. Игры могут вылетать.
+    PatchVersionInMeta:
+      title: Патчить требуемую версию
+      description: Патчить версию системы, которую требует meta NCA игры. Игры могут вылетать.
+
+dbi_mtp:
+  title: MTP
+  description: Что MTP-соединение показывает компьютеру и как передаёт данные.
+  options:
+    ShowCombinedNSP:
+      title: Объединённый NSP
+      description: Показывать NSP с игрой, её последним обновлением и всеми DLC в одном файле.
+    AddBaseUpdate:
+      title: Суффиксы Base и Update
+      description: Добавлять к именам файлов суффиксы [Base] и [Update].
+    ShowMAC:
+      title: Папка Mods & cheats
+      description: Показывать виртуальную папку "Mods & cheats", которая ведёт в папку игры в sdmc:/atmosphere/contents.
+    MACasTID:
+      title: ID игры для Mods & cheats
+      description: Называть эту папку по ID игры.
+    CustomStorages:
+      title: Пользовательские хранилища
+      description: Показывать папки SD-карты, заданные закладками, как отдельные хранилища.
+    TurnOffScreen:
+      title: Выключать экран
+      description: Выключать экран при запуске режима MTP.
+    ReportAndroidExtension:
+      title: Расширения Android
+      description: Сообщать о расширениях Android для MTP. Стоит переключить, если компьютер передаёт медленно или принимает консоль за что-то другое.
+    SingleURB:
+      title: Передача одиночными URB
+      description: Передавать одиночными URB. Гораздо медленнее, но бывает стабильнее.
+    BufferSize:
+      title: Размер буфера, КБ
+      description: Размер буфера передачи MTP.
+    NewBufferTimeout:
+      title: Тайм-аут передачи, мс
+      description: Сколько ждёт передача MTP.
+    AutoremoveInstalled:
+      title: Убирать установленные файлы
+      description: Сообщать компьютеру, что файл, скопированный в хранилище установки, пропал, когда он установлен.
+    InitiatorStrictClassFiltering:
+      title: Строгий отбор устройств
+      description: Принимать только MTP-устройства класса 6/1/1. Некоторым устройствам Xiaomi нужно, чтобы он был выключен.
+
+dbi_ftp:
+  title: FTP
+  description: FTP-сервер DBI.
+  options:
+    TurnOffScreen:
+      title: Выключать экран
+      description: Выключать экран при запуске режима FTP.
+    ReadMT:
+      title: Даты файлов
+      description: Читать время изменения файлов. Может замедлить большие папки.
+    Port:
+      title: Порт
+      description: Порт сервера на IP-адресе консоли.
+    MinPassivePort:
+      title: Пассивные порты от
+      description: Первый порт пассивного диапазона, 0 - подобрать автоматически.
+    MaxPassivePort:
+      title: Пассивные порты до
+      description: Последний порт пассивного диапазона, 0 - подобрать автоматически.
+    CDIR:
+      title: Текущая папка как cdir
+      description: Отдавать текущую папку в списках как type=cdir.
+    ForceUtf8:
+      title: Всегда UTF-8
+      description: Всегда использовать UTF-8 для имён файлов.
+    UseWaitAll:
+      title: Ждать все данные
+      description: Принимать с опцией WaitAll. Бывает быстрее, но с некоторыми клиентами не работает.
+
+dbi_http:
+  title: HTTP
+  description: Порт HTTP-сервера DBI и то, как он читает по HTTP.
+  options:
+    Port:
+      title: Порт
+      description: Порт сервера на IP-адресе консоли.
+    Timeout:
+      title: Тайм-аут чтения, с
+      description: Сколько DBI ждёт данных.
+    RetryCount:
+      title: Повторы
+      description: Сколько раз повторяется неудавшееся чтение, 0 - без ограничения.
+
+dbi_access_point:
+  title: Точка доступа
+  description: Сеть Wi-Fi, которую консоль сама поднимает для своих серверов FTP и HTTP, чтобы клиенты подключались к ней напрямую.
+  options:
+    UseAP:
+      title: Запускать точку доступа
+      description: Поднимать сеть консоли, когда запускается сервер.
+    SSID:
+      title: Имя сети
+      description: Название точки доступа.
+    Password:
+      title: Пароль
+      description: Пароль точки доступа.
+    Use5GHz:
+      title: 5 ГГц
+      description: Работать на 5 ГГц, а не на 2,4 ГГц.
+    Hidden:
+      title: Скрытая сеть
+      description: Скрывать имя сети, чтобы подключались только те, кто его знает.
+
+dbi_mtp_storages:
+  title: Хранилища MTP
+  description: Хранилища, которые компьютер видит по MTP.
+  options:
+    SDCard:
+      title: SD Card
+      description: SD-карта.
+    NandUSER:
+      title: Nand USER
+      description: Раздел USER внутренней памяти.
+    NandSYSTEM:
+      title: Nand SYSTEM
+      description: Раздел SYSTEM внутренней памяти.
+    InstalledGames:
+      title: Installed games
+      description: Установленные игры, чтобы копировать их с консоли.
+    SDCardInstall:
+      title: SD Card install
+      description: Скопированные сюда файлы устанавливаются на SD-карту.
+    NANDInstall:
+      title: NAND install
+      description: Скопированные сюда файлы устанавливаются во внутреннюю память.
+    Saves:
+      title: Saves
+      description: Сохранения игр.
+    Album:
+      title: Album
+      description: Скриншоты и видео из Альбома.
+    Gamecard:
+      title: Gamecard
+      description: Вставленный картридж.
+
+dbi_fb2:
+  title: FB2
+  description: Как DBI показывает книги FB2.
+  options:
+    Theme:
+      title: Тема
+      description: Цвета страницы.
+      values:
+        Day: День
+        Night: Ночь
+        Sepia: Сепия
+        Darkroom: Тёмная комната
+    Hyphenation:
+      title: Переносы
+      description: Переносить слова между строками.
+    Orientation:
+      title: Ориентация
+      description: Как повёрнута страница, когда открывается книга.
+      values:
+        '0': 0°
+        '90': 90°
+        '180': 180°
+        '270': 270°
+
+dbi_network_sources:
+  title: Сетевые источники
+  description: Серверы, с которых DBI устанавливает по сети, те, что перечислены в его конфиге.
+  options:
+    sources:
+      title: Источники
+      description: Имя, вид сервера и его адрес, например http://192.168.1.47/Nintendo/Switch/. Логин и пароль пишутся прямо в адресе, как в ftp://user:password@192.168.1.24:2121/, поэтому в ссылки источники не попадают.
+      fields:
+        Name: Имя
+        Type: Тип
+        URL: Адрес
+
+dbi_local_sources:
+  title: Закладки
+  description: Пункты главного меню, которые ведут в папки SD-карты.
+  options:
+    sources:
+      title: Закладки
+      description: Имя и папка, которую оно открывает, например sdmc:/switch.
+      fields:
+        Name: Имя
+        Path: Папка
+
+dbi_mtp_custom_storages:
+  title: Пользовательские хранилища MTP
+  description: Папки SD-карты, которые компьютер видит по MTP как отдельные хранилища.
+  options:
+    storages:
+      title: Хранилища
+      description: Имя и папка, которую оно показывает, например sdmc:/switch.
+      fields:
+        Name: Имя
+        Path: Папка
+
+dbi_title_name_override:
+  title: Названия игр
+  description: Названия, которые DBI показывает у игр вместо их собственных.
+  options:
+    names:
+      title: Названия
+      description: ID игры и название, которое для неё показывать.
+      fields:
+        TitleID: ID игры
+        Name: Название
+
+dbi_disabled_titles_to_check_for_updates:
+  title: Проверка обновлений
+  description: Игры, которые DBI пропускает, когда проверяет обновления.
+  options:
+    BlockAllTitlesWithLFS:
+      title: Пропускать игры с модами LFS
+      description: Не проверять обновления для игр с модом LayeredFS.
+    titles:
+      title: Игры
+      description: ID игр, которые нужно пропускать, у каждого пометка, что это за игра.
+      fields:
+        TitleID: ID игры
+        Name: Пометка
+
+dbi_locations:
+  title: Расположения
+  description: Серверы, с которых DBI устанавливает по сети, те, что он хранит в отдельном файле. Файл записывается, только когда в нём что-то есть.
+  options:
+    locations:
+      title: Расположения
+      description: Имя, вид сервера и его адрес, например http://192.168.1.47/Nintendo/Switch/. Логин и пароль пишутся прямо в адресе, поэтому в ссылки расположения не попадают.
+      fields:
+        Name: Имя
+        Type: Тип
+        URL: Адрес
+
 sys_clk:
   title: sys-clk
   description: Служебные интервалы sys-clk.
@@ -897,7 +1360,7 @@ sys_tune:
       description: Музыка продолжает играть, когда запускается игра. В оверлее это задаётся и для каждой игры отдельно.
 
 jksv:
-  title: JKSV
+  title: Общие
   description: Настройки менеджера сохранений, те же, что хранит его меню настроек. Избранное и чёрный список задаются в самом JKSV.
   options:
     WorkingDirectory:
@@ -981,7 +1444,7 @@ jksv:
       description: Длительность переходов, чем меньше, тем быстрее. При 1 они мгновенные.
 
 jksv_webdav:
-  title: JKSV, WebDAV
+  title: WebDAV
   description: Сервер WebDAV, на котором JKSV хранит бэкапы.
   options:
     origin:

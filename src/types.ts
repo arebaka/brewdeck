@@ -90,8 +90,8 @@ export interface Preset {
 	components: string[];
 }
 
-export type TuningValue = boolean | number | string | string[];
-export type TuningStep = 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'apps' | 'plugins' | 'overclock';
+export type TuningValue = boolean | number | string | string[] | string[][];
+export type TuningStep = 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
@@ -109,7 +109,14 @@ export type TuningOption = TuningOptionBase & (
 	| { type: 'hue'; default: number }
 	| { type: 'color'; default: string }
 	| { type: 'rgba4444'; default: string } // a color with its opacity, a hex digit per channel: #1117
+	| { type: 'list'; fields: ListField[]; maxLength: number; max?: number; default: string[][] } // rows of a value per field, `max` of them at most
 );
+
+// A field of the rows of a list: a line of text, or a choice among its values
+export interface ListField {
+	id: string;
+	values?: string[];
+}
 
 export interface TuningGroup {
 	id: string;
@@ -222,7 +229,7 @@ export interface PspState extends BuildState {
 	plugins: Record<string, string[]>;
 }
 
-export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'apps' | 'plugins' | 'overclock' | 'appearance' | 'build';
+export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock' | 'appearance' | 'build';
 
 export type IssueLevel = 'error' | 'warning' | 'info';
 

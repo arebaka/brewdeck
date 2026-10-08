@@ -256,8 +256,9 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.batch .control', 'RESET').click()`);
 	await check('reset clears only its step', `!location.search.includes('exosphere.') && location.search.includes('launch.emummc-SD01.usb3force=1')`);
 
-	// Settings of the selected components, by what the components are
-	await check('modules, overlays and applications have steps of their own', `['Modules', 'Overlays', 'Apps'].every(name => byText('.sidebar .step .label', name) != null)`);
+	// Settings of the selected components: modules and overlays by what they are, applications with a lot to set by themselves
+	await check('modules, overlays and the selected applications have steps of their own', `['Modules', 'Overlays', 'DBI', 'JKSV'].every(name => byText('.sidebar .step .label', name) != null)
+		&& byText('.sidebar .step .label', 'Amiibo') == null`);
 	await page.act(`step('Modules')`);
 	await page.act(`byText('.tuning .row .name', 'Add unknown controllers').closest('.row').click()`);
 	await check('a setting of sys-con reaches the link', `location.search.includes('sys_con.auto_add_controller=0')`);
@@ -285,11 +286,39 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the slider of a color sets its opacity', `location.search.includes('status_monitor_mini.background_color=%23111F')`);
 	await page.act(`setField(${color}.querySelector('.color'), '#ff0000')`);
 	await check('a color is kept with a hex digit per channel', `location.search.includes('status_monitor_mini.background_color=%23F00F')`);
-	await page.act(`step('Apps')`);
-	await page.act(`byText('.row .choice', 'Українська').click()`);
-	await check('the translation of DBI takes a language', `location.search.includes('dbi_patcher.language=ua')`);
+	await page.act(`step('JKSV')`);
+	await check('the step of an application lists its settings alone', `$$('.tuning > .header .title').map(node => node.textContent.trim()).join() == 'JKSV,WebDAV'`);
 	await page.act(`byText('.tuning .row .name', 'Trash bin').closest('.row').click()`);
 	await check('a setting of JKSV reaches the link', `location.search.includes('jksv.EnableTrash=1')`);
+	await page.act(`step('DBI')`);
+	await page.act(`byText('.row .choice', 'Українська').click()`);
+	await check('the translation of DBI takes a language', `location.search.includes('dbi_patcher.language=ua')`);
+	await check('every section of the config of DBI is a group of settings', `['General', 'Main menu', 'Install', 'MTP storages', 'Update checks']
+		.every(name => byText('.tuning > .header .title', name) != null)`);
+	await page.act(`byText('.tuning .row .name', 'Exit to the HOME Menu').closest('.row').click()`);
+	await check('a setting of DBI reaches the link', `location.search.includes('dbi_general.ExitToHomeScreen=1')`);
+	// A list holds rows of its fields, a row counts once it has a name
+	const list = (title: string) => `byText('.tuning > .header .title', '${title}').closest('.tuning')`;
+	const control = (title: string, name: string) => `[...${list(title)}.querySelectorAll('.list .control')].find(node => node.textContent.trim() == '${name}')`;
+	const field = (title: string, row: number, at: number) => `${list(title)}.querySelectorAll('.entry')[${row}].querySelectorAll('.field')[${at}]`;
+	await check('a list shows the rows it ships with', `${list('Local sources')}.querySelectorAll('.entry').length == 1
+		&& ${field('Local sources', 0, 0)}.value == 'DBILogs' && ${field('Local sources', 0, 1)}.placeholder == 'Folder'`);
+	await page.act(`${control('Local sources', 'Add')}.click()`);
+	await check('a new row is not in the link until it is named', `${list('Local sources')}.querySelectorAll('.entry').length == 2
+		&& !location.search.includes('dbi_local_sources')`);
+	await page.act(`setField(${field('Local sources', 1, 0)}, 'Home=brew')`);
+	await page.act(`setField(${field('Local sources', 1, 1)}, 'sdmc:/switch')`);
+	await check('a row of a list reaches the link, its name without the sign that parts the fields',
+		`location.search.includes('dbi_local_sources.sources=DBILogs%3Dsdmc:%2Fswitch%2FDBI%2Flogs&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch')`);
+	await page.act(`${control('Local sources', 'Remove')}.click()`);
+	await check('a row goes away', `${list('Local sources')}.querySelectorAll('.entry').length == 1
+		&& /dbi_local_sources\\.sources=Homebrew%3Dsdmc:%2Fswitch(&|$)/.test(location.search) && !location.search.includes('DBILogs')`);
+	await page.act(`${control('Locations', 'Add')}.click()`);
+	await page.act(`setField(${field('Locations', 0, 0)}, 'NAS')`);
+	await page.act(`setField(${field('Locations', 0, 1)}, 'SFTP')`);
+	await page.act(`setField(${field('Locations', 0, 2)}, 'sftp://lesha:hunter2@nas/')`);
+	await check('a field of a list is a choice where it has its values, and an address stays out of the link',
+		`${field('Locations', 0, 1)}.tagName == 'SELECT' && ${field('Locations', 0, 1)}.value == 'SFTP' && !location.search.includes('hunter2')`);
 
 	// Overclock
 	await page.act(`step('Overclock')`);
@@ -375,6 +404,16 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 		const code = document.querySelector('.generated .code');
 		return JSON.parse(code.textContent).EnableTrash === 1 && code.querySelector('.hljs-attr') != null;
 	})()`);
+	await page.act(`byText('.generated .choice', 'switch/DBI/dbi.config').click()`);
+	await check('the config of DBI is previewed as a highlighted INI', `(() => {
+		const code = document.querySelector('.generated .code');
+		return code.textContent.includes('\\nExitToHomeScreen=true\\n') && code.textContent.includes('\\n[Network sources]\\n')
+			&& code.textContent.includes('\\nHomebrew=sdmc:/switch\\n') && !code.textContent.includes('\\nDBILogs=sdmc:/switch/DBI/logs\\n\\n[MTP')
+			&& code.querySelector('.hljs-section') != null;
+	})()`);
+	await page.act(`byText('.generated .choice', 'switch/DBI/dbi.locations').click()`);
+	await check('the locations of DBI are previewed in a file of their own', `document.querySelector('.generated .code').textContent.trim()
+		== '[Location_0]\\nName=NAS\\nType=SFTP\\nURL=sftp://lesha:hunter2@nas/'`);
 	await page.act(`byText('.generated .choice', 'config/status-monitor/config.ini').click()`);
 	await check('the config of Status Monitor has a section of every mode', `(() => {
 		const code = document.querySelector('.generated .code').textContent;

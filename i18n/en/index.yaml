@@ -36,7 +36,9 @@ steps:
   security: Security
   sysmodules: Modules
   overlays: Overlays
-  apps: Apps
+  dbi: DBI
+  jksv: JKSV
+  amiibo: Amiibo
   plugins: Plugins
   overclock: Overclock
   appearance: Appearance
@@ -194,6 +196,8 @@ pages:
     reset: RESET
     'on': 'on'
     'off': 'off'
+    add: Add
+    remove: Remove
   security:
     title: Security
     description: 'What the console tells Nintendo: blocking of their servers and the identity data of the console the system sees. Exosphere also keeps the debug settings of the secure monitor.'
@@ -203,9 +207,15 @@ pages:
   overlays:
     title: Overlays
     description: Settings of the overlay menu and the selected overlays. Only components with a verified configuration format are listed.
-  apps:
-    title: Applications
-    description: Settings of the selected applications. Only components with a verified configuration format are listed.
+  dbi:
+    title: DBI
+    description: The translation of DBI and its config, a group of settings per section, with the lists of its network sources, shortcuts and title names.
+  jksv:
+    title: JKSV
+    description: Settings of the save manager and the WebDAV server it keeps backups on.
+  amiibo:
+    title: Amiibo
+    description: Settings of the selected amiibo tools.
   plugins:
     title: Plugins
     description: Where every selected plugin loads. ARK reads the list from SEPLUGINS/PLUGINS.TXT, its plugin manager in the XMB turns plugins on and off later.

@@ -1,0 +1,6 @@
+{{#locations}}
+[Location_{{index}}]
+Name={{Name}}
+Type={{Type}}
+URL={{URL}}
+{{/locations}}

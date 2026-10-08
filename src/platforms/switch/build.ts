@@ -1,6 +1,6 @@
-import { ImageTarget, SwitchState, TuningValue } from '@/types';
+import { ImageTarget, SwitchState, TuningOption, TuningValue } from '@/types';
 import { HARDWARE } from '@data';
-import { isRequirementMet } from '@/data';
+import { isRequirementMet, listRows } from '@/data';
 import { Asset, BuildRequest, BuildResult, ConfigSpec, installerView, installers, render, renderConfigs } from '@/build';
 import TEMPLATES, { README } from '@templates/switch';
 import { CATALOG, COMPONENTS, GALLERY, launchEntries } from './data';
@@ -27,6 +27,28 @@ const STATUS_MONITOR = {
 	game_resolutions: 'status_monitor_game_resolutions'
 };
 
+// The same for the config of DBI
+const DBI = {
+	general: 'dbi_general',
+	album: 'dbi_album',
+	filtering: 'dbi_filtering',
+	activity_log: 'dbi_activity_log',
+	main_menu: 'dbi_main_menu',
+	applications: 'dbi_applications',
+	install: 'dbi_install',
+	mtp: 'dbi_mtp',
+	ftp: 'dbi_ftp',
+	http: 'dbi_http',
+	access_point: 'dbi_access_point',
+	mtp_storages: 'dbi_mtp_storages',
+	fb2: 'dbi_fb2',
+	network_sources: 'dbi_network_sources',
+	local_sources: 'dbi_local_sources',
+	mtp_custom_storages: 'dbi_mtp_custom_storages',
+	title_name_override: 'dbi_title_name_override',
+	disabled_titles_to_check_for_updates: 'dbi_disabled_titles_to_check_for_updates'
+};
+
 // Nyx accepts backgrounds from 0x0B0B0B to 0xC7C7C7 only
 function nyxBackground(color: TuningValue): string {
 	const value = Math.min(Math.max(parseInt(String(color).slice(1), 16) || 0, 0x0b0b0b), 0xc7c7c7);
@@ -42,6 +64,18 @@ function isDNSBlocked({ tuning: { dns } }: Request, target: string): boolean {
 function isGroupSelected(request: Request, id: string): boolean {
 	const { requires } = CATALOG.tuning.find(group => group.id == id)!;
 	return !requires || isRequirementMet(requires, request.selectedComponentIDs);
+}
+
+// Rows of a list as its template takes them: the values of a row by the names of its fields, with its number from zero
+function listView(option: Extract<TuningOption, { type: 'list' }>, value: TuningValue) {
+	return listRows(value as string[][])
+		.map((row, index) => ({ index, ...Object.fromEntries(option.fields.map((field, at) => [field.id, row[at].trim()])) }));
+}
+
+// Network locations of DBI, the ones it keeps in a file of their own
+function dbiLocations({ tuning: { dbi_locations } }: Request) {
+	const [option] = CATALOG.tuning.find(group => group.id == 'dbi_locations')!.options;
+	return option.type == 'list' ? listView(option, dbi_locations[option.id]) : [];
 }
 
 // The combo of the overlay menu as its configs spell it, empty without buttons
@@ -281,6 +315,29 @@ const CONFIGS: ConfigSpec<Request>[] = [
 			led: flag(sys_ftpd_light.led)
 		}),
 		when: request => isGroupSelected(request, 'sys_ftpd_light')
+	},
+	{
+		path: 'switch/DBI/dbi.config',
+		template: TEMPLATES.dbiConfig,
+		// Every section is a group of settings, picked values are joined with a comma. A folder or an address left empty
+		// stays the one DBI ships with, and titles go by their IDs in upper case
+		view: ({ tuning }) => Object.fromEntries(Object.entries(DBI).map(([section, id]) => [
+			section,
+			Object.fromEntries(CATALOG.tuning.find(group => group.id == id)!.options.map(option => {
+				const value = tuning[id][option.id];
+				if (option.type == 'list') {
+					return [option.id, listView(option, value).map(row => 'TitleID' in row ? { ...row, TitleID: String(row.TitleID).toUpperCase() } : row)];
+				}
+				return [option.id, Array.isArray(value) ? value.join(',') : String(value === '' ? option.default : value)];
+			}))
+		])),
+		when: request => isGroupSelected(request, 'dbi_general')
+	},
+	{
+		path: 'switch/DBI/dbi.locations',
+		template: TEMPLATES.dbiLocations,
+		view: request => ({ locations: dbiLocations(request) }),
+		when: request => isGroupSelected(request, 'dbi_locations') && dbiLocations(request).length > 0
 	},
 	{
 		path: 'config/JKSV/JKSV.json',

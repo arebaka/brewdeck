@@ -19,6 +19,8 @@ import sysConConfigIni from './sd/config/sys-con/config.ini?raw';
 import statusMonitorConfigIni from './sd/config/status-monitor/config.ini?raw';
 import sysTuneConfigIni from './sd/config/sys-tune/config.ini?raw';
 import sysFtpdConfigIni from './sd/config/sys-ftpd/config.ini?raw';
+import dbiConfig from './sd/switch/DBI/dbi.config?raw';
+import dbiLocations from './sd/switch/DBI/dbi.locations?raw';
 import jksvJson from './sd/config/JKSV/JKSV.json?raw';
 import jksvWebdavJson from './sd/config/JKSV/webdav.json?raw';
 import amiigoSettingsJson from './sd/config/amiigo/settings.json?raw';
@@ -44,6 +46,8 @@ export default {
 	statusMonitorConfigIni,
 	sysTuneConfigIni,
 	sysFtpdConfigIni,
+	dbiConfig,
+	dbiLocations,
 	jksvJson,
 	jksvWebdavJson,
 	amiigoSettingsJson,

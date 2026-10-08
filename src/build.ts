@@ -8,7 +8,7 @@ import { INSTALL_SH, INSTALL_PS1 } from '@templates';
 export type BuildRequest<S extends BuildState = BuildState> = S & {
 	lang: Language;
 	t: Translation;
-	images?: Record<string, string>; // encoded images by SD path, embedded into the installers
+	images?: { [path: string]: string }; // encoded images by SD path, embedded into the installers
 };
 
 export interface GeneratedFile {
@@ -76,6 +76,10 @@ function installSteps(comp: ComponentInfo, modchip: boolean, options: Record<str
 	}
 }
 
+// A line that reads as the end of a config inside an installer would run what follows it as commands. The value of an option
+// never starts a line, a row of a list does, so such a line is moved off the start of its line: neither shell takes it then
+const sealed = (content: string) => content.replace(/^(?=BREWDECK_EOF$|'@)/gm, ' ');
+
 // What the installers do on the card: download the selected components, write the configs and the images.
 // Platforms add the texts the installers greet with: `title`, `card` and `console`
 export function installerView(request: BuildRequest, hardware: HardwareInfo, selected: ComponentInfo[], configs: GeneratedFile[], assets: Asset[]) {
@@ -89,7 +93,7 @@ export function installerView(request: BuildRequest, hardware: HardwareInfo, sel
 		// The App Store helpers only go into installers that use them
 		hasAppstore: components.some(comp => comp.steps.some(step => step.appstore)),
 		// Heredocs and here-strings add the final line break themselves
-		configs: configs.map(config => ({ path: config.path, content: config.content.trimEnd() })),
+		configs: configs.map(config => ({ path: config.path, content: sealed(config.content.trimEnd()) })),
 		manual: manual.map(comp => ({ name: comp.name, url: comp.sources.manual })),
 		hasManual: manual.length > 0,
 		images: assets.map(asset => ({ path: asset.path, data: request.images?.[asset.path] ?? '' })),

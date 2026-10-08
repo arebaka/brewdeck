@@ -2,6 +2,6 @@
 /// <reference types="@modyfi/vite-plugin-yaml/modules" />
 
 declare module '*.tsv' {
-	const content: Array<Record<string, string>>;
+	const content: [{[key: string]: string}];
 	export default content;
 }

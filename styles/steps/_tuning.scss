@@ -39,4 +39,29 @@
 			width: 120px;
 		}
 	}
+
+	// Rows of a list under its description, the button that adds one below them
+	.list {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: space(2);
+	}
+
+	// Fields of a row share its line and wrap on a narrow screen, a choice is as wide as its values.
+	// The last field holds a path or an address, so it takes more of the line
+	.entry {
+		display: flex;
+		flex-wrap: wrap;
+		gap: space(2);
+		width: 100%;
+
+		input {
+			flex: 1 1 160px;
+
+			&:last-of-type {
+				flex-grow: 2;
+			}
+		}
+	}
 }

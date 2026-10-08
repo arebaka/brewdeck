@@ -1,7 +1,8 @@
 import type {
 	ComponentCategory, ComponentInfo, ComponentSource, ComponentSources, Download, FirmwareStatus, FirmwareVersion,
-	GithubAsset, HardwareRevision, Preset, Requirement, TuningGroup, TuningOption, TuningStep
+	GithubAsset, HardwareRevision, ListField, Preset, Requirement, TuningGroup, TuningOption, TuningStep
 } from '@/types';
+import { listRow } from '@/data';
 
 // A row of a table: every cell is a string, an empty one where the row has nothing to say
 export type Row = Record<string, string>;
@@ -131,6 +132,16 @@ function option(row: Row): TuningOption {
 		case 'rgba4444':
 			if (!/^#[0-9A-F]{4}$/.test(row.default)) throw new Error(`Not a color of the option ${id}: "${row.default}"`);
 			return { id, type: 'rgba4444', default: row.default };
+		case 'list': {
+			// The fields of a row are named in the cell of values, one with alternatives is a choice among them.
+			// The default spells its rows the way links do: fields of a row are separated by `=`
+			const fields = (list(row.values) ?? []).map(field => {
+				const [name, values] = field.split(':');
+				return compact<ListField>({ id: name, values: values?.split('|') });
+			});
+			const rows = (list(row.default) ?? []).map(item => listRow(item, fields.length));
+			return { id, type: 'list', fields, maxLength: number(row.maxLength), max: row.max ? number(row.max) : undefined, default: rows };
+		}
 		default:
 			throw new Error(`Unknown type of the option ${id}: "${row.type}"`);
 	}

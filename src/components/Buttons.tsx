@@ -8,13 +8,13 @@ const LEFT = ['ZL', 'L', 'MINUS', 'LS', 'DLEFT', 'DUP', 'DDOWN', 'DRIGHT'];
 const RIGHT = ['ZR', 'R', 'PLUS', 'RS', 'Y', 'X', 'B', 'A'];
 
 // Some modules name the stick presses their own way
-const ALIASES: Record<string, string> = {
+const ALIASES: {[name: string]: string} = {
 	LSTICK: 'LS',
 	RSTICK: 'RS'
 };
 
 // Shape and label of every button, as the system UI draws them
-const GLYPHS: Record<string, { shape: string; label: string }> = {
+const GLYPHS: {[button: string]: { shape: string; label: string }} = {
 	A: { shape: 'face', label: 'A' },
 	B: { shape: 'face', label: 'B' },
 	X: { shape: 'face', label: 'X' },

@@ -1,0 +1,2 @@
+id	type	default	values	max	maxLength
+storages	list	DBILogs=sdmc:/switch/DBI/logs	Name,Path	16	128

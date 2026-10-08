@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Symbols of the PlayStation buttons, drawn so fonts cannot shift or squeeze them. The triangle stands on its centroid
-const SHAPES: Record<string, React.ReactNode> = {
+const SHAPES: {[button: string]: React.ReactNode} = {
 	cross: <path d="M8 8 16 16 M16 8 8 16" />,
 	circle: <circle cx="12" cy="12" r="4.6" />,
 	triangle: <path d="M12 6.7 17 15.3 H7 Z" />,

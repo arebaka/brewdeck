@@ -1,0 +1,16 @@
+id	type	default
+BrowseSD	toggle	on
+BrowseSystem	toggle	off
+BrowseUser	toggle	off
+USBHost	toggle	on
+BackendInstall	toggle	on
+GameCard	toggle	on
+Network	toggle	on
+Local	toggle	on
+BrowseApps	toggle	on
+Tickets	toggle	on
+Saves	toggle	on
+MTP	toggle	on
+FTP	toggle	on
+HTTP	toggle	on
+Tools	toggle	on

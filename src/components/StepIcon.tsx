@@ -41,10 +41,18 @@ const ICONS: {[step in StepId]: React.ReactNode} = {
 		<rect x="3" y="8" width="13" height="12" rx="1.5" />
 		<path d="M8 8V5.5A1.5 1.5 0 0 1 9.5 4h10A1.5 1.5 0 0 1 21 5.5v9a1.5 1.5 0 0 1-1.5 1.5H16" />
 	</>,
-	apps: <>
-		<rect x="3" y="5" width="18" height="14" rx="1.5" />
-		<path d="M3 9h18" />
-		<path d="M6 7h.01M8.5 7h.01" />
+	dbi: <>
+		<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z" />
+		<path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
+	</>,
+	jksv: <>
+		<path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z" />
+		<path d="M8 4v5h7V4M8 20v-6h8v6" />
+	</>,
+	amiibo: <>
+		<circle cx="12" cy="6.5" r="2.5" />
+		<path d="M8.5 16v-2.5a3.5 3.5 0 0 1 7 0V16" />
+		<rect x="5" y="16" width="14" height="4" rx="1.5" />
 	</>,
 	plugins: <>
 		<path d="M9.5 3.5a2 2 0 0 1 4 0V6H18v4.5h-1.5a2 2 0 0 0 0 4H18V19h-4.5v-1.5a2 2 0 0 0-4 0V19H5v-4.5h1.5a2 2 0 0 0 0-4H5V6h4.5z" />

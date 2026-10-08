@@ -180,9 +180,6 @@ dbi:
     - repo: rashevskyv/dbi
       asset: ^DBI\.nro$
       path: switch/DBI/DBI.nro
-    - repo: rashevskyv/dbi
-      asset: ^dbi\.config$
-      path: switch/DBI/dbi.config
 
 dbi_patcher:
   github:

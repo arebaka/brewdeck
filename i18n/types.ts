@@ -18,6 +18,7 @@ export type TuningOption = {
 	title: string;
 	description: string;
 	values?: {[value in string]: string}; // labels of select values, raw values are shown otherwise
+	fields?: {[field in string]: string}; // labels of the fields of a list, their names are shown otherwise
 };
 
 export type TuningGroup = {
@@ -103,11 +104,15 @@ export interface Translation {
 			reset: string;
 			on: string;
 			off: string;
+			add: string;
+			remove: string;
 		};
 		security: Page;
 		sysmodules: Page;
 		overlays: Page;
-		apps: Page;
+		dbi: Page;
+		jksv: Page;
+		amiibo: Page;
 		plugins: Page & {
 			list: string; // heading of the plugins file
 			runlevels: {[runlevel in string]: string}; // where a plugin loads

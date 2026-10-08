@@ -11,10 +11,12 @@ hljs.registerLanguage('json', json);
 hljs.registerLanguage('powershell', powershell);
 
 // Languages of the generated files by extension, other files stay plain
-const LANGUAGES: Record<string, string> = {
+const LANGUAGES: {[extension: string]: string} = {
 	sh: 'bash',
 	ps1: 'powershell',
 	ini: 'ini',
+	config: 'ini',
+	locations: 'ini',
 	json: 'json'
 };
 

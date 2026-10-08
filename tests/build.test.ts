@@ -153,7 +153,7 @@ describe('configs of modules, overlays and applications', () => {
 	const options = (group: string) => CATALOG.tuning.find(item => item.id == group)!.options.map(option => option.id);
 	const PATHS = [
 		'config/ultrahand/config.ini', 'config/status-monitor/config.ini', 'config/sys-tune/config.ini', 'config/sys-con/config.ini',
-		'config/JKSV/JKSV.json', 'config/JKSV/webdav.json', 'config/amiigo/settings.json'
+		'config/JKSV/JKSV.json', 'config/JKSV/webdav.json', 'config/amiigo/settings.json', 'switch/DBI/dbi.config'
 	];
 
 	it('writes them for the selected components with nothing changed too, all but the WebDAV server that is not set', () => {
@@ -259,6 +259,129 @@ describe('configs of modules, overlays and applications', () => {
 		expect(ini({ host_address: '04:20:69:04:20:69' })).toContain('[bluetooth]\nhost_address=04:20:69:04:20:69\n\n[misc]');
 		expect(ini({ enable_rumble: false })).not.toContain('[bluetooth]');
 		expect(ini({ dualsense_adaptive_trigger_travel: 40 })).toContain('dualsense_adaptive_trigger_travel=40');
+	});
+
+	it('writes the config of DBI with every setting of its sections, each into its own', () => {
+		const SECTIONS = {
+			General: 'dbi_general',
+			Album: 'dbi_album',
+			Filtering: 'dbi_filtering',
+			ActivityLog: 'dbi_activity_log',
+			MainMenu: 'dbi_main_menu',
+			Applications: 'dbi_applications',
+			Install: 'dbi_install',
+			MTP: 'dbi_mtp',
+			FTP: 'dbi_ftp',
+			HTTP: 'dbi_http',
+			'Access point': 'dbi_access_point',
+			'MTP Storages': 'dbi_mtp_storages',
+			FB2: 'dbi_fb2',
+			'Disabled titles to check for updates': 'dbi_disabled_titles_to_check_for_updates'
+		};
+		const content = configs([], {
+			dbi_general: { ExitToHomeScreen: true, AppSorting: ['Size', 'Name'], SavesFolder: '', CustomDNS: '1.1.1.1' },
+			dbi_mtp: { TurnOffScreen: true },
+			dbi_ftp: { Port: 2121 },
+			dbi_access_point: { UseAP: true, SSID: 'deck', Password: 'hunter22' },
+			dbi_fb2: { Theme: 'Night', Orientation: 90 }
+		})['switch/DBI/dbi.config'];
+		// Keys of the config by its sections, the commented examples of its lists left out
+		const ini: {[section: string]: {[key: string]: string}} = {};
+		let section = '';
+		for (const line of content.split('\n')) {
+			const [, header] = line.match(/^\[(.+)\]$/) ?? [];
+			const [, key, value] = line.match(/^([^;=]+?) ?= ?(.*)$/) ?? [];
+			if (header) ini[section = header] = {};
+			else if (key) ini[section][key] = value;
+		}
+		// The storages of MTP are numbered and spelled with spaces: `5: SD Card install`
+		const plain = (key: string) => key.replace(/^\d: | /g, '').toLowerCase();
+		// A list is the rows of its section, not a key of it
+		const settings = (group: string) => CATALOG.tuning.find(item => item.id == group)!.options.filter(option => option.type != 'list').map(option => option.id);
+
+		for (const [name, group] of Object.entries(SECTIONS)) {
+			expect(Object.keys(ini[name]).map(plain), name).toEqual(settings(group).map(plain));
+		}
+		expect(content).not.toContain('{{');
+		// A folder left empty stays the one DBI ships with
+		expect(ini.General).toMatchObject({ ExitToHomeScreen: 'true', AppSorting: 'Size,Name', SavesFolder: 'sdmc:/switch/DBI/saves/', CustomDNS: '1.1.1.1', TimeShow: 'true' });
+		expect(ini.MTP).toMatchObject({ TurnOffScreen: 'true', AddBaseUpdate: 'false', BufferSize: '512' });
+		expect(ini.FTP).toMatchObject({ TurnOffScreen: 'false', Port: '2121' });
+		expect(ini.HTTP.Port).toBe('1234');
+		expect(ini['Access point']).toEqual({ UseAP: 'true', SSID: 'deck', Password: 'hunter22', Use5GHz: 'false', Hidden: 'false' });
+		expect(ini['MTP Storages']).toMatchObject({ '1: SD Card': 'true', '9: Gamecard': 'false' });
+		expect(ini.FB2).toEqual({ Theme: 'Night', Hyphenation: 'true', Orientation: '90' });
+		// The lists go with the rows DBI ships until they are changed
+		expect(ini['Network sources']).toEqual({});
+		expect(ini['Local sources']).toEqual({ DBILogs: 'sdmc:/switch/DBI/logs' });
+		expect(ini['MTP custom storages']).toEqual({ DBILogs: 'sdmc:/switch/DBI/logs' });
+		expect(lines(content)).toContain('010072400E04A000; Pokemon Cafe Mix');
+	});
+
+	it('leaves the DNS servers of DBI out until they are set', () => {
+		expect(configs([], {})['switch/DBI/dbi.config']).not.toContain('CustomDNS');
+	});
+
+	it('writes the lists of DBI a line per row, the rows without a name left out', () => {
+		const rows = lines(configs([], {
+			dbi_network_sources: { sources: [['Home server', 'ApacheHTTP', 'http://192.168.1.47/Nintendo/Switch/?a=b'], ['', 'FTP', 'ftp://192.168.1.24/']] },
+			dbi_local_sources: { sources: [['Homebrew', 'sdmc:/switch'], [' Logs ', 'sdmc:/switch/DBI/logs']] },
+			dbi_mtp_custom_storages: { storages: [] },
+			dbi_title_name_override: { names: [['010023901191c000', 'Naheulbeuk']] },
+			dbi_disabled_titles_to_check_for_updates: { titles: [['010072400e04a000', ''], ['0100F2C0115B6000', 'TotK']] }
+		})['switch/DBI/dbi.config']);
+		expect(rows).toEqual(expect.arrayContaining([
+			'Home server=ApacheHTTP|http://192.168.1.47/Nintendo/Switch/?a=b',
+			'Homebrew=sdmc:/switch',
+			'Logs=sdmc:/switch/DBI/logs',
+			// Titles go by their IDs in upper case, a note follows its ID only when there is one
+			'010023901191C000=Naheulbeuk',
+			'010072400E04A000',
+			'0100F2C0115B6000; TotK'
+		]));
+		expect(rows.filter(row => row.includes('ftp://192.168.1.24/') || row.startsWith('DBILogs='))).toEqual([]);
+	});
+
+	// A row of a list starts a line of its config, and a line is all it takes to end the config inside an installer
+	it('keeps a row of a list from ending its config inside the installers', () => {
+		const build = SWITCH.defaults();
+		const { files } = SWITCH.build({
+			...build,
+			tuning: {
+				...build.tuning,
+				dbi_local_sources: { sources: [['\'@', 'x'], ['\'@; New-Item pwned', 'x']] },
+				dbi_disabled_titles_to_check_for_updates: { BlockAllTitlesWithLFS: true, titles: [['BREWDECK_EOF', ''], ['X', 'touch pwned']] }
+			},
+			lang: 'en',
+			t: I18N.en
+		});
+		const sh = lines(files.find(file => file.path == 'install.sh')!.content);
+		const ps1 = lines(files.find(file => file.path == 'install.ps1')!.content);
+		// The rows are written, only not from the start of their lines
+		expect(sh).toEqual(expect.arrayContaining([' BREWDECK_EOF', 'X; touch pwned', ' \'@=x', ' \'@; New-Item pwned=x']));
+		expect(sh.filter(line => line == 'BREWDECK_EOF').length).toBe(sh.filter(line => line.endsWith('<< \'BREWDECK_EOF\'')).length);
+		expect(ps1.filter(line => line.startsWith('\'@')).length).toBe(ps1.filter(line => line.endsWith('@\'')).length);
+	});
+
+	it('writes the locations of DBI into a file of their own, a section per location, only when there are some', () => {
+		const file = (locations: string[][]) => configs([], { dbi_locations: { locations } })['switch/DBI/dbi.locations'];
+		expect(file([])).toBeUndefined();
+		expect(file([['', 'FTP', 'ftp://192.168.1.24/']])).toBeUndefined();
+		expect(lines(file([['Home', 'ApacheHTTP', 'http://192.168.1.47/'], ['', 'FTP', ''], ['NAS', 'SFTP', 'sftp://me:hunter2@nas/']]))).toEqual([
+			'[Location_0]', 'Name=Home', 'Type=ApacheHTTP', 'URL=http://192.168.1.47/',
+			'[Location_1]', 'Name=NAS', 'Type=SFTP', 'URL=sftp://me:hunter2@nas/'
+		]);
+	});
+
+	it('writes the config of DBI instead of downloading the one of its release', () => {
+		const build = SWITCH.defaults();
+		const { files } = SWITCH.build({ ...build, lang: 'en', t: I18N.en });
+		for (const file of files.filter(file => file.path.startsWith('install.'))) {
+			expect(file.content).toContain("'switch/DBI/dbi.config'");
+			expect(file.content).not.toContain('dbi\\.config');
+		}
+		const { configs } = SWITCH.build({ ...build, selectedComponentIDs: resolveSelection(CATALOG, []), lang: 'en', t: I18N.en });
+		expect(configs.map(config => config.path)).not.toContain('switch/DBI/dbi.config');
 	});
 
 	it('writes every setting of JKSV as valid JSON, switches as numbers', () => {

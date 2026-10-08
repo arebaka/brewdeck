@@ -21,8 +21,27 @@ status_monitor_micro	overlays	config/status-monitor/config.ini	status_monitor	st
 status_monitor_fps_counter	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/fps-counter.tsv
 status_monitor_fps_graph	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/fps-graph.tsv
 status_monitor_game_resolutions	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/game_resolutions.tsv
-dbi_patcher	apps	switch/DBI/translation.bin	dbi_patcher
-jksv	apps	config/JKSV/JKSV.json	jksv	jksv/jksv.tsv
-jksv_webdav	apps	config/JKSV/webdav.json	jksv	jksv/webdav.tsv
-amiigo	apps	config/amiigo/settings.json	amiigo
+dbi_patcher	dbi	switch/DBI/translation.bin	dbi_patcher
+dbi_general	dbi	switch/DBI/dbi.config	dbi	dbi/general.tsv
+dbi_album	dbi	switch/DBI/dbi.config	dbi	dbi/album.tsv
+dbi_filtering	dbi	switch/DBI/dbi.config	dbi	dbi/filtering.tsv
+dbi_activity_log	dbi	switch/DBI/dbi.config	dbi	dbi/activity_log.tsv
+dbi_main_menu	dbi	switch/DBI/dbi.config	dbi	dbi/main_menu.tsv
+dbi_applications	dbi	switch/DBI/dbi.config	dbi	dbi/applications.tsv
+dbi_install	dbi	switch/DBI/dbi.config	dbi	dbi/install.tsv
+dbi_mtp	dbi	switch/DBI/dbi.config	dbi	dbi/mtp.tsv
+dbi_ftp	dbi	switch/DBI/dbi.config	dbi	dbi/ftp.tsv
+dbi_http	dbi	switch/DBI/dbi.config	dbi	dbi/http.tsv
+dbi_access_point	dbi	switch/DBI/dbi.config	dbi	dbi/access_point.tsv
+dbi_mtp_storages	dbi	switch/DBI/dbi.config	dbi	dbi/mtp_storages.tsv
+dbi_fb2	dbi	switch/DBI/dbi.config	dbi	dbi/fb2.tsv
+dbi_network_sources	dbi	switch/DBI/dbi.config	dbi	dbi/network_sources.tsv
+dbi_local_sources	dbi	switch/DBI/dbi.config	dbi	dbi/local_sources.tsv
+dbi_mtp_custom_storages	dbi	switch/DBI/dbi.config	dbi	dbi/mtp_custom_storages.tsv
+dbi_title_name_override	dbi	switch/DBI/dbi.config	dbi	dbi/title_name_override.tsv
+dbi_disabled_titles_to_check_for_updates	dbi	switch/DBI/dbi.config	dbi	dbi/disabled_titles_to_check_for_updates.tsv
+dbi_locations	dbi	switch/DBI/dbi.locations	dbi	dbi/locations.tsv
+jksv	jksv	config/JKSV/JKSV.json	jksv	jksv/jksv.tsv
+jksv_webdav	jksv	config/JKSV/webdav.json	jksv	jksv/webdav.tsv
+amiigo	amiibo	config/amiigo/settings.json	amiigo
 sys_clk	overclock	config/sys-clk/config.ini	sys_clk

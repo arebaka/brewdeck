@@ -1,0 +1,13 @@
+id	type	default	min	max
+ShowCombinedNSP	toggle	on
+AddBaseUpdate	toggle	off
+ShowMAC	toggle	on
+MACasTID	toggle	on
+CustomStorages	toggle	on
+TurnOffScreen	toggle	off
+ReportAndroidExtension	toggle	on
+SingleURB	toggle	off
+BufferSize	number	512	64	4096
+NewBufferTimeout	number	2000	100	60000
+AutoremoveInstalled	toggle	on
+InitiatorStrictClassFiltering	toggle	on

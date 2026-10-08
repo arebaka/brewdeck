@@ -4,8 +4,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { BuildResult, GeneratedFile } from '@/build';
+import { BuildResult, GeneratedFile, installerView, installers } from '@/build';
 import { presetSelection } from '@/data';
+import { HARDWARE } from '@data';
 import { CATALOG, SWITCH } from '@/platforms/switch';
 import { CATALOG as PSP_CATALOG, PSP } from '@/platforms/psp';
 import { I18N } from '@i18n';
@@ -45,6 +46,20 @@ const EVERYTHING = {
 		t: I18N.en
 	})
 };
+
+// A config with lines that read as its end inside either installer, each followed by what would then run as a command.
+// The installers have to write them all, moved off the start of their lines
+const HOSTILE = {
+	path: 'config/hostile.ini',
+	content: '[list]\nBREWDECK_EOF\ntouch pwned\n\'@; New-Item pwned\n\'@\nNew-Item pwned\n',
+	written: '[list]\n BREWDECK_EOF\ntouch pwned\n \'@; New-Item pwned\n \'@\nNew-Item pwned\n'
+};
+const HOSTILE_FILES = installers({
+	...installerView({ ...SWITCH.defaults(), selectedComponentIDs: [], lang: 'en', t: I18N.en }, HARDWARE[0], [], [HOSTILE], []),
+	title: 'a hostile config',
+	card: 'SD card',
+	console: 'Nintendo Switch'
+});
 
 const RUNS = Object.entries(OFFLINE);
 const BUILDS = Object.entries(EVERYTHING).flatMap(([platform, result]) => [[`${platform} offline`, OFFLINE[platform as keyof typeof OFFLINE].files], [`${platform} everything`, result.files]] as const);
@@ -98,6 +113,13 @@ describe.skipIf(!CAN_RUN_BASH)('install.sh', () => {
 		execFileSync('bash', [join(root, 'install.sh')], { cwd: home, stdio: 'pipe' });
 		expectCleaned(root, home, 'install.sh');
 	});
+
+	it('writes a line that reads as the end of a config instead of running what follows it', () => {
+		const root = card('install.sh', script(HOSTILE_FILES, 'install.sh'));
+		execFileSync('bash', [join(root, 'install.sh')], { cwd: root, stdio: 'pipe' });
+		expect(existsSync(join(root, 'pwned'))).toBe(false);
+		expect(readFileSync(join(root, HOSTILE.path), 'utf8')).toBe(HOSTILE.written);
+	});
 });
 
 describe.skipIf(!has('shellcheck'))('install.sh under shellcheck', () => {
@@ -122,6 +144,13 @@ describe.skipIf(!has('pwsh'))('install.ps1', () => {
 		const home = elsewhere();
 		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1')], { cwd: home, stdio: 'pipe' });
 		expectCleaned(root, home, 'install.ps1');
+	}, 60_000);
+
+	it('writes a line that reads as the end of a config instead of running what follows it', () => {
+		const root = card('install.ps1', `﻿${script(HOSTILE_FILES, 'install.ps1')}`);
+		execFileSync('pwsh', ['-NoProfile', '-File', join(root, 'install.ps1')], { cwd: root, stdio: 'pipe' });
+		expect(existsSync(join(root, 'pwned'))).toBe(false);
+		expect(readFileSync(join(root, HOSTILE.path), 'utf8')).toBe(HOSTILE.written);
 	}, 60_000);
 
 	it.each(BUILDS)('parses the %s build', (name, files) => {

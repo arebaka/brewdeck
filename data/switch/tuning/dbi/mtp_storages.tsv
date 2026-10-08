@@ -1,0 +1,10 @@
+id	type	default
+SDCard	toggle	on
+NandUSER	toggle	off
+NandSYSTEM	toggle	off
+InstalledGames	toggle	on
+SDCardInstall	toggle	on
+NANDInstall	toggle	on
+Saves	toggle	on
+Album	toggle	on
+Gamecard	toggle	off

@@ -76,6 +76,45 @@ describe('links', () => {
 		}
 	});
 
+	it('carry a list a param per row, the last field with whatever it holds', () => {
+		const sources = (query: string) => decodeState(`?${query}`).builds.switch.tuning.dbi_local_sources.sources;
+		const state = defaultState();
+		const { tuning } = state.builds.switch;
+		// A row without a name is being filled in yet, links leave it out
+		tuning.dbi_local_sources.sources = [['Homebrew', 'sdmc:/switch'], ['Mods', 'sdmc:/a=b, c'], ['', 'sdmc:/nameless']];
+		expect(encodeState(state)).toContain('&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch&dbi_local_sources.sources=Mods%3Dsdmc:%2Fa%3Db,%20c');
+		expect(encodeState(state)).not.toContain('nameless');
+		expect(sources(encodeState(state))).toEqual([['Homebrew', 'sdmc:/switch'], ['Mods', 'sdmc:/a=b, c']]);
+
+		// A list without rows is told from the one a link says nothing about
+		tuning.dbi_local_sources.sources = [];
+		expect(encodeState(state)).toMatch(/&dbi_local_sources\.sources=$/);
+		expect(sources(encodeState(state))).toEqual([]);
+		tuning.dbi_local_sources.sources = [['DBILogs', 'sdmc:/switch/DBI/logs'], ['', '']];
+		expect(encodeState(state)).not.toContain('dbi_local_sources');
+	});
+
+	it('take a list only with every row of it valid', () => {
+		const sources = (...rows: string[]) => decodeState(`?${rows.map(row => `dbi_local_sources.sources=${encodeURIComponent(row)}`).join('&')}`)
+			.builds.switch.tuning.dbi_local_sources.sources;
+		const shipped = [['DBILogs', 'sdmc:/switch/DBI/logs']];
+		expect(sources('Homebrew=sdmc:/switch', 'Empty')).toEqual([['Homebrew', 'sdmc:/switch'], ['Empty', '']]);
+		expect(sources('Homebrew=sdmc:/switch', '=sdmc:/nameless')).toEqual(shipped);
+		expect(sources('Homebrew=sdmc:/switch\nBREWDECK_EOF\necho pwned')).toEqual(shipped);
+		expect(sources(`Homebrew=${'x'.repeat(129)}`)).toEqual(shipped);
+		expect(sources(...Array.from({ length: 17 }, (_, index) => `Folder ${index}=sdmc:/`))).toEqual(shipped);
+	});
+
+	// Their addresses may hold a login and a password
+	it('keep the network sources of DBI out', () => {
+		const state = defaultState();
+		state.builds.switch.tuning.dbi_locations.locations = [['NAS', 'SFTP', 'sftp://lesha:hunter2@nas/']];
+		state.builds.switch.tuning.dbi_network_sources.sources = [['NAS', 'FTP', 'ftp://lesha:hunter2@nas/']];
+		expect(encodeState(state)).toBe(encodeState(defaultState()));
+		const { tuning } = decodeState('?dbi_locations.locations=Shop%3DApacheHTTP%3Dhttp://example.com/&dbi_network_sources.sources=Shop%3DApacheHTTP%3Dhttp://example.com/').builds.switch;
+		expect([tuning.dbi_locations.locations, tuning.dbi_network_sources.sources]).toEqual([[], []]);
+	});
+
 	it('ignore invalid values', () => {
 		const decoded = decodeState('?hw=foo&hos=99.0.0&sw=nope,-atmosphere,-hekate&hekate.backlight=999&boot=nope&autoboot=evil'
 			+ '&nyx.themebg=red&tesla.key_combo=L,HOME&sys_ftpd_light.port=1.5e9'

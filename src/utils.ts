@@ -23,7 +23,7 @@ export function formatSize(bytes: number, decimals: number = 2): string {
 }
 
 // Width in inches of Apple panels by their default scaled width in points
-const APPLE_PANELS: Record<number, number> = {
+const APPLE_PANELS: {[width: number]: number} = {
 	1440: 11.28, // MacBook Air 13" M1, MacBook Pro 13"
 	1470: 11.43, // MacBook Air 13.6"
 	1512: 11.91, // MacBook Pro 14"

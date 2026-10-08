@@ -1,5 +1,5 @@
 import { Catalog, TuningConfig, TuningGroup, TuningOption, TuningValue } from './types';
-import { isCountAllowed, resolveSelection } from './data';
+import { isCountAllowed, isTuningOptionChanged, listRow, listRows, resolveSelection } from './data';
 
 // Parameters of a link in their order
 export type Params = [string, string][];
@@ -16,8 +16,19 @@ function serialize(value: TuningValue): string {
 	return String(value);
 }
 
-// A value of the option read from a link, undefined unless it is valid
-function parse(option: TuningOption, raw: string): TuningValue | undefined {
+// Params of an option: one with its value, for a list one per row, an empty one when it has no rows
+function optionParams(key: string, option: TuningOption, value: TuningValue): Params {
+	if (option.type != 'list') return [[key, serialize(value)]];
+	const rows = listRows(value as string[][]);
+	return rows.length ? rows.map(row => [key, row.join('=')]) : [[key, '']];
+}
+
+// A text is a single line: a line break would get out of its key in the config and out of the config in the installers
+const isLine = (text: string, maxLength: number) => text.length <= maxLength && !/[\p{Cc}\p{Zl}\p{Zp}]/u.test(text);
+
+// A value of the option read from the params of a link with its key, undefined unless it is valid
+function parse(option: TuningOption, raws: string[]): TuningValue | undefined {
+	const [raw] = raws;
 	const number = Number(raw);
 	switch (option.type) {
 		case 'toggle':
@@ -39,8 +50,16 @@ function parse(option: TuningOption, raw: string): TuningValue | undefined {
 		case 'rgba4444':
 			return /^#[0-9a-f]{4}$/i.test(raw) ? raw.toUpperCase() : undefined;
 		case 'text':
-			// A text is a single line: a line break would get out of its key in the config and out of the config in the installers
-			return raw.length <= option.maxLength && !/[\p{Cc}\p{Zl}\p{Zp}]/u.test(raw) ? raw : undefined;
+			return isLine(raw, option.maxLength) ? raw : undefined;
+		case 'list': {
+			// Every row has to name itself and hold a line or one of the choices in every field
+			const rows = raws.length == 1 && raw == '' ? [] : raws.map(item => listRow(item, option.fields.length));
+			const isValid = rows.length <= (option.max ?? Infinity) && rows.every(row => row[0].trim() != '' && row.every((cell, index) => {
+				const { values } = option.fields[index];
+				return values ? values.includes(cell) : isLine(cell, option.maxLength);
+			}));
+			return isValid ? rows : undefined;
+		}
 	}
 }
 
@@ -61,16 +80,16 @@ export function decodeSelection(catalog: Catalog, raw: string | null): string[] 
 // Options that differ from their defaults, secrets never leave the page
 export function encodeTuning(groups: TuningGroup[], tuning: TuningConfig): Params {
 	return groups.flatMap(group => group.options
-		.filter(option => !option.secret && JSON.stringify(tuning[group.id][option.id]) != JSON.stringify(option.default))
-		.map(option => [`${group.id}.${option.id}`, serialize(tuning[group.id][option.id])] as [string, string]));
+		.filter(option => !option.secret && isTuningOptionChanged(group, option, tuning))
+		.flatMap(option => optionParams(`${group.id}.${option.id}`, option, tuning[group.id][option.id])));
 }
 
 // Options of a link into the tuning, an invalid value keeps the one there is
 export function decodeTuning(groups: TuningGroup[], params: URLSearchParams, tuning: TuningConfig): void {
 	for (const group of groups) {
 		for (const option of group.options.filter(option => !option.secret)) {
-			const raw = params.get(`${group.id}.${option.id}`);
-			const value = raw == null ? undefined : parse(option, raw);
+			const raws = params.getAll(`${group.id}.${option.id}`);
+			const value = raws.length ? parse(option, raws) : undefined;
 			if (value !== undefined) tuning[group.id][option.id] = value;
 		}
 	}

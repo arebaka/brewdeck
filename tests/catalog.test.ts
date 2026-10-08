@@ -134,10 +134,12 @@ describe('steps', () => {
 	const steps = (ids: string[]) => SWITCH.steps({ ...SWITCH.defaults(), selectedComponentIDs: resolveSelection(CATALOG, ids) });
 
 	it('show the settings of modules, overlays and applications only for the selected ones that have some', () => {
-		expect(steps([]).filter(step => ['sysmodules', 'overlays', 'apps'].includes(step))).toEqual([]);
+		expect(steps([]).filter(step => ['sysmodules', 'overlays', 'dbi', 'jksv', 'amiibo'].includes(step))).toEqual([]);
 		expect(steps(['sys_con'])).toContain('sysmodules');
 		expect(steps(['ultrahand'])).toContain('overlays');
-		expect(steps(['jksv'])).toContain('apps');
+		// An application with a lot to set has a step of its own, the tools for amiibo share theirs
+		expect(steps(['jksv']).filter(step => ['dbi', 'jksv', 'amiibo'].includes(step))).toEqual(['jksv']);
+		expect(steps(['dbi', 'amiigo']).filter(step => ['dbi', 'jksv', 'amiibo'].includes(step))).toEqual(['dbi', 'amiibo']);
 	});
 
 	// A step misspelled in the data would hide its settings without a word

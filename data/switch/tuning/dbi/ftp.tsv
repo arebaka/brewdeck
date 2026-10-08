@@ -1,0 +1,9 @@
+id	type	default	min	max
+TurnOffScreen	toggle	off
+ReadMT	toggle	off
+Port	number	5000	1	65535
+MinPassivePort	number	40000	0	65535
+MaxPassivePort	number	40100	0	65535
+CDIR	toggle	off
+ForceUtf8	toggle	on
+UseWaitAll	toggle	off
