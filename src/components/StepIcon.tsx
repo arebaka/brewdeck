@@ -41,6 +41,11 @@ const ICONS: {[step in StepId]: React.ReactNode} = {
 		<rect x="3" y="8" width="13" height="12" rx="1.5" />
 		<path d="M8 8V5.5A1.5 1.5 0 0 1 9.5 4h10A1.5 1.5 0 0 1 21 5.5v9a1.5 1.5 0 0 1-1.5 1.5H16" />
 	</>,
+	status_monitor: <>
+		<rect x="3" y="5" width="18" height="12" rx="1.5" />
+		<path d="M6 12h3l1.5-3 3 6 1.5-3h3" />
+		<path d="M9 20h6" />
+	</>,
 	dbi: <>
 		<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z" />
 		<path d="m4 7.5 8 4.5 8-4.5M12 12v9" />

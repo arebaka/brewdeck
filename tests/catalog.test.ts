@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { HARDWARE } from '@data';
-import { matchingPreset, presetSelection, resolveSelection } from '@/data';
+import { matchingPreset, presetSelection, resolveSelection, tuningGroups } from '@/data';
 import { PLATFORMS } from '@/platforms';
 import { CATALOG, GALLERY, SWITCH } from '@/platforms/switch';
 import { I18N } from '@i18n';
@@ -134,12 +134,32 @@ describe('steps', () => {
 	const steps = (ids: string[]) => SWITCH.steps({ ...SWITCH.defaults(), selectedComponentIDs: resolveSelection(CATALOG, ids) });
 
 	it('show the settings of modules, overlays and applications only for the selected ones that have some', () => {
-		expect(steps([]).filter(step => ['sysmodules', 'overlays', 'dbi', 'jksv', 'amiibo'].includes(step))).toEqual([]);
+		const OWN = ['status_monitor', 'dbi', 'jksv', 'amiibo'];
+		expect(steps([]).filter(step => ['sysmodules', 'overlays', ...OWN].includes(step))).toEqual([]);
 		expect(steps(['sys_con'])).toContain('sysmodules');
 		expect(steps(['ultrahand'])).toContain('overlays');
-		// An application with a lot to set has a step of its own, the tools for amiibo share theirs
-		expect(steps(['jksv']).filter(step => ['dbi', 'jksv', 'amiibo'].includes(step))).toEqual(['jksv']);
-		expect(steps(['dbi', 'amiigo']).filter(step => ['dbi', 'jksv', 'amiibo'].includes(step))).toEqual(['dbi', 'amiibo']);
+		// A component with a lot to set has a step of its own, the tools for amiibo share theirs
+		expect(steps(['jksv']).filter(step => OWN.includes(step))).toEqual(['jksv']);
+		expect(steps(['dbi', 'amiigo']).filter(step => OWN.includes(step))).toEqual(['dbi', 'amiibo']);
+		// Status Monitor brings a menu of overlays along, and the menu has its combo to set
+		expect(steps(['status_monitor']).filter(step => ['overlays', ...OWN].includes(step))).toEqual(['overlays', 'status_monitor']);
+	});
+
+	// Ultrahand keeps a list of overlays, a section for each: the group of an overlay takes both of them selected
+	it('show the settings of an overlay in the list of Ultrahand only with Ultrahand and the overlay', () => {
+		const groups = (ids: string[]) => tuningGroups(CATALOG.tuning, 'overlays', resolveSelection(CATALOG, ids)).map(group => group.id);
+		expect(groups(['ultrahand', 'status_monitor', 'sys_clk'])).toEqual(['tesla', 'ultrahand', 'ultrahand_status_monitor', 'ultrahand_sys_clk']);
+		expect(groups(['ultrahand'])).toEqual(['tesla', 'ultrahand']);
+		expect(groups(['ovlmenu', 'status_monitor', 'sys_clk'])).toEqual(['tesla']);
+	});
+
+	// The group is the section of the file of the overlay, so it has to name the file a component installs
+	it('names the file of an overlay for every group of the list of Ultrahand', () => {
+		const groups = CATALOG.tuning.filter(group => group.file == 'config/ultrahand/overlays.ini');
+		expect(groups.length).toBeGreaterThan(0);
+		expect(groups.filter(group => !/^[\w-]+\.ovl$/.test(group.section ?? '')).map(group => group.id)).toEqual([]);
+		expect(new Set(groups.map(group => group.section)).size).toBe(groups.length);
+		expect(groups.filter(group => group.requires?.length != 2 || group.requires[0] != 'ultrahand' || !CATALOG.components.some(comp => comp.id == group.requires![1])).map(group => group.id)).toEqual([]);
 	});
 
 	// A step misspelled in the data would hide its settings without a word

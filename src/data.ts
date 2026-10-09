@@ -50,9 +50,14 @@ export function isRequirementMet(requirement: Requirement, selectedComponentIDs:
 		: requirement.some(id => selectedComponentIDs.includes(id));
 }
 
+// A group of settings takes effect once every component it needs is selected, a group that needs none always does
+export function isTuningGroupActive(group: TuningGroup, selectedComponentIDs: string[]): boolean {
+	return (group.requires ?? []).every(requirement => isRequirementMet(requirement, selectedComponentIDs));
+}
+
 // Groups of the step whose components are selected
 export function tuningGroups(groups: TuningGroup[], step: TuningStep, selectedComponentIDs: string[]): TuningGroup[] {
-	return groups.filter(group => group.step == step && (!group.requires || isRequirementMet(group.requires, selectedComponentIDs)));
+	return groups.filter(group => group.step == step && isTuningGroupActive(group, selectedComponentIDs));
 }
 
 // Adds required components and missing dependencies (the first of alternatives), bundled components follow their parent.

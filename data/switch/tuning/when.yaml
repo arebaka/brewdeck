@@ -49,6 +49,24 @@ ultrahand:
   dynamic_widget_border:
     show_widget_border: true
 
+# Every overlay in the list of Ultrahand has the same options
+ultrahand_status_monitor: &ultrahand_overlay
+  launch_args:
+    use_launch_args: true
+ultrahand_fps_locker: *ultrahand_overlay
+ultrahand_reversenx_rt: *ultrahand_overlay
+ultrahand_sysdvr_overlay: *ultrahand_overlay
+ultrahand_edizon_overlay: *ultrahand_overlay
+ultrahand_noled: *ultrahand_overlay
+ultrahand_master_volume: *ultrahand_overlay
+ultrahand_bt_audio: *ultrahand_overlay
+ultrahand_sys_clk: *ultrahand_overlay
+ultrahand_nx_fan_control: *ultrahand_overlay
+ultrahand_ldn_mitm: *ultrahand_overlay
+ultrahand_sys_tune: *ultrahand_overlay
+ultrahand_fizeau: *ultrahand_overlay
+ultrahand_emuiibo: *ultrahand_overlay
+
 dbi_general:
   TimeShowSeconds:
     TimeShow: true

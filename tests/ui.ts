@@ -257,14 +257,17 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('reset clears only its step', `!location.search.includes('exosphere.') && location.search.includes('launch.emummc-SD01.usb3force=1')`);
 
 	// Settings of the selected components: modules and overlays by what they are, applications with a lot to set by themselves
-	await check('modules, overlays and the selected applications have steps of their own', `['Modules', 'Overlays', 'DBI', 'JKSV'].every(name => byText('.sidebar .step .label', name) != null)
+	await check('modules, overlays and the selected applications have steps of their own', `['Modules', 'Overlays', 'Status Monitor', 'DBI', 'JKSV'].every(name => byText('.sidebar .step .label', name) != null)
 		&& byText('.sidebar .step .label', 'Amiibo') == null`);
 	await page.act(`step('Modules')`);
 	await page.act(`byText('.tuning .row .name', 'Add unknown controllers').closest('.row').click()`);
 	await check('a setting of sys-con reaches the link', `location.search.includes('sys_con.auto_add_controller=0')`);
 	await page.act(`step('Overlays')`);
-	await check('the settings of selected overlays are listed, Status Monitor by its modes', `$$('.tuning > .header .title').map(title => title.textContent).join('|')
-		== 'Tesla / Ultrahand|Status Monitor|' + ['Full', 'Mini', 'Micro', 'FPS Counter', 'FPS Graph', 'Game Resolutions'].map(mode => 'Status Monitor, ' + mode).join('|')`);
+	// The overlays Ultrahand lists are its own to set, Tesla Menu keeps no such list
+	await check('the menu of overlays has its combo, and nothing of Ultrahand without it', `$$('.tuning > .header .title').map(title => title.textContent).join('|') == 'Tesla / Ultrahand'`);
+	await page.act(`step('Status Monitor')`);
+	await check('Status Monitor has a step of its own, a group for every mode', `$$('.tuning > .header .title').map(title => title.textContent).join('|')
+		== ['General', 'Full', 'Mini', 'Micro', 'FPS Counter', 'FPS Graph', 'Game Resolutions'].join('|')`);
 	await page.act(`byText('.tuning .row .name', 'Touch screen').closest('.row').click()`);
 	await check('a setting of Status Monitor reaches the link', `location.search.includes('status_monitor.touch_screen=0')`);
 	// A combo of Status Monitor holds from one to four buttons
@@ -280,14 +283,14 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the last button of a combo stays', `/status_monitor\\.key_combo=RSTICK(&|$)/.test(location.search)
 		&& ${button('Right stick press')}.classList.contains('locked')`);
 	// The field picks a color, the slider next to it how solid the color is
-	const color = `[...byText('.tuning > .header .title', 'Status Monitor, Mini').closest('.tuning').querySelectorAll('.row')]
+	const color = `[...byText('.tuning > .header .title', 'Mini').closest('.tuning').querySelectorAll('.row')]
 		.find(row => row.querySelector('.name').textContent == 'Background').querySelector('.rgba')`;
 	await page.act(`setField(${color}.querySelector('.range'), '15')`);
 	await check('the slider of a color sets its opacity', `location.search.includes('status_monitor_mini.background_color=%23111F')`);
 	await page.act(`setField(${color}.querySelector('.color'), '#ff0000')`);
 	await check('a color is kept with a hex digit per channel', `location.search.includes('status_monitor_mini.background_color=%23F00F')`);
 	await page.act(`step('JKSV')`);
-	await check('the step of an application lists its settings alone', `$$('.tuning > .header .title').map(node => node.textContent.trim()).join() == 'JKSV,WebDAV'`);
+	await check('the step of an application lists its settings alone', `$$('.tuning > .header .title').map(node => node.textContent.trim()).join() == 'General,WebDAV'`);
 	await page.act(`byText('.tuning .row .name', 'Trash bin').closest('.row').click()`);
 	await check('a setting of JKSV reaches the link', `location.search.includes('jksv.EnableTrash=1')`);
 	await page.act(`step('DBI')`);

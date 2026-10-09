@@ -36,6 +36,7 @@ steps:
   security: Безопасность
   sysmodules: Модули
   overlays: Оверлеи
+  status_monitor: Status Monitor
   dbi: DBI
   jksv: JKSV
   amiibo: Amiibo
@@ -207,6 +208,9 @@ pages:
   overlays:
     title: Оверлеи
     description: Настройки меню оверлеев и выбранных оверлеев. Здесь только компоненты с проверенным форматом конфигурации.
+  status_monitor:
+    title: Status Monitor
+    description: Конфиг экранного монитора, его сочетания и показания, затем вид каждого из его режимов.
   dbi:
     title: DBI
     description: Перевод DBI и его конфиг, группа настроек на секцию, со списками сетевых источников, закладок и названий игр.

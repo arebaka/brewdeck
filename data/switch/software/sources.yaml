@@ -241,8 +241,9 @@ simple_mod_downloader:
 switch_cheats_updater:
   appstore: switch-cheats-updater
 
+# The package of the Homebrew App Store has its files out of place: the sysmodule lies in atmosphere/ itself
+# and the overlay in switch/, so neither is loaded
 emuiibo:
-  appstore: emuiibo
   github:
     repo: XorTroll/emuiibo
     asset: ^emuiibo\.zip$

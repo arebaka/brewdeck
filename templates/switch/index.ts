@@ -13,6 +13,7 @@ import nintendoHostsTxt from './sd/atmosphere/hosts/nintendo.txt?raw';
 import adHostsTxt from './sd/atmosphere/hosts/advertising.txt?raw';
 import teslaConfigIni from './sd/config/tesla/config.ini?raw';
 import ultrahandConfigIni from './sd/config/ultrahand/config.ini?raw';
+import ultrahandOverlaysIni from './sd/config/ultrahand/overlays.ini?raw';
 import sysPatchConfigIni from './sd/config/sys-patch/config.ini?raw';
 import missionControlIni from './sd/config/MissionControl/missioncontrol.ini?raw';
 import sysConConfigIni from './sd/config/sys-con/config.ini?raw';
@@ -40,6 +41,7 @@ export default {
 	adHostsTxt,
 	teslaConfigIni,
 	ultrahandConfigIni,
+	ultrahandOverlaysIni,
 	sysPatchConfigIni,
 	missionControlIni,
 	sysConConfigIni,

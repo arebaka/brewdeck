@@ -152,7 +152,7 @@ describe('configs of modules, overlays and applications', () => {
 	}));
 	const options = (group: string) => CATALOG.tuning.find(item => item.id == group)!.options.map(option => option.id);
 	const PATHS = [
-		'config/ultrahand/config.ini', 'config/status-monitor/config.ini', 'config/sys-tune/config.ini', 'config/sys-con/config.ini',
+		'config/ultrahand/config.ini', 'config/ultrahand/overlays.ini', 'config/status-monitor/config.ini', 'config/sys-tune/config.ini', 'config/sys-con/config.ini',
 		'config/JKSV/JKSV.json', 'config/JKSV/webdav.json', 'config/amiigo/settings.json', 'switch/DBI/dbi.config'
 	];
 
@@ -193,6 +193,34 @@ describe('configs of modules, overlays and applications', () => {
 		const none = configs([], { tesla: { key_combo: [] } });
 		expect(none['config/tesla/config.ini']).toBeUndefined();
 		expect(none['config/ultrahand/config.ini']).not.toContain('key_combo');
+	});
+
+	it('writes the list of overlays of Ultrahand, a section for every selected overlay by the name of its file', () => {
+		const ini = sections(configs(['fps_locker'], {
+			ultrahand_status_monitor: {
+				priority: 3, star: true, use_launch_args: true, launch_args: '--microOverlay', key_combo: ['ZL', 'ZR', 'DUP'],
+				// A mode without a name is being filled in yet, one without a combo keeps its place in the lists
+				modes: [['Micro', 'L+R+DDOWN', '--microOverlay'], ['', 'ZL+ZR+L', '--nameless'], ['Other', '', '--other']]
+			},
+			ultrahand_fps_locker: { hide: true, custom_name: 'FPS' }
+		})['config/ultrahand/overlays.ini']);
+		// The recommended build has Status Monitor and sys-clk, sections go in the order of the catalog
+		expect(Object.keys(ini)).toEqual(['Status-Monitor-Overlay.ovl', 'FPSLocker.ovl', 'sys-clk-overlay.ovl']);
+		expect(ini['Status-Monitor-Overlay.ovl']).toEqual({
+			priority: '3', star: 'true', hide: 'false', use_launch_args: 'true', launch_args: '--microOverlay', custom_name: '', custom_version: '',
+			key_combo: 'ZL+ZR+DUP', force_support: 'false', mode_args: '(--microOverlay, --other)', mode_combos: '(L+R+DDOWN, )', mode_labels: '(Micro, Other)'
+		});
+		expect(ini['FPSLocker.ovl']).toEqual({
+			priority: '20', star: 'false', hide: 'true', use_launch_args: 'false', launch_args: '', custom_name: 'FPS', custom_version: '', key_combo: '', force_support: 'false'
+		});
+	});
+
+	it('writes the list of overlays only for Ultrahand', () => {
+		const paths = (ids: string[]) => SWITCH.build({ ...SWITCH.defaults(), selectedComponentIDs: resolveSelection(CATALOG, ids), lang: 'en', t: I18N.en })
+			.configs.map(config => config.path);
+		expect(paths(['ultrahand', 'status_monitor'])).toContain('config/ultrahand/overlays.ini');
+		expect(paths(['ultrahand'])).not.toContain('config/ultrahand/overlays.ini');
+		expect(paths(['ovlmenu', 'status_monitor'])).not.toContain('config/ultrahand/overlays.ini');
 	});
 
 	it('writes the volumes of sys-tune as parts of one and its path from the root of the card', () => {

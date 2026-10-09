@@ -392,7 +392,7 @@ sys_con:
         '5': Error
 
 status_monitor:
-  title: Status Monitor
+  title: General
   description: Buttons and readings shared by the modes of the on-screen monitor. The modes themselves are set below.
   options:
     key_combo:
@@ -430,7 +430,7 @@ status_monitor:
       description: Cache glyphs to draw faster.
 
 status_monitor_full:
-  title: Status Monitor, Full
+  title: Full
   description: The mode with every reading in detail, a panel at a side of the screen.
   options:
     refresh_rate:
@@ -462,7 +462,7 @@ status_monitor_full:
       description: How much the game reads from storage per second. Needs SaltyNX.
 
 status_monitor_mini:
-  title: Status Monitor, Mini
+  title: Mini
   description: The compact mode, a small panel with a reading per line. The slider next to a color sets its opacity.
   options:
     show:
@@ -514,7 +514,7 @@ status_monitor_mini:
       description: Color of the readings on the right.
 
 status_monitor_micro:
-  title: Status Monitor, Micro
+  title: Micro
   description: The mode of a single line along the top or bottom edge of the screen. The slider next to a color sets its opacity.
   options:
     show:
@@ -562,7 +562,7 @@ status_monitor_micro:
       description: Color of the readings themselves.
 
 status_monitor_fps_counter:
-  title: Status Monitor, FPS Counter
+  title: FPS Counter
   description: The mode with nothing but the FPS of the game. Needs SaltyNX. The slider next to a color sets its opacity.
   options:
     layer_width_align:
@@ -593,7 +593,7 @@ status_monitor_fps_counter:
       description: Color of the number.
 
 status_monitor_fps_graph:
-  title: Status Monitor, FPS Graph
+  title: FPS Graph
   description: The mode with a graph of the FPS of the game. Needs SaltyNX. The slider next to a color sets its opacity.
   options:
     layer_width_align:
@@ -639,7 +639,7 @@ status_monitor_fps_graph:
       description: Color of the bottom mark of the scale, 0.
 
 status_monitor_game_resolutions:
-  title: Status Monitor, Game Resolutions
+  title: Game Resolutions
   description: The mode listing the resolutions a game renders at. Needs SaltyNX. The slider next to a color sets its opacity.
   options:
     refresh_rate:
@@ -1331,6 +1331,97 @@ ultrahand:
     max_notifications:
       title: Notification slots
       description: How many notifications stay on the screen at once.
+
+ultrahand_status_monitor: &ultrahand_overlay
+  title: Ultrahand, Status Monitor
+  description: How Ultrahand lists and starts the overlay.
+  options:
+    priority:
+      title: Sort priority
+      description: Place of the overlay in the list, lower numbers go first. Favorites stay ahead of the rest.
+    star:
+      title: Favorite
+      description: Keep the overlay among the favorites, at the top of the list.
+    hide:
+      title: Hidden
+      description: Move the overlay to the hidden ones.
+    use_launch_args:
+      title: Launch arguments
+      description: Start the overlay with the arguments below.
+    launch_args:
+      title: Arguments
+      description: What the overlay is started with, such as --microOverlay for the Micro mode of Status Monitor.
+    custom_name:
+      title: Name
+      description: Name to show in the list instead of the one the overlay has.
+    custom_version:
+      title: Version
+      description: Version to show in the list instead of the one the overlay has.
+    key_combo:
+      title: Launch combo
+      description: Buttons to hold together to open the overlay at once, past the menu, up to four. It works while the launch combos of Ultrahand are on, and no other overlay may have the same one.
+    force_support:
+      title: Force support
+      description: Let the overlay start even when Ultrahand marks it as not built for Atmosphere 1.10 and newer.
+    modes:
+      title: Launch modes
+      description: Ways to start the overlay with arguments of their own, each under a name and, if needed, with a combo that opens it at once. Status Monitor takes --microOverlay.
+      fields:
+        label: Name
+        combo: Combo
+        args: Arguments
+
+ultrahand_fps_locker:
+  <<: *ultrahand_overlay
+  title: Ultrahand, FPSLocker
+
+ultrahand_reversenx_rt:
+  <<: *ultrahand_overlay
+  title: Ultrahand, ReverseNX-RT
+
+ultrahand_sysdvr_overlay:
+  <<: *ultrahand_overlay
+  title: Ultrahand, SysDVR Overlay
+
+ultrahand_edizon_overlay:
+  <<: *ultrahand_overlay
+  title: Ultrahand, EdiZon Overlay
+
+ultrahand_noled:
+  <<: *ultrahand_overlay
+  title: Ultrahand, noled
+
+ultrahand_master_volume:
+  <<: *ultrahand_overlay
+  title: Ultrahand, MasterVolume
+
+ultrahand_bt_audio:
+  <<: *ultrahand_overlay
+  title: Ultrahand, BT_Audio-ovl
+
+ultrahand_sys_clk:
+  <<: *ultrahand_overlay
+  title: Ultrahand, sys-clk
+
+ultrahand_nx_fan_control:
+  <<: *ultrahand_overlay
+  title: Ultrahand, NX-FanControl
+
+ultrahand_ldn_mitm:
+  <<: *ultrahand_overlay
+  title: Ultrahand, ldn_mitm
+
+ultrahand_sys_tune:
+  <<: *ultrahand_overlay
+  title: Ultrahand, sys-tune
+
+ultrahand_fizeau:
+  <<: *ultrahand_overlay
+  title: Ultrahand, Fizeau
+
+ultrahand_emuiibo:
+  <<: *ultrahand_overlay
+  title: Ultrahand, emuiibo
 
 sys_tune:
   title: sys-tune

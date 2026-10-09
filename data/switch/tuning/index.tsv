@@ -1,4 +1,4 @@
-id	step	file	requires	table
+id	step	file	requires	table	section
 logo	launch	bootloader/hekate_ipl.ini
 hekate	system	bootloader/hekate_ipl.ini
 nyx	system	bootloader/nyx.ini
@@ -14,13 +14,27 @@ sys_tune	sysmodules	config/sys-tune/config.ini	sys_tune
 sys_ftpd_light	sysmodules	config/sys-ftpd/config.ini	sys_ftpd_light
 tesla	overlays	config/tesla/config.ini	ovlmenu|ultrahand
 ultrahand	overlays	config/ultrahand/config.ini	ultrahand	ultrahand/ultrahand.tsv
-status_monitor	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/status-monitor.tsv
-status_monitor_full	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/full.tsv
-status_monitor_mini	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/mini.tsv
-status_monitor_micro	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/micro.tsv
-status_monitor_fps_counter	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/fps-counter.tsv
-status_monitor_fps_graph	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/fps-graph.tsv
-status_monitor_game_resolutions	overlays	config/status-monitor/config.ini	status_monitor	status_monitor/game_resolutions.tsv
+ultrahand_status_monitor	overlays	config/ultrahand/overlays.ini	ultrahand,status_monitor	ultrahand/overlays.tsv	Status-Monitor-Overlay.ovl
+ultrahand_fps_locker	overlays	config/ultrahand/overlays.ini	ultrahand,fps_locker	ultrahand/overlays.tsv	FPSLocker.ovl
+ultrahand_reversenx_rt	overlays	config/ultrahand/overlays.ini	ultrahand,reversenx_rt	ultrahand/overlays.tsv	ReverseNX-RT-ovl.ovl
+ultrahand_sysdvr_overlay	overlays	config/ultrahand/overlays.ini	ultrahand,sysdvr_overlay	ultrahand/overlays.tsv	sysdvr-overlay.ovl
+ultrahand_edizon_overlay	overlays	config/ultrahand/overlays.ini	ultrahand,edizon_overlay	ultrahand/overlays.tsv	ovlEdiZon.ovl
+ultrahand_noled	overlays	config/ultrahand/overlays.ini	ultrahand,noled	ultrahand/overlays.tsv	noled.ovl
+ultrahand_master_volume	overlays	config/ultrahand/overlays.ini	ultrahand,master_volume	ultrahand/overlays.tsv	MasterVolume.ovl
+ultrahand_bt_audio	overlays	config/ultrahand/overlays.ini	ultrahand,bt_audio	ultrahand/overlays.tsv	BT_Audio-ovl.ovl
+ultrahand_sys_clk	overlays	config/ultrahand/overlays.ini	ultrahand,sys_clk	ultrahand/overlays.tsv	sys-clk-overlay.ovl
+ultrahand_nx_fan_control	overlays	config/ultrahand/overlays.ini	ultrahand,nx_fan_control	ultrahand/overlays.tsv	Nx-FanControl.ovl
+ultrahand_ldn_mitm	overlays	config/ultrahand/overlays.ini	ultrahand,ldn_mitm	ultrahand/overlays.tsv	ldnmitm_config.ovl
+ultrahand_sys_tune	overlays	config/ultrahand/overlays.ini	ultrahand,sys_tune	ultrahand/overlays.tsv	sys-tune-overlay.ovl
+ultrahand_fizeau	overlays	config/ultrahand/overlays.ini	ultrahand,fizeau	ultrahand/overlays.tsv	Fizeau.ovl
+ultrahand_emuiibo	overlays	config/ultrahand/overlays.ini	ultrahand,emuiibo	ultrahand/overlays.tsv	emuiibo.ovl
+status_monitor	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/status-monitor.tsv
+status_monitor_full	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/full.tsv
+status_monitor_mini	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/mini.tsv
+status_monitor_micro	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/micro.tsv
+status_monitor_fps_counter	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/fps-counter.tsv
+status_monitor_fps_graph	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/fps-graph.tsv
+status_monitor_game_resolutions	status_monitor	config/status-monitor/config.ini	status_monitor	status_monitor/game_resolutions.tsv
 dbi_patcher	dbi	switch/DBI/translation.bin	dbi_patcher
 dbi_general	dbi	switch/DBI/dbi.config	dbi	dbi/general.tsv
 dbi_album	dbi	switch/DBI/dbi.config	dbi	dbi/album.tsv

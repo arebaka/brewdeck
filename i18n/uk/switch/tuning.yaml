@@ -392,7 +392,7 @@ sys_con:
         '5': Помилки
 
 status_monitor:
-  title: Status Monitor
+  title: Загальні
   description: Кнопки й показники, спільні для режимів екранного монітора. Самі режими налаштовуються нижче.
   options:
     key_combo:
@@ -430,7 +430,7 @@ status_monitor:
       description: Кешувати гліфи, щоб малювати швидше.
 
 status_monitor_full:
-  title: Status Monitor, Full
+  title: Full
   description: Режим з усіма показниками в подробицях, панель біля краю екрана.
   options:
     refresh_rate:
@@ -462,7 +462,7 @@ status_monitor_full:
       description: Скільки гра читає з накопичувача за секунду. Потрібен SaltyNX.
 
 status_monitor_mini:
-  title: Status Monitor, Mini
+  title: Mini
   description: Компактний режим, невелика панель із показником у кожному рядку. Повзунок поруч із кольором задає його непрозорість.
   options:
     show:
@@ -514,7 +514,7 @@ status_monitor_mini:
       description: Колір самих показників праворуч.
 
 status_monitor_micro:
-  title: Status Monitor, Micro
+  title: Micro
   description: Режим одного рядка вздовж верхнього або нижнього краю екрана. Повзунок поруч із кольором задає його непрозорість.
   options:
     show:
@@ -562,7 +562,7 @@ status_monitor_micro:
       description: Колір самих показників.
 
 status_monitor_fps_counter:
-  title: Status Monitor, FPS Counter
+  title: FPS Counter
   description: Режим, у якому немає нічого, крім FPS гри. Потрібен SaltyNX. Повзунок поруч із кольором задає його непрозорість.
   options:
     layer_width_align:
@@ -593,7 +593,7 @@ status_monitor_fps_counter:
       description: Колір числа.
 
 status_monitor_fps_graph:
-  title: Status Monitor, FPS Graph
+  title: FPS Graph
   description: Режим із графіком FPS гри. Потрібен SaltyNX. Повзунок поруч із кольором задає його непрозорість.
   options:
     layer_width_align:
@@ -639,7 +639,7 @@ status_monitor_fps_graph:
       description: Колір нижньої позначки шкали, 0.
 
 status_monitor_game_resolutions:
-  title: Status Monitor, Game Resolutions
+  title: Game Resolutions
   description: Режим зі списком роздільностей, у яких гра малює картинку. Потрібен SaltyNX. Повзунок поруч із кольором задає його непрозорість.
   options:
     refresh_rate:
@@ -1331,6 +1331,97 @@ ultrahand:
     max_notifications:
       title: Слоти сповіщень
       description: Скільки сповіщень тримається на екрані одночасно.
+
+ultrahand_status_monitor: &ultrahand_overlay
+  title: Ultrahand, Status Monitor
+  description: Як Ultrahand показує оверлей у списку й запускає його.
+  options:
+    priority:
+      title: Пріоритет сортування
+      description: Місце оверлея у списку, менші числа йдуть вище. Обрані однаково стоять перед рештою.
+    star:
+      title: Обране
+      description: Тримати оверлей серед обраних, на початку списку.
+    hide:
+      title: Прихований
+      description: Прибрати оверлей до прихованих.
+    use_launch_args:
+      title: Аргументи запуску
+      description: Запускати оверлей з аргументами нижче.
+    launch_args:
+      title: Аргументи
+      description: З чим запускається оверлей, наприклад --microOverlay для режиму Micro у Status Monitor.
+    custom_name:
+      title: Ім’я
+      description: Ім’я, яке показується у списку замість власного імені оверлея.
+    custom_version:
+      title: Версія
+      description: Версія, яка показується у списку замість власної версії оверлея.
+    key_combo:
+      title: Комбінація запуску
+      description: Кнопки, які треба затиснути одночасно, щоб відкрити оверлей одразу, оминаючи меню, до чотирьох. Працює, поки в Ultrahand увімкнено комбінації запуску, і не має збігатися з комбінацією іншого оверлея.
+    force_support:
+      title: Примусова підтримка
+      description: Дозволити запуск оверлея, навіть якщо Ultrahand позначає його як не зібраний під Atmosphere 1.10 і новіші.
+    modes:
+      title: Режими запуску
+      description: Способи запустити оверлей зі своїми аргументами, у кожного ім’я та, якщо треба, комбінація, яка відкриває його одразу. Status Monitor приймає --microOverlay.
+      fields:
+        label: Ім’я
+        combo: Комбінація
+        args: Аргументи
+
+ultrahand_fps_locker:
+  <<: *ultrahand_overlay
+  title: Ultrahand, FPSLocker
+
+ultrahand_reversenx_rt:
+  <<: *ultrahand_overlay
+  title: Ultrahand, ReverseNX-RT
+
+ultrahand_sysdvr_overlay:
+  <<: *ultrahand_overlay
+  title: Ultrahand, SysDVR Overlay
+
+ultrahand_edizon_overlay:
+  <<: *ultrahand_overlay
+  title: Ultrahand, EdiZon Overlay
+
+ultrahand_noled:
+  <<: *ultrahand_overlay
+  title: Ultrahand, noled
+
+ultrahand_master_volume:
+  <<: *ultrahand_overlay
+  title: Ultrahand, MasterVolume
+
+ultrahand_bt_audio:
+  <<: *ultrahand_overlay
+  title: Ultrahand, BT_Audio-ovl
+
+ultrahand_sys_clk:
+  <<: *ultrahand_overlay
+  title: Ultrahand, sys-clk
+
+ultrahand_nx_fan_control:
+  <<: *ultrahand_overlay
+  title: Ultrahand, NX-FanControl
+
+ultrahand_ldn_mitm:
+  <<: *ultrahand_overlay
+  title: Ultrahand, ldn_mitm
+
+ultrahand_sys_tune:
+  <<: *ultrahand_overlay
+  title: Ultrahand, sys-tune
+
+ultrahand_fizeau:
+  <<: *ultrahand_overlay
+  title: Ultrahand, Fizeau
+
+ultrahand_emuiibo:
+  <<: *ultrahand_overlay
+  title: Ultrahand, emuiibo
 
 sys_tune:
   title: sys-tune

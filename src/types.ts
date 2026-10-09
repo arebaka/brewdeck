@@ -91,7 +91,7 @@ export interface Preset {
 }
 
 export type TuningValue = boolean | number | string | string[] | string[][];
-export type TuningStep = 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock';
+export type TuningStep = 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'status_monitor' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock';
 
 interface TuningOptionBase {
 	id: string;
@@ -122,7 +122,8 @@ export interface TuningGroup {
 	id: string;
 	step: TuningStep;
 	file: string; // SD path the group is written to, shown to the user
-	requires?: Requirement; // component that has to be selected for the group to take effect
+	section?: string; // section of the file the group is, where the file has one per component, such as an overlay in the list of Ultrahand
+	requires?: Requirement[]; // components that have to be selected for the group to take effect: all of them, any of a nested list
 	options: TuningOption[];
 }
 
@@ -229,7 +230,7 @@ export interface PspState extends BuildState {
 	plugins: Record<string, string[]>;
 }
 
-export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock' | 'appearance' | 'build';
+export type StepId = 'hardware' | 'firmware' | 'software' | 'launch' | 'system' | 'security' | 'sysmodules' | 'overlays' | 'status_monitor' | 'dbi' | 'jksv' | 'amiibo' | 'plugins' | 'overclock' | 'appearance' | 'build';
 
 export type IssueLevel = 'error' | 'warning' | 'info';
 

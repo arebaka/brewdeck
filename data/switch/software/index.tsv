@@ -46,7 +46,7 @@ breeze	Breeze	tomvita	mods	beta108.4c	9631043	2026-07-30	breeze.jpg	github			edi
 simple_mod_manager	SimpleModManager	nadrino	mods	2.1.4	4151256	2026-02-24	simple_mod_manager.png	appstore
 simple_mod_downloader	SimpleModDownloader	PoloNX	mods	2.3.0	4608694	2025-12-08	simple_mod_downloader.png	appstore		simple_mod_manager
 switch_cheats_updater	switch-cheats-updater	HamletDuFromage	mods	1.2.1	916880	2020-05-12	switch_cheats_updater.png	appstore							on
-emuiibo	emuiibo	XorTroll	amiibo	1.1.3	629714	2026-03-15	emuiibo.png	appstore
+emuiibo	emuiibo	XorTroll	amiibo	1.1.3	629696	2026-03-14	emuiibo.png	github
 amiigo	Amiigo	CompSciOrBust	amiibo	2.4.1	3823895	2026-01-20	amiigo.png	appstore		emuiibo
 amiibo_generator	AmiiboGenerator	Slluxx	amiibo	2.1.1	666142	2023-11-05	amiibo_generator.png	appstore		emuiibo					on
 linkalho	Linkalho	rdmrocha / impeeza	tools	2.0.2	3156396	2025-11-17	linkalho.jpg	github

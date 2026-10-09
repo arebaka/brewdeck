@@ -36,6 +36,7 @@ steps:
   security: Security
   sysmodules: Modules
   overlays: Overlays
+  status_monitor: Status Monitor
   dbi: DBI
   jksv: JKSV
   amiibo: Amiibo
@@ -207,6 +208,9 @@ pages:
   overlays:
     title: Overlays
     description: Settings of the overlay menu and the selected overlays. Only components with a verified configuration format are listed.
+  status_monitor:
+    title: Status Monitor
+    description: The config of the on-screen monitor, its combos and readings, then the look of each of its modes.
   dbi:
     title: DBI
     description: The translation of DBI and its config, a group of settings per section, with the lists of its network sources, shortcuts and title names.

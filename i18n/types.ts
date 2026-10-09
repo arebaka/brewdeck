@@ -110,6 +110,7 @@ export interface Translation {
 		security: Page;
 		sysmodules: Page;
 		overlays: Page;
+		status_monitor: Page;
 		dbi: Page;
 		jksv: Page;
 		amiibo: Page;

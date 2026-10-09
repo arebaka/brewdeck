@@ -1,6 +1,6 @@
 import { ImageTarget, SwitchState, TuningOption, TuningValue } from '@/types';
 import { HARDWARE } from '@data';
-import { isRequirementMet, listRows } from '@/data';
+import { isTuningGroupActive, listRows } from '@/data';
 import { Asset, BuildRequest, BuildResult, ConfigSpec, installerView, installers, render, renderConfigs } from '@/build';
 import TEMPLATES, { README } from '@templates/switch';
 import { CATALOG, COMPONENTS, GALLERY, launchEntries } from './data';
@@ -60,14 +60,13 @@ function isDNSBlocked({ tuning: { dns } }: Request, target: string): boolean {
 	return dns.mode == 'block' && (dns.targets as string[]).includes(target);
 }
 
-// Whether the component a group of settings belongs to is selected: its config is then written, changed or not
+// Whether the components a group of settings belongs to are selected: its config is then written, changed or not
 function isGroupSelected(request: Request, id: string): boolean {
-	const { requires } = CATALOG.tuning.find(group => group.id == id)!;
-	return !requires || isRequirementMet(requires, request.selectedComponentIDs);
+	return isTuningGroupActive(CATALOG.tuning.find(group => group.id == id)!, request.selectedComponentIDs);
 }
 
 // Rows of a list as its template takes them: the values of a row by the names of its fields, with its number from zero
-function listView(option: Extract<TuningOption, { type: 'list' }>, value: TuningValue) {
+function listView(option: Extract<TuningOption, { type: 'list' }>, value: TuningValue): { index: number; [field: string]: string | number }[] {
 	return listRows(value as string[][])
 		.map((row, index) => ({ index, ...Object.fromEntries(option.fields.map((field, at) => [field.id, row[at].trim()])) }));
 }
@@ -76,6 +75,29 @@ function listView(option: Extract<TuningOption, { type: 'list' }>, value: Tuning
 function dbiLocations({ tuning: { dbi_locations } }: Request) {
 	const [option] = CATALOG.tuning.find(group => group.id == 'dbi_locations')!.options;
 	return option.type == 'list' ? listView(option, dbi_locations[option.id]) : [];
+}
+
+// The file Ultrahand keeps its list of overlays in
+const OVERLAYS_INI = 'config/ultrahand/overlays.ini';
+
+// Overlays in the list of Ultrahand, the selected ones: a section of its file each, named after the file of the overlay.
+// The modes of an overlay are kept as three lists side by side: their arguments, combos and names
+function ultrahandOverlays(request: Request) {
+	const groups = CATALOG.tuning.filter(group => group.file == OVERLAYS_INI && isTuningGroupActive(group, request.selectedComponentIDs));
+	return groups.map(group => {
+		const values = request.tuning[group.id];
+		const modes = group.options.flatMap(option => option.type == 'list' ? listView(option, values[option.id]) : []);
+		const scalars = group.options.filter(option => option.type != 'list' && option.type != 'multiselect');
+		return {
+			section: group.section,
+			...Object.fromEntries(scalars.map(option => [option.id, String(values[option.id])])),
+			key_combo: (values.key_combo as string[]).join('+'),
+			hasModes: modes.length > 0,
+			mode_args: modes.map(mode => mode.args).join(', '),
+			mode_combos: modes.map(mode => mode.combo).join(', '),
+			mode_labels: modes.map(mode => mode.label).join(', ')
+		};
+	});
 }
 
 // The combo of the overlay menu as its configs spell it, empty without buttons
@@ -246,6 +268,12 @@ const CONFIGS: ConfigSpec<Request>[] = [
 			key_combo: menuCombo(request)
 		}),
 		when: request => isGroupSelected(request, 'ultrahand')
+	},
+	{
+		path: OVERLAYS_INI,
+		template: TEMPLATES.ultrahandOverlaysIni,
+		view: request => ({ overlays: ultrahandOverlays(request) }),
+		when: request => ultrahandOverlays(request).length > 0
 	},
 	{
 		path: 'config/sys-patch/config.ini',
