@@ -118,12 +118,14 @@ function embeddedImages(script: string) {
 	});
 }
 
-async function run(page: Page, url: string, downloads: string): Promise<number> {
+async function run(page: Page, url: string, downloads: string, spellOut: (link: string) => string): Promise<number> {
 	let failures = 0;
+	// The address is a short link, so the checks get what it says spelled in full as `link`
 	const check = async (name: string, expression: string) => {
 		let value: unknown;
 		try {
-			value = await page.evaluate(expression);
+			const link = spellOut(String(await page.evaluate('location.search')));
+			value = await page.evaluate(`(link => (${expression}))(${JSON.stringify(link)})`);
 		} catch (error) {
 			value = String(error);
 		}
@@ -169,10 +171,11 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`step('Software')`);
 	await page.act(`byText('.batch .choice', 'Minimal').click()`);
 	await check('a preset replaces the selection and stays marked', `byText('.batch .choice.active', 'Minimal') != null
-		&& location.search.includes('sw=') && !location.search.includes('sys_patch')`);
+		&& link.includes('sw=') && !link.includes('sys_patch')`);
 	await page.act(`byText('.batch .choice', 'Recommended').click()`);
 	await page.act(`byText('.component .name', 'Moonlight').closest('.component').click()`);
-	await check('a hand edit turns into a custom selection', `document.querySelector('.choice.custom') != null && location.search.includes('moonlight')`);
+	await check('a hand edit turns into a custom selection', `document.querySelector('.choice.custom') != null && link.includes('moonlight')`);
+	await check('the address names the console and the software by their numbers', `/^\\?h=[\\w-]+&s=[\\w-]+$/.test(location.search)`);
 	await page.act(`byText('.component .name', 'Atmosphere').closest('.component').click()`);
 	await check('required components stay', `byText('.component .name', 'Atmosphere').closest('.component').classList.contains('active')`);
 	await check('Daybreak opens the utilities and is required with Atmosphere', `(() => {
@@ -214,27 +217,28 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`step('Launch')`);
 	await check('payloads are picked on the Launch step', `byText('.component .name', 'Lockpick RCM') != null`);
 	await page.act(`byText('.row .name', 'CFW (sysMMC)').closest('.switch').click()`);
-	await check('a boot mode leaves the menu', `location.search.includes('boot=emummc,stock') && byText('.choices .choice', 'CFW (sysMMC)') == null`);
+	await check('a boot mode leaves the menu', `link.includes('boot=emummc,stock') && byText('.choices .choice', 'CFW (sysMMC)') == null`);
 	const folder = `document.querySelector('.add input')`;
 	await page.act(`setField(${folder}, 'sd01/..')`);
 	await check('an emuMMC folder keeps safe characters in upper case', `${folder}.value == 'SD01'`);
 	await page.act(`key(${folder}, 'Enter')`);
-	await check('another emuMMC gets an entry', `location.search.includes('emummc=SD01') && byText('.row .name', 'CFW (emuMMC SD01)') != null`);
+	await check('another emuMMC gets an entry', `link.includes('emummc=SD01') && byText('.row .name', 'CFW (emuMMC SD01)') != null`);
 	await page.act(`setField(${folder}, 'RAW1')`);
 	await page.act(`key(${folder}, 'Enter')`);
 	// Choice of an Exosphere key under the entry
 	const override = (entry: string, label: string, value: string) => `[...byText('.row .name', '${entry}').closest('.row').querySelectorAll('.override')]
 		.find(item => item.querySelector('.label').textContent == '${label}').querySelectorAll('.choice')[${['as configured', 'on', 'off'].indexOf(value)}]`;
 	await page.act(`${override('CFW (emuMMC SD01)', 'USB 3.0', 'on')}.click()`);
-	await check('an entry overrides an Exosphere key', `location.search.includes('launch.emummc-SD01.usb3force=1')
+	await check('an entry overrides an Exosphere key', `link.includes('launch.emummc-SD01.usb3force=1')
 		&& byText('.row .name', 'CFW (emuMMC SD01)').closest('.row').querySelector('.keys').textContent.includes('usb3force=1')`);
 	await page.act(`${override('CFW (emuMMC RAW1)', 'Boot config memory mode', 'off')}.click()`);
 	await page.act(`byText('.row .name', 'CFW (emuMMC RAW1)').closest('.row').querySelector('.control').click()`);
-	await check('a removed emuMMC takes its keys along', `!location.search.includes('RAW1') && location.search.includes('emummc=SD01')`);
+	await check('a removed emuMMC takes its keys along', `!link.includes('RAW1') && link.includes('emummc=SD01')`);
+	await check('what the launch is set to goes into a param of its own', `/^\\?h=[\\w-]+&s=[\\w-]+&l=[\\w-]+$/.test(location.search)`);
 	await check('the boot screen delay is set with the menu', `byText('.row .name', 'Boot screen delay') != null`);
 	await page.act(`byText('.component .name', 'CommonProblemResolver').closest('.component').click()`);
 	await page.act(`byText('.choices .choice', 'CommonProblemResolver').click()`);
-	await check('a payload can boot on its own', `location.search.includes('autoboot=common_problem_resolver')`);
+	await check('a payload can boot on its own', `link.includes('autoboot=common_problem_resolver')`);
 
 	// CFW
 	await page.act(`step('CFW')`);
@@ -242,26 +246,26 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the boot screen delay left the step', `byText('.row .name', 'Boot screen delay') == null`);
 	await check('buttons are drawn in their shapes', `$$('.buttons .button.trigger').length > 0 && $$('.buttons .button.face').length > 0`);
 	await page.act(`byText('.row .name', 'Button').closest('.row').querySelector('.button.trigger.left').click()`);
-	await check('a button picks the key', `location.search.includes('hbl.key=ZL')`);
+	await check('a button picks the key', `link.includes('hbl.key=ZL')`);
 	await page.act(`byText('.batch .control', 'RESET').click()`);
-	await check('reset clears the step', `!location.search.includes('hbl.')`);
+	await check('reset clears the step', `!link.includes('hbl.')`);
 
 	// Security
 	await page.act(`step('Security')`);
 	const baudRate = `byText('.row .name', 'Log baud rate').closest('.row').querySelector('input')`;
 	await page.act(`setField(${baudRate}, '9600')`);
-	await check('a number field reaches the link', `location.search.includes('exosphere.log_baud_rate=9600')`);
+	await check('a number field reaches the link', `link.includes('exosphere.log_baud_rate=9600')`);
 	await page.act(`setField(${baudRate}, '99999999')`);
-	await check('a number out of range is not taken', `location.search.includes('exosphere.log_baud_rate=9600')`);
+	await check('a number out of range is not taken', `link.includes('exosphere.log_baud_rate=9600')`);
 	await page.act(`byText('.batch .control', 'RESET').click()`);
-	await check('reset clears only its step', `!location.search.includes('exosphere.') && location.search.includes('launch.emummc-SD01.usb3force=1')`);
+	await check('reset clears only its step', `!link.includes('exosphere.') && link.includes('launch.emummc-SD01.usb3force=1')`);
 
 	// Settings of the selected components: modules and overlays by what they are, applications with a lot to set by themselves
 	await check('modules, overlays and the selected applications have steps of their own', `['Modules', 'Overlays', 'Status Monitor', 'DBI', 'JKSV'].every(name => byText('.sidebar .step .label', name) != null)
 		&& byText('.sidebar .step .label', 'Amiibo') == null`);
 	await page.act(`step('Modules')`);
 	await page.act(`byText('.tuning .row .name', 'Add unknown controllers').closest('.row').click()`);
-	await check('a setting of sys-con reaches the link', `location.search.includes('sys_con.auto_add_controller=0')`);
+	await check('a setting of sys-con reaches the link', `link.includes('sys_con.auto_add_controller=0')`);
 	await page.act(`step('Overlays')`);
 	// The overlays Ultrahand lists are its own to set, Tesla Menu keeps no such list
 	await check('the menu of overlays has its combo, and nothing of Ultrahand without it', `$$('.tuning > .header .title').map(title => title.textContent).join('|') == 'Tesla / Ultrahand'`);
@@ -269,37 +273,37 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('Status Monitor has a step of its own, a group for every mode', `$$('.tuning > .header .title').map(title => title.textContent).join('|')
 		== ['General', 'Full', 'Mini', 'Micro', 'FPS Counter', 'FPS Graph', 'Game Resolutions'].join('|')`);
 	await page.act(`byText('.tuning .row .name', 'Touch screen').closest('.row').click()`);
-	await check('a setting of Status Monitor reaches the link', `location.search.includes('status_monitor.touch_screen=0')`);
+	await check('a setting of Status Monitor reaches the link', `link.includes('status_monitor.touch_screen=0')`);
 	// A combo of Status Monitor holds from one to four buttons
 	const button = (name: string) => `byText('.tuning .row .name', 'Exit combo').closest('.row').querySelector('.button[aria-label="${name}"]')`;
 	await page.act(`${button('ZL')}.click()`);
-	await check('a full combo locks the buttons it cannot take', `location.search.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')
+	await check('a full combo locks the buttons it cannot take', `link.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')
 		&& ${button('ZR')}.classList.contains('locked') && !${button('ZL')}.classList.contains('locked')`);
 	await page.act(`${button('ZR')}.click()`);
-	await check('and takes no more of them', `location.search.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')`);
+	await check('and takes no more of them', `link.includes('status_monitor.key_combo=L,ZL,DDOWN,RSTICK')`);
 	for (const name of ['ZL', 'L', 'Down', 'Right stick press']) {
 		await page.act(`${button(name)}.click()`);
 	}
-	await check('the last button of a combo stays', `/status_monitor\\.key_combo=RSTICK(&|$)/.test(location.search)
+	await check('the last button of a combo stays', `/status_monitor\\.key_combo=RSTICK(&|$)/.test(link)
 		&& ${button('Right stick press')}.classList.contains('locked')`);
 	// The field picks a color, the slider next to it how solid the color is
 	const color = `[...byText('.tuning > .header .title', 'Mini').closest('.tuning').querySelectorAll('.row')]
 		.find(row => row.querySelector('.name').textContent == 'Background').querySelector('.rgba')`;
 	await page.act(`setField(${color}.querySelector('.range'), '15')`);
-	await check('the slider of a color sets its opacity', `location.search.includes('status_monitor_mini.background_color=%23111F')`);
+	await check('the slider of a color sets its opacity', `link.includes('status_monitor_mini.background_color=%23111F')`);
 	await page.act(`setField(${color}.querySelector('.color'), '#ff0000')`);
-	await check('a color is kept with a hex digit per channel', `location.search.includes('status_monitor_mini.background_color=%23F00F')`);
+	await check('a color is kept with a hex digit per channel', `link.includes('status_monitor_mini.background_color=%23F00F')`);
 	await page.act(`step('JKSV')`);
 	await check('the step of an application lists its settings alone', `$$('.tuning > .header .title').map(node => node.textContent.trim()).join() == 'General,WebDAV'`);
 	await page.act(`byText('.tuning .row .name', 'Trash bin').closest('.row').click()`);
-	await check('a setting of JKSV reaches the link', `location.search.includes('jksv.EnableTrash=1')`);
+	await check('a setting of JKSV reaches the link', `link.includes('jksv.EnableTrash=1')`);
 	await page.act(`step('DBI')`);
 	await page.act(`byText('.row .choice', 'Українська').click()`);
-	await check('the translation of DBI takes a language', `location.search.includes('dbi_patcher.language=ua')`);
+	await check('the translation of DBI takes a language', `link.includes('dbi_patcher.language=ua')`);
 	await check('every section of the config of DBI is a group of settings', `['General', 'Main menu', 'Install', 'MTP storages', 'Update checks']
 		.every(name => byText('.tuning > .header .title', name) != null)`);
 	await page.act(`byText('.tuning .row .name', 'Exit to the HOME Menu').closest('.row').click()`);
-	await check('a setting of DBI reaches the link', `location.search.includes('dbi_general.ExitToHomeScreen=1')`);
+	await check('a setting of DBI reaches the link', `link.includes('dbi_general.ExitToHomeScreen=1')`);
 	// A list holds rows of its fields, a row counts once it has a name
 	const list = (title: string) => `byText('.tuning > .header .title', '${title}').closest('.tuning')`;
 	const control = (title: string, name: string) => `[...${list(title)}.querySelectorAll('.list .control')].find(node => node.textContent.trim() == '${name}')`;
@@ -308,20 +312,20 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 		&& ${field('Local sources', 0, 0)}.value == 'DBILogs' && ${field('Local sources', 0, 1)}.placeholder == 'Folder'`);
 	await page.act(`${control('Local sources', 'Add')}.click()`);
 	await check('a new row is not in the link until it is named', `${list('Local sources')}.querySelectorAll('.entry').length == 2
-		&& !location.search.includes('dbi_local_sources')`);
+		&& !link.includes('dbi_local_sources')`);
 	await page.act(`setField(${field('Local sources', 1, 0)}, 'Home=brew')`);
 	await page.act(`setField(${field('Local sources', 1, 1)}, 'sdmc:/switch')`);
 	await check('a row of a list reaches the link, its name without the sign that parts the fields',
-		`location.search.includes('dbi_local_sources.sources=DBILogs%3Dsdmc:%2Fswitch%2FDBI%2Flogs&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch')`);
+		`link.includes('dbi_local_sources.sources=DBILogs%3Dsdmc:%2Fswitch%2FDBI%2Flogs&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch')`);
 	await page.act(`${control('Local sources', 'Remove')}.click()`);
 	await check('a row goes away', `${list('Local sources')}.querySelectorAll('.entry').length == 1
-		&& /dbi_local_sources\\.sources=Homebrew%3Dsdmc:%2Fswitch(&|$)/.test(location.search) && !location.search.includes('DBILogs')`);
+		&& /dbi_local_sources\\.sources=Homebrew%3Dsdmc:%2Fswitch(&|$)/.test(link) && !link.includes('DBILogs')`);
 	await page.act(`${control('Locations', 'Add')}.click()`);
 	await page.act(`setField(${field('Locations', 0, 0)}, 'NAS')`);
 	await page.act(`setField(${field('Locations', 0, 1)}, 'SFTP')`);
 	await page.act(`setField(${field('Locations', 0, 2)}, 'sftp://lesha:hunter2@nas/')`);
 	await check('a field of a list is a choice where it has its values, and an address stays out of the link',
-		`${field('Locations', 0, 1)}.tagName == 'SELECT' && ${field('Locations', 0, 1)}.value == 'SFTP' && !location.search.includes('hunter2')`);
+		`${field('Locations', 0, 1)}.tagName == 'SELECT' && ${field('Locations', 0, 1)}.value == 'SFTP' && !link.includes('hunter2')`);
 
 	// Overclock
 	await page.act(`step('Overclock')`);
@@ -336,7 +340,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`key(${titleId}, 'Enter')`);
 	await check('Enter adds the title ID', `$$('.game').length == 2 && ${titleId}.value == ''`);
 	await page.act(`byText('.game .choice', 'Performance').click()`);
-	await check('a template fills the table', `$$('.game')[0].querySelector('select').value == '1785' && location.search.includes('0100F2C0115B6000.performance')`);
+	await check('a template fills the table', `$$('.game')[0].querySelector('select').value == '1785' && link.includes('0100F2C0115B6000.performance')`);
 	await page.act(`setField($$('.game')[0].querySelectorAll('select')[1], '')`);
 	await check('editing a cell makes the profile custom', `$$('.game')[0].querySelector('.choice.active').textContent == 'Custom'`);
 	await page.act(`byText('.apply .choice', 'Battery saver').click()`);
@@ -349,7 +353,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	// Tile of a gallery picture by its ID, whatever the order of the gallery
 	const tile = (target: string, id: string) => `document.querySelector('.gallery.${target} img[alt="${id}"]').closest('.picture')`;
 	await page.act(`${tile('bootlogo', 'hekate-a')}.click()`);
-	await check('a gallery image reaches the link', `location.search.includes('img.bootlogo=hekate-a')`);
+	await check('a gallery image reaches the link', `link.includes('img.bootlogo=hekate-a')`);
 	// Picture on the preview of the console screen
 	const shown = (target: string) => `document.querySelector('.screen.${target} img')?.src.split('/appearance/')[1]`;
 	await check('the boot screen is previewed on the screen of the console in its real size', `(() => {
@@ -371,14 +375,14 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('an entry starts from the common boot screen', `document.querySelector('.gallery.bootlogo .picture.active').textContent == 'Common'
 		&& ${shown('bootlogo')} == 'bootlogo/hekate-a.png'`);
 	await page.act(`${tile('bootlogo', 'hekate-b')}.click()`);
-	await check('an entry takes a boot screen of its own', `location.search.includes('img.logo.emummc-SD01=hekate-b')
-		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && location.search.includes('img.bootlogo=hekate-a')
+	await check('an entry takes a boot screen of its own', `link.includes('img.logo.emummc-SD01=hekate-b')
+		&& ${chip('bootlogo', 'CFW (emuMMC SD01)')}.classList.contains('set') && link.includes('img.bootlogo=hekate-a')
 		&& ${shown('bootlogo')} == 'bootlogo/hekate-b.png'`);
 	await page.act(`${tile('icon', 'hekate-switch')}.click()`);
-	await check('the first entry gets the icon', `location.search.includes('img.icon.emummc=hekate-switch')`);
+	await check('the first entry gets the icon', `link.includes('img.icon.emummc=hekate-switch')`);
 	await page.act(`${chip('icon', 'Lockpick RCM')}.click()`);
 	await page.act(`${tile('icon', 'hekate-payload')}.click()`);
-	await check('a payload gets an icon too', `location.search.includes('img.icon.lockpick_rcm=hekate-payload')`);
+	await check('a payload gets an icon too', `link.includes('img.icon.lockpick_rcm=hekate-payload')`);
 
 	// Keyboard
 	await page.act(`document.activeElement.blur(); key(document.body, 'Escape')`);
@@ -454,7 +458,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.lang-switch button', 'en').click()`);
 	await page.act(`step('Hardware')`);
 	await page.act(`byText('.consoles .item .name', 'PSP-3000').closest('.item').click()`);
-	await check('a PSP turns the page into its own', `document.documentElement.dataset.platform == 'psp' && location.search.startsWith('?hw=psp3000&fw=6.61&sw=')
+	await check('a PSP turns the page into its own', `document.documentElement.dataset.platform == 'psp' && link.startsWith('hw=psp3000&fw=6.61&sw=')
 		&& document.querySelector('.topbar .subtitle').textContent == 'PSP custom firmware builder'
 		&& getComputedStyle(document.body).fontFamily.includes('M PLUS 1p')`);
 	await check('a PSP goes through steps of its own', `$$('.sidebar .step .label').map(label => label.textContent).join() == 'Hardware,Firmware,Software,CFW,Plugins,Build'`);
@@ -472,10 +476,10 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await page.act(`byText('.item .name', '6.35').closest('.item').click()`);
 	await check('an old firmware takes the official update', `$$('.notice .fix').some(button => button.textContent == 'Add System Update 6.61')`);
 	await page.act(`$$('.notice .fix').find(button => button.textContent == 'Add System Update 6.61').click()`);
-	await check('the update solves it', `$$('.notice').length == 0 && location.search.includes('update661')`);
+	await check('the update solves it', `$$('.notice').length == 0 && link.includes('update661')`);
 	await page.act(`step('Plugins')`);
 	await page.act(`byText('.row .name', 'Game Categories Lite').closest('.row').querySelectorAll('.choice')[2].click()`);
-	await check('a plugin takes another runlevel', `location.search.includes('plugin.gclite=vsh,game')
+	await check('a plugin takes another runlevel', `link.includes('plugin.gclite=vsh,game')
 		&& byText('.row .name', 'Game Categories Lite').closest('.row').querySelector('.keys').textContent == 'vsh game, gclite/category_lite.prx, on'`);
 	await page.act(`step('Build')`);
 	await sleep(1000);
@@ -484,7 +488,7 @@ async function run(page: Page, url: string, downloads: string): Promise<number> 
 	await check('the readme asks for the update first', `document.querySelector('.readme').textContent.includes('PSP Update ver 6.61')`);
 	await page.act(`step('Hardware')`);
 	await page.act(`byText('.consoles .item .name', 'Erista (V1)').closest('.item').click()`);
-	await check('the Switch keeps its build', `document.documentElement.dataset.platform == 'switch' && location.search.includes('emummc=SD01')`);
+	await check('the Switch keeps its build', `document.documentElement.dataset.platform == 'switch' && link.includes('emummc=SD01')`);
 	await check('the Switch keeps its side bar and letters', `$$('.sidebar .step .icon').every(icon => getComputedStyle(icon).display == 'none')
 		&& $$('.controls .glyph').every(glyph => !glyph.querySelector('svg') && /^[A-Z]$/.test(glyph.textContent))`);
 
@@ -505,7 +509,9 @@ async function main() {
 		const socket = new WebSocket(target.webSocketDebuggerUrl);
 		await new Promise(resolve => socket.onopen = resolve);
 
-		const failures = await run(new Page(socket), url, downloads);
+		// The links are read the way the page reads them
+		const { spellOut } = await server.ssrLoadModule('/src/state.tsx');
+		const failures = await run(new Page(socket), url, downloads, spellOut);
 		console.log(failures ? `${failures} failed` : 'all passed');
 		process.exitCode = failures ? 1 : 0;
 		socket.close();

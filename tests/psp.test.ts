@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { decodeState, defaultState, encodeState } from '@/state';
+import { decodeState, defaultState, encodeState, spellOut } from '@/state';
 import { resolveSelection } from '@/data';
 import { CATALOG, PSP } from '@/platforms/psp';
 import { I18N } from '@i18n';
@@ -27,10 +27,13 @@ describe('PSP links', () => {
 	const state = defaultState();
 	state.platform = 'psp';
 	state.builds.psp = customPsp();
-	const query = encodeState(state);
+	const link = encodeState(state);
+	const query = spellOut(link);
 
 	it('take the platform of the model', () => {
+		expect(link).toMatch(/^h=[\w-]+&s=[\w-]+&f=[\w-]+&p=[\w-]+$/);
 		expect(query).toMatch(/^hw=pspgo&fw=5\.70&sw=/);
+		expect(decodeState(`?${link}`)).toEqual(state);
 		expect(decodeState(`?${query}`)).toEqual(state);
 	});
 

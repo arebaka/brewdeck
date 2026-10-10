@@ -1,9 +1,15 @@
-import { ClockKey, Clocks, EntryOverride, ImageTarget, LaunchConfig, SwitchRevision, SwitchState } from '@/types';
-import { HARDWARE } from '@data';
-import { Params, decodeSelection, decodeTuning, encodeSelection, encodeTuning, query } from '@/url';
+import { ClockKey, Clocks, EntryOverride, ImageTarget, LaunchConfig, LinkCodes, SwitchRevision, SwitchState, Vocabulary } from '@/types';
+import { HARDWARE, HARDWARE_CODES } from '@data';
+import { LINK as CODES } from '@data/switch';
+import { compareVersions } from '@/data';
+import { Params, byParam, decodeSelection, decodeTuning, encodeSelection, encodeTuning, tuningKeys, tuningParam, tuningWords } from '@/url';
 import { BOOT_ENTRIES, CATALOG, COMPONENTS, ENTRY_OVERRIDES, GALLERY, HOS_VERSIONS, OVERCLOCK, defaultBuild, gameName, isEmuMMCFolder, templateClocks } from './data';
 
 const BOOT_MODES = BOOT_ENTRIES.map(entry => entry.id);
+
+// Clocks a profile sets: of the processor, the graphics and the memory in every mode of the console
+const CLOCK_KEYS = ['docked', 'handheld', 'handheld_charging', 'handheld_charging_usb', 'handheld_charging_official']
+	.flatMap(mode => ['cpu', 'gpu', 'mem'].map(module => `${mode}_${module}`));
 
 // Entries booting the system, enabled or not: they keep overrides, logos and icons
 const hosEntries = (launch: LaunchConfig) => [...BOOT_MODES, ...launch.emummcs.map(folder => `emummc-${folder}`)];
@@ -11,9 +17,47 @@ const hosEntries = (launch: LaunchConfig) => [...BOOT_MODES, ...launch.emummcs.m
 // Components with a payload, each of them can be an entry with a logo and an icon
 const PAYLOADS = COMPONENTS.filter(comp => comp.payload).map(comp => comp.id);
 
+// The param of a short link a key goes into: the Launch menu with Hekate (l), the profiles of the overclock with sys-clk (c),
+// the pictures on their own (a), an option with the rest of what its group sets up
+function paramOf(key: string): string | undefined {
+	if (['boot', 'emummc', 'autoboot'].includes(key) || key.startsWith('launch.')) return 'l';
+	if (key == 'oc') return 'c';
+	if (key.startsWith('img.')) return 'a';
+	return tuningParam(CATALOG.tuning, key);
+}
+
+// The numbers short links of the Switch name things by
+export const LINK: LinkCodes = { ...CODES, hardware: HARDWARE_CODES, firmwareKey: 'hos', paramOf };
+
+// Everything links of the Switch name, to give it numbers: the system versions from the oldest, the software from what a build
+// starts with, the words the values are made of and the params in the order links spell them
+export function vocabulary(): Vocabulary {
+	const entries = [...BOOT_MODES, ...PAYLOADS];
+	return {
+		firmware: HOS_VERSIONS.map(v => v.version).sort(compareVersions),
+		software: [...new Set([...defaultBuild().selectedComponentIDs, ...COMPONENTS.map(comp => comp.id)])],
+		keys: byParam([
+			'boot', 'emummc', 'autoboot',
+			...BOOT_MODES.flatMap(mode => ENTRY_OVERRIDES.map(override => `launch.${mode}.${override}`)),
+			...tuningKeys(CATALOG.tuning),
+			'oc', 'img.bootlogo', 'img.background',
+			...entries.map(entry => `img.logo.${entry}`),
+			...entries.map(entry => `img.icon.${entry}`)
+		], paramOf),
+		words: [
+			...tuningWords(CATALOG.tuning),
+			...BOOT_MODES, 'menu', ...PAYLOADS,
+			...GALLERY.map(image => image.id),
+			'stock', 'custom', ...Object.keys(OVERCLOCK.templates), ...CLOCK_KEYS, ...OVERCLOCK.games.map(game => game.id),
+			// Keys of more emuMMCs have no numbers, so they are spelled in these words
+			'launch', 'img', 'logo', 'icon', ...ENTRY_OVERRIDES
+		]
+	};
+}
+
 // The revision, the HOS version and the whole software selection always, so links keep their builds when recommendations change.
 // Everything else only where it differs from the defaults
-export function encode(build: SwitchState): string {
+export function encode(build: SwitchState): Params {
 	const defaults = defaultBuild();
 	const params: Params = [];
 	const set = (key: string, value: string) => params.push([key, value]);
@@ -51,7 +95,7 @@ export function encode(build: SwitchState): string {
 		if (image != 'upload') set(`img.icon.${entry}`, image);
 	}
 
-	return query(params);
+	return params;
 }
 
 // The build a link describes, anything invalid keeps its default
@@ -100,7 +144,7 @@ export function decode(params: URLSearchParams): SwitchState {
 			const clocks: Clocks = template == 'custom' ? {} : templateClocks(template);
 			for (const pair of pairs) {
 				const [key, mhz] = pair.split('-');
-				if (/^(docked|handheld(_charging(_usb|_official)?)?)_(cpu|gpu|mem)$/.test(key) && Number(mhz) > 0) {
+				if (CLOCK_KEYS.includes(key) && Number(mhz) > 0) {
 					clocks[key as ClockKey] = Number(mhz);
 				}
 			}

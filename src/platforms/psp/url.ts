@@ -1,10 +1,32 @@
-import { PspRevision, PspState } from '@/types';
-import { HARDWARE } from '@data';
-import { Params, decodeSelection, decodeTuning, encodeSelection, encodeTuning, query } from '@/url';
+import { LinkCodes, PspRevision, PspState, Vocabulary } from '@/types';
+import { HARDWARE, HARDWARE_CODES } from '@data';
+import { LINK as CODES } from '@data/psp';
+import { compareVersions } from '@/data';
+import { Params, byParam, decodeSelection, decodeTuning, encodeSelection, encodeTuning, tuningKeys, tuningParam, tuningWords } from '@/url';
 import { CATALOG, COMPONENTS, FIRMWARE, RUNLEVELS, defaultBuild } from './data';
 
+// The param of a short link a key goes into: the runlevels of a plugin with what else the plugin has to set,
+// an option with the rest of what its group sets up
+function paramOf(key: string): string | undefined {
+	return key.startsWith('plugin.') ? COMPONENTS.find(comp => key == `plugin.${comp.id}`)?.link : tuningParam(CATALOG.tuning, key);
+}
+
+// The numbers short links of the PSP name things by
+export const LINK: LinkCodes = { ...CODES, hardware: HARDWARE_CODES, firmwareKey: 'fw', paramOf };
+
+// Everything links of the PSP name, to give it numbers: the firmwares from the oldest, the software from what a build
+// starts with, the words the values are made of and the params in the order links spell them
+export function vocabulary(): Vocabulary {
+	return {
+		firmware: FIRMWARE.map(v => v.version).sort(compareVersions),
+		software: [...new Set([...defaultBuild().selectedComponentIDs, ...COMPONENTS.map(comp => comp.id)])],
+		keys: byParam([...tuningKeys(CATALOG.tuning), ...COMPONENTS.filter(comp => comp.plugin).map(comp => `plugin.${comp.id}`)], paramOf),
+		words: [...tuningWords(CATALOG.tuning), ...RUNLEVELS]
+	};
+}
+
 // The model, the firmware and the whole software selection always, options and plugins where they differ from the defaults
-export function encode(build: PspState): string {
+export function encode(build: PspState): Params {
 	const params: Params = [];
 	const set = (key: string, value: string) => params.push([key, value]);
 
@@ -17,7 +39,7 @@ export function encode(build: PspState): string {
 	// plugin.gclite=vsh, an empty list leaves the plugin off
 	for (const [id, scope] of Object.entries(build.plugins)) set(`plugin.${id}`, scope.join(','));
 
-	return query(params);
+	return params;
 }
 
 // The build a link describes, anything invalid keeps its default

@@ -19,6 +19,7 @@
 		"preview": "vite preview",
 		"start": "bun run build && bun run preview",
 		"sync": "bun scripts/sync.mjs",
+		"number": "bun scripts/number.mjs",
 		"clean": "rm -rf dist"
 	},
 	"bugs": {

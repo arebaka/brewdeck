@@ -2,7 +2,7 @@ import { StepId, SwitchState, TuningStep } from '@/types';
 import { tuningGroups } from '@/data';
 import { Platform } from '..';
 import { CATALOG, HOS_VERSIONS, defaultBuild, isHOSSupported, launchEntries } from './data';
-import { decode, encode } from './url';
+import { LINK, decode, encode } from './url';
 import { validate } from './validation';
 import { build } from './build';
 
@@ -37,6 +37,7 @@ export const SWITCH: Platform<SwitchState> = {
 			appearance: images || ''
 		};
 	},
+	link: LINK,
 	encode,
 	decode,
 	validate,

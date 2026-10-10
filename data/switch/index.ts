@@ -1,6 +1,7 @@
 import type { BootEntry, BootMode, GalleryImage, ImageTarget, LaunchKey, OverclockData } from '@/types';
-import { type Conditions, type Row, compact, components, firmware, flag, number, presets, tuning } from '../parse';
+import { type Conditions, type Row, compact, components, firmware, flag, link, number, presets, tuning } from '../parse';
 
+import LINK_ROWS from './link.tsv';
 import FIRMWARE_ROWS from './firmware.tsv';
 import SOFTWARE_ROWS from './software/index.tsv';
 import SOFTWARE_SOURCES from './software/sources.yaml';
@@ -24,6 +25,8 @@ export const FIRMWARE = firmware(FIRMWARE_ROWS);
 export const SOFTWARE = components(SOFTWARE_ROWS, SOFTWARE_SOURCES);
 export const PRESETS = presets(PRESET_ROWS);
 export const TUNING = tuning(TUNING_ROWS, path => TUNING_TABLES[`./tuning/${path}`], TUNING_CONDITIONS as Conditions);
+
+export const LINK = link(LINK_ROWS);
 
 // Entries of the Launch menu that boot the system, with the keys of their sections
 export const LAUNCH: BootEntry[] = LAUNCH_ROWS.map(row => ({

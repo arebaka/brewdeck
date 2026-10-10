@@ -6,6 +6,6 @@ use_launch_args	toggle	off
 launch_args	text						128
 custom_name	text						64
 custom_version	text						32
-key_combo	multiselect		L,R,ZL,ZR,DLEFT,DUP,DRIGHT,DDOWN,A,B,X,Y,LS,RS,MINUS,PLUS		4
+key_combo	multiselect		L,R,ZL,ZR,DUP,DDOWN,DLEFT,DRIGHT,A,B,X,Y,LS,RS,MINUS,PLUS		4
 force_support	toggle	off
 modes	list		label,combo:|ZL+ZR+DDOWN|ZL+ZR+DRIGHT|ZL+ZR+DUP|ZL+ZR+DLEFT|L+R+DDOWN|L+R+DRIGHT|L+R+DUP|L+R+DLEFT|L+DDOWN|R+DDOWN|ZL+ZR+PLUS|L+R+PLUS|ZL+ZR+MINUS|L+R+MINUS|ZL+MINUS|ZR+MINUS|ZL+PLUS|ZR+PLUS|MINUS+PLUS|LS+RS|L+DDOWN+RS|L+R+LS|L+R+RS|ZL+ZR+LS|ZL+ZR+RS|ZL+ZR+L|ZL+ZR+R|ZL+ZR+LS+RS,args		8		64

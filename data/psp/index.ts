@@ -1,5 +1,6 @@
-import { type Conditions, type Row, components, firmware, presets, tuning } from '../parse';
+import { type Conditions, type Row, components, firmware, link, presets, tuning } from '../parse';
 
+import LINK_ROWS from './link.tsv';
 import FIRMWARE_ROWS from './firmware.tsv';
 import SOFTWARE_ROWS from './software/index.tsv';
 import SOFTWARE_SOURCES from './software/sources.yaml';
@@ -14,3 +15,4 @@ export const FIRMWARE = firmware(FIRMWARE_ROWS);
 export const SOFTWARE = components(SOFTWARE_ROWS, SOFTWARE_SOURCES);
 export const PRESETS = presets(PRESET_ROWS);
 export const TUNING = tuning(TUNING_ROWS, path => TUNING_TABLES[`./tuning/${path}`], TUNING_CONDITIONS as Conditions);
+export const LINK = link(LINK_ROWS);

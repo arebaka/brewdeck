@@ -1,7 +1,7 @@
 import { PspState, StepId } from '@/types';
 import { Platform } from '..';
 import { CATALOG, FIRMWARE, defaultBuild, isFirmwareSupported, selectedPlugins } from './data';
-import { decode, encode } from './url';
+import { LINK, decode, encode } from './url';
 import { validate } from './validation';
 import { build } from './build';
 
@@ -22,6 +22,7 @@ export const PSP: Platform<PspState> = {
 	values: ({ selectedComponentIDs }) => ({
 		plugins: selectedPlugins(selectedComponentIDs).length
 	}),
+	link: LINK,
 	encode,
 	decode,
 	validate,

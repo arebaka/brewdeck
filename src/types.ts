@@ -62,6 +62,7 @@ export interface ComponentInfo {
 	name: string;
 	author: string;
 	category: ComponentCategory;
+	link?: string; // param of a short link its settings go into, one for the components that are set up together
 	version: string;
 	size: number; // bytes to download
 	released?: string;
@@ -121,6 +122,7 @@ export interface ListField {
 export interface TuningGroup {
 	id: string;
 	step: TuningStep;
+	link: string; // param of a short link the options go into, the one of the component they set up
 	file: string; // SD path the group is written to, shown to the user
 	section?: string; // section of the file the group is, where the file has one per component, such as an overlay in the list of Ultrahand
 	requires?: Requirement[]; // components that have to be selected for the group to take effect: all of them, any of a nested list
@@ -137,6 +139,21 @@ export interface Catalog {
 	categories: ComponentCategory[]; // picked on the Software step in this order, the others on steps of their own
 	presets: Preset[];
 	tuning: TuningGroup[];
+}
+
+// What links of a platform name, by the list it is numbered in. The tables in data/**/link.tsv give a number once and for good
+export interface Vocabulary {
+	firmware: string[]; // system versions
+	software: string[]; // components
+	words: string[]; // what the values of the params are made of
+	keys: {[param: string]: string[]}; // params of a link spelled in full, by the param of a short link they are packed into
+}
+
+// What a short link names by numbers instead of spelling: the ids behind the numbers
+export interface LinkCodes extends Vocabulary {
+	hardware: string[]; // consoles of every platform
+	firmwareKey: string; // the param a link spelled in full tells the system version in
+	paramOf(key: string): string | undefined; // the param of a short link a param spelled in full is packed into
 }
 
 // What a build keeps on every platform: the console, its system version, the software and the options

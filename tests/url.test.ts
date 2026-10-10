@@ -1,19 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
-import { decodeState, defaultState, encodeState } from '@/state';
+import { AppState, decodeState, defaultState, encodeState, spellOut } from '@/state';
 import { resolveSelection } from '@/data';
 import { CATALOG } from '@/platforms/switch';
 import { customState } from './fixtures';
 
+// What the link of a build says, spelled in full
+const spell = (state: AppState) => spellOut(encodeState(state));
+
 describe('links', () => {
 	const state = customState();
-	const query = encodeState(state);
+	const link = encodeState(state);
+	const query = spellOut(link);
 
 	it('restore the build', () => {
 		const expected = structuredClone(state);
 		expected.builds.switch.tuning.sys_ftpd_light.user = '';
 		expected.builds.switch.tuning.sys_ftpd_light.password = '';
 		expected.builds.switch.appearance = { bootlogo: 'hekate-a', logos: { stock: 'hekate-b' }, icons: { emummc: 'hekate-switch', fusee: 'hekate-payload' } };
+		expect(decodeState(`?${link}`)).toEqual(expected);
 		expect(decodeState(`?${query}`)).toEqual(expected);
 	});
 
@@ -28,12 +33,13 @@ describe('links', () => {
 	});
 
 	it('encode the same build the same way', () => {
-		expect(encodeState(decodeState(`?${query}`))).toBe(query);
+		expect(encodeState(decodeState(`?${link}`))).toBe(link);
+		expect(encodeState(decodeState(`?${query}`))).toBe(link);
 	});
 
 	it('always pin the revision, the HOS version and the whole software selection', () => {
 		const defaults = defaultState().builds.switch;
-		expect(encodeState(defaultState())).toBe(`hw=${defaults.hardware}&hos=${defaults.firmware}&sw=${defaults.selectedComponentIDs.join(',')}`);
+		expect(spell(defaultState())).toBe(`hw=${defaults.hardware}&hos=${defaults.firmware}&sw=${defaults.selectedComponentIDs.join(',')}`);
 	});
 
 	it('take the platform of the revision', () => {
@@ -82,16 +88,17 @@ describe('links', () => {
 		const { tuning } = state.builds.switch;
 		// A row without a name is being filled in yet, links leave it out
 		tuning.dbi_local_sources.sources = [['Homebrew', 'sdmc:/switch'], ['Mods', 'sdmc:/a=b, c'], ['', 'sdmc:/nameless']];
-		expect(encodeState(state)).toContain('&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch&dbi_local_sources.sources=Mods%3Dsdmc:%2Fa%3Db,%20c');
-		expect(encodeState(state)).not.toContain('nameless');
+		expect(spell(state)).toContain('&dbi_local_sources.sources=Homebrew%3Dsdmc:%2Fswitch&dbi_local_sources.sources=Mods%3Dsdmc:%2Fa%3Db,%20c');
+		expect(spell(state)).not.toContain('nameless');
 		expect(sources(encodeState(state))).toEqual([['Homebrew', 'sdmc:/switch'], ['Mods', 'sdmc:/a=b, c']]);
 
 		// A list without rows is told from the one a link says nothing about
 		tuning.dbi_local_sources.sources = [];
-		expect(encodeState(state)).toMatch(/&dbi_local_sources\.sources=$/);
+		expect(spell(state)).toMatch(/&dbi_local_sources\.sources=$/);
 		expect(sources(encodeState(state))).toEqual([]);
 		tuning.dbi_local_sources.sources = [['DBILogs', 'sdmc:/switch/DBI/logs'], ['', '']];
-		expect(encodeState(state)).not.toContain('dbi_local_sources');
+		expect(spell(state)).not.toContain('dbi_local_sources');
+		expect(encodeState(state)).toBe(encodeState(defaultState()));
 	});
 
 	it('take a list only with every row of it valid', () => {

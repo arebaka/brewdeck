@@ -1,6 +1,7 @@
-import { BuildState, Catalog, FirmwareVersion, Issue, PlatformId, StepId } from '@/types';
+import { BuildState, Catalog, FirmwareVersion, Issue, LinkCodes, PlatformId, StepId } from '@/types';
 import { Translation } from '@i18n';
 import { BuildRequest, BuildResult } from '@/build';
+import { Params } from '@/url';
 import { SWITCH } from './switch';
 import { PSP } from './psp';
 
@@ -15,8 +16,9 @@ export interface Platform<S extends BuildState = BuildState> {
 
 	steps(build: S): StepId[]; // steps the build goes through, in their order
 	values(build: S): Partial<Record<StepId, string | number>>; // what the sidebar shows next to the steps of its own
-	encode(build: S): string; // query of a link reproducing the build
-	decode(params: URLSearchParams): S; // the build of a link, anything invalid keeps its default
+	link: LinkCodes; // numbers short links name things by
+	encode(build: S): Params; // params of a link reproducing the build, spelled in full
+	decode(params: URLSearchParams): S; // the build of a link spelled in full, anything invalid keeps its default
 	validate(build: S, t: Translation): Issue[];
 	build(request: BuildRequest<S>): BuildResult;
 }

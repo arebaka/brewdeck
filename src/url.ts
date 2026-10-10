@@ -84,6 +84,39 @@ export function encodeTuning(groups: TuningGroup[], tuning: TuningConfig): Param
 		.flatMap(option => optionParams(`${group.id}.${option.id}`, option, tuning[group.id][option.id])));
 }
 
+// Keys of the options links carry, in the order links spell them
+export const tuningKeys = (groups: TuningGroup[]) => groups.flatMap(group => group.options
+	.filter(option => !option.secret)
+	.map(option => `${group.id}.${option.id}`));
+
+// The param of a short link the key of an option goes into, the one of its group
+export const tuningParam = (groups: TuningGroup[], key: string) => groups.find(group => key.startsWith(`${group.id}.`))?.link;
+
+// Keys by the params of a short link they go into, the params in the order they get their first keys
+export function byParam(keys: string[], paramOf: (key: string) => string | undefined): {[param: string]: string[]} {
+	const params: {[param: string]: string[]} = {};
+	for (const key of keys) {
+		const param = paramOf(key);
+		if (param !== undefined) (params[param] ??= []).push(key);
+	}
+	return params;
+}
+
+// Words the values of these options are made of: what there is to choose from, as often as the options offer it
+export function tuningWords(groups: TuningGroup[]): string[] {
+	return groups.flatMap(group => group.options.filter(option => !option.secret).flatMap(option => {
+		switch (option.type) {
+			case 'select':
+			case 'multiselect':
+				return option.values.map(String);
+			case 'list':
+				return option.fields.flatMap(field => field.values ?? []);
+			default:
+				return [];
+		}
+	}));
+}
+
 // Options of a link into the tuning, an invalid value keeps the one there is
 export function decodeTuning(groups: TuningGroup[], params: URLSearchParams, tuning: TuningConfig): void {
 	for (const group of groups) {

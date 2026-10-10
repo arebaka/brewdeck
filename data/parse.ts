@@ -1,6 +1,6 @@
 import type {
 	ComponentCategory, ComponentInfo, ComponentSource, ComponentSources, Download, FirmwareStatus, FirmwareVersion,
-	GithubAsset, HardwareRevision, ListField, Preset, Requirement, TuningGroup, TuningOption, TuningStep
+	GithubAsset, HardwareRevision, ListField, Preset, Requirement, TuningGroup, TuningOption, TuningStep, Vocabulary
 } from '@/types';
 import { listRow } from '@/data';
 
@@ -64,6 +64,7 @@ export const components = (rows: Row[], sources: Record<string, SourcesEntry>): 
 		name: row.name,
 		author: row.author,
 		category: row.category as ComponentCategory,
+		link: text(row.link),
 		version: row.version,
 		size: number(row.size),
 		released: text(row.released),
@@ -89,6 +90,27 @@ export const components = (rows: Row[], sources: Record<string, SourcesEntry>): 
 		plugin: row.plugin_path ? { path: row.plugin_path, scope: list(row.plugin_scope) ?? [] } : undefined
 	});
 });
+
+// Ids of a list by the numbers short links name them with. A number is kept for good, by what the catalog no longer has too,
+// so the links made before read the same
+export function numbered(rows: Row[], list: string): string[] {
+	const ids: string[] = [];
+	for (const row of rows.filter(row => row.list == list)) ids[number(row.code)] = row.id;
+	return ids;
+}
+
+// What short links of a platform name by numbers: system versions, components, the words of the values, and the params.
+// The params are numbered apart for every param of a short link they are packed into, in the list named after it
+export function link(rows: Row[]): Vocabulary {
+	const lists = ['firmware', 'software', 'words'];
+	const params = [...new Set(rows.map(row => row.list))].filter(list => !lists.includes(list));
+	return {
+		firmware: numbered(rows, 'firmware'),
+		software: numbered(rows, 'software'),
+		words: numbered(rows, 'words'),
+		keys: Object.fromEntries(params.map(param => [param, numbered(rows, param)]))
+	};
+}
 
 export const presets = (rows: Row[]): Preset[] => rows.map(row => ({
 	id: row.id,
@@ -153,9 +175,11 @@ export const tuning = (index: Row[], table: (path: string) => Row[] | undefined,
 	const path = row.table || `${row.id}.tsv`;
 	const rows = table(path);
 	if (!rows) throw new Error(`No table ${path} with the options of the group ${row.id}`);
+	if (!row.link) throw new Error(`No param of a link for the options of the group ${row.id}`);
 	return compact<TuningGroup>({
 		id: row.id,
 		step: row.step as TuningStep,
+		link: row.link,
 		file: row.file,
 		section: text(row.section),
 		requires: list(row.requires)?.map(requirement),
